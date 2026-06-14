@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Red Flag Detector - AI Engineer at TechNova AI Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            color-scheme: dark;
+        }
+        
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .risk-critical { color: #ff6b6b; }
+        .risk-high { color: #ffa94d; }
+        .risk-medium { color: #ffd93d; }
+        .risk-low { color: #6bcf7f; }
+        .bg-critical { background-color: #1e293b; border: 1px solid #7f1d1d; }
+        .bg-high { background-color: #1e293b; border: 1px solid #92400e; }
+        .bg-medium { background-color: #1e293b; border: 1px solid #713f12; }
+        .bg-low { background-color: #1e293b; border: 1px solid #064e3b; }
+        .badge-critical { background-color: #dc2626; }
+        .badge-high { background-color: #ea580c; }
+        .badge-medium { background-color: #f59e0b; }
+        .badge-low { background-color: #10b981; }
+        .progress-bar {
+            height: 8px;
+            background-color: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .dashboard-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #334155;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .header-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            padding: 40px 20px;
+            border-bottom: 2px solid #334155;
+        }
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+        }
+        .score-critical { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); }
+        .score-high { background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); }
+        .score-medium { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .score-low { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            padding: 16px;
+            border-bottom: 1px solid #334155;
+            align-items: center;
+        }
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        .flag-item {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+            background-color: #1e293b;
+        }
+        .flag-critical { border-left-color: #dc2626; background-color: #1e293b; border: 1px solid #7f1d1d; }
+        .flag-high { border-left-color: #ea580c; background-color: #1e293b; border: 1px solid #92400e; }
+        .flag-medium { border-left-color: #f59e0b; background-color: #1e293b; border: 1px solid #713f12; }
+        .verdict-box {
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 16px;
+            border: 2px solid;
+        }
+        .verdict-apply { background: #0f4c3a; border-color: #10b981; }
+        .verdict-caution { background: #3d3a0f; border-color: #f59e0b; }
+        .verdict-avoid { background: #3a1515; border-color: #dc2626; }
+        .question-box {
+            background: #1e293b;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        
+        table {
+            background-color: transparent;
+        }
+        
+        table thead tr {
+            border-bottom-color: #334155;
+        }
+        
+        table tbody tr {
+            border-bottom-color: #334155;
+            background-color: transparent;
+        }
+        
+        table tbody tr:hover {
+            background-color: #0f172a;
+        }
+        
+        .bg-green-50 { background-color: #0f4c3a !important; border: 1px solid #064e3b !important; }
+        .border-green-600 { border-color: #10b981 !important; }
+        .text-green-900 { color: #86efac !important; }
+        .text-green-800 { color: #6ee7b7 !important; }
+        
+        .bg-yellow-50 { background-color: #3d3a0f !important; border: 1px solid #7c2d12 !important; }
+        .border-yellow-600 { border-color: #f59e0b !important; }
+        .text-yellow-900 { color: #fef08a !important; }
+        .text-yellow-800 { color: #fde047 !important; }
+        
+        .bg-orange-50 { background-color: #3d2817 !important; border: 1px solid #7c2d12 !important; }
+        .border-orange-600 { border-color: #ea580c !important; }
+        .text-orange-900 { color: #fed7aa !important; }
+        .text-orange-800 { color: #fdba74 !important; }
+        
+        .bg-red-50 { background-color: #3a1515 !important; border: 1px solid #7f1d1d !important; }
+        .border-red-600 { border-color: #dc2626 !important; }
+        .text-red-900 { color: #fca5a5 !important; }
+        .text-red-700 { color: #fca5a5 !important; }
+        .text-red-800 { color: #fca5a5 !important; }
+        
+        .bg-blue-50 { background-color: #0f2847 !important; border: 1px solid #1e40af !important; }
+        .border-blue-600 { border-color: #3b82f6 !important; }
+        .text-blue-900 { color: #bfdbfe !important; }
+        .text-blue-800 { color: #93c5fd !important; }
+        
+        .bg-gray-50 { background-color: #1e293b !important; }
+        .text-gray-900 { color: #e2e8f0 !important; }
+        .text-gray-700 { color: #cbd5e1 !important; }
+        .text-gray-600 { color: #94a3b8 !important; }
+        .text-gray-500 { color: #64748b !important; }
+        
+        .bg-green-200 { background-color: #064e3b !important; }
+        .border-green-200 { border-color: #10b981 !important; }
+        
+        .border-red-200 { border-color: #dc2626 !important; }
+    </style>
+</head>
+<body>
+    <!-- Header Banner -->
+    <div class="header-banner">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-4xl font-bold mb-2">🚩 Job Red Flag Detector</h1>
+            <p class="text-slate-400 text-lg">Comprehensive Job Opportunity Analysis Report</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        
+        <!-- Job & Company Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="dashboard-card">
+                <h2 class="text-xl font-bold mb-4 text-slate-100">📋 Position Information</h2>
+                <div class="space-y-3">
+                    <div><span class="font-semibold text-slate-300">Position:</span> <span class="text-slate-200">AI Engineer</span></div>
+                    <div><span class="font-semibold text-slate-300">Company:</span> <span class="text-slate-200">TechNova AI Labs</span></div>
+                    <div><span class="font-semibold text-slate-300">Location:</span> <span class="text-slate-200">Bangalore, India (Hybrid)</span></div>
+                    <div><span class="font-semibold text-slate-300">Industry:</span> <span class="text-slate-200">AI & Software Development</span></div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h2 class="text-xl font-bold mb-4 text-slate-100">🏢 Company Information</h2>
+                <div class="space-y-3">
+                    <div><span class="font-semibold text-slate-300">Founded:</span> <span class="text-slate-200">2021 (5 years old)</span></div>
+                    <div><span class="font-semibold text-slate-300">Size:</span> <span class="text-slate-200">50-200 Employees</span></div>
+                    <div><span class="font-semibold text-slate-300">Growth Stage:</span> <span class="text-slate-200">Early Growth Phase</span></div>
+                    <div><span class="font-semibold text-slate-300">Hiring Target:</span> <span class="text-slate-200">Fresh & Early-Career Professionals</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overall Risk Score -->
+        <div class="dashboard-card mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-slate-100">⚠️ Overall Risk Assessment</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                <div class="flex flex-col items-center">
+                    <div class="score-circle score-medium">62</div>
+                    <p class="text-slate-400 mt-4 text-center font-semibold">OVERALL RISK SCORE</p>
+                    <p class="text-slate-500 text-sm mt-2">⚠️ APPLY WITH CAUTION</p>
+                </div>
+                <div class="md:col-span-2">
+                    <div class="mb-6">
+                        <p class="text-sm font-semibold text-slate-300 mb-2">Risk Distribution</p>
+                        <div class="space-y-2">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-400">Requirements Mismatch</span>
+                                    <span class="text-xs font-bold text-red-400">75/100</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%; background-color: #dc2626;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-400">Culture & Work Environment</span>
+                                    <span class="text-xs font-bold text-orange-400">58/100</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 58%; background-color: #ea580c;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-400">Remote Work Clarity</span>
+                                    <span class="text-xs font-bold text-yellow-400">55/100</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 55%; background-color: #f59e0b;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-400">Hiring Practices</span>
+                                    <span class="text-xs font-bold text-yellow-400">65/100</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%; background-color: #f59e0b;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-xs font-medium text-slate-400">Company Stability</span>
+                                    <span class="text-xs font-bold text-yellow-400">60/100</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 60%; background-color: #f59e0b;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Breakdown Table -->
+        <div class="dashboard-card mb-8">
+            <h2 class="text-xl font-bold mb-4 text-slate-100">📊 Risk Category Breakdown</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2 border-slate-600">
+                            <th class="text-left py-3 px-4 font-bold text-slate-100">Risk Category</th>
+                            <th class="text-left py-3 px-4 font-bold text-slate-100">Risk Level</th>
+                            <th class="text-left py-3 px-4 font-bold text-slate-100">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-slate-700 hover:bg-slate-800/50">
+                            <td class="py-4 px-4 font-semibold text-slate-200">Requirements & Skills</td>
+                            <td class="py-4 px-4"><span class="badge-critical text-white px-3 py-1 rounded-full text-sm font-bold">🔴 CRITICAL</span></td>
+                            <td class="py-4 px-4"><span class="text-red-400 font-semibold">High Mismatch</span></td>
+                        </tr>
+                        <tr class="border-b border-slate-700 hover:bg-slate-800/50">
+                            <td class="py-4 px-4 font-semibold text-slate-200">Work Culture & Burnout Risk</td>
+                            <td class="py-4 px-4"><span class="badge-high text-white px-3 py-1 rounded-full text-sm font-bold">🟠 HIGH</span></td>
+                            <td class="py-4 px-4"><span class="text-orange-400 font-semibold">Needs Clarification</span></td>
+                        </tr>
+                        <tr class="border-b border-slate-700 hover:bg-slate-800/50">
+                            <td class="py-4 px-4 font-semibold text-slate-200">Remote Work Authenticity</td>
+                            <td class="py-4 px-4"><span class="badge-medium text-white px-3 py-1 rounded-full text-sm font-bold">🟡 MEDIUM</span></td>
+                            <td class="py-4 px-4"><span class="text-yellow-400 font-semibold">Lacks Details</span></td>
+                        </tr>
+                        <tr class="border-b border-slate-700 hover:bg-slate-800/50">
+                            <td class="py-4 px-4 font-semibold text-slate-200">Hiring Practices</td>
+                            <td class="py-4 px-4"><span class="badge-medium text-white px-3 py-1 rounded-full text-sm font-bold">🟡 MEDIUM</span></td>
+                            <td class="py-4 px-4"><span class="text-yellow-400 font-semibold">Age/Growth Concerns</span></td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/50">
+                            <td class="py-4 px-4 font-semibold text-slate-200">Company Stability</td>
+                            <td class="py-4 px-4"><span class="badge-medium text-white px-3 py-1 rounded-full text-sm font-bold">🟡 MEDIUM</span></td>
+                            <td class="py-4 px-4"><span class="text-yellow-400 font-semibold">Young Company</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Red Flags -->
+        <div class="dashboard-card mb-8">
+            <h2 class="text-xl font-bold mb-6 text-slate-100">🚨 Top Red Flags Identified</h2>
+            
+            <div class="flag-item flag-critical">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-bold text-slate-100">1. Severe Skills-Level Mismatch</h3>
+                    <span class="badge-critical text-white px-2 py-1 rounded text-xs font-bold">9/10</span>
+                </div>
+                <p class="text-sm text-slate-300 mb-2"><strong>Risk:</strong> 12 required skills + 6 preferred skills for a role targeting "fresh graduates."</p>
+                <p class="text-sm text-slate-400"><strong>Why it matters:</strong> Unrealistic expectations for entry-level hires often indicate either: (a) intention to pay junior salaries for mid-level work, (b) poor job description creation, or (c) management doesn't understand skill requirements.</p>
+                <p class="text-sm text-red-400 mt-2"><strong>⚠️ Action:</strong> Ask in interview: "What are the minimum required skills vs. nice-to-have?" Be skeptical if they claim all are mandatory.</p>
+            </div>
+
+            <div class="flag-item flag-critical">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-bold text-slate-100">2. Contradictory Role Scope</h3>
+                    <span class="badge-critical text-white px-2 py-1 rounded text-xs font-bold">8/10</span>
+                </div>
+                <p class="text-sm text-slate-300 mb-2"><strong>Risk:</strong> Role requires: research, development, deployment, data analysis, visualization, AND generative AI work simultaneously.</p>
+                <p class="text-sm text-slate-400"><strong>Why it matters:</strong> This is actually 3-4 different roles combined into one. Suggests either understaffing, unclear role definition, or expectations to work on everything with limited resources. "Research and implement" + "assist with LLMs" + "integrate models" = wearing many hats.</p>
+                <p class="text-sm text-red-400 mt-2"><strong>⚠️ Action:</strong> Ask: "What are my top 3 priorities in the first 3 months?" If they struggle to answer, red flag confirmed.</p>
+            </div>
+
+            <div class="flag-item flag-high">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-bold text-slate-100">3. Missing Salary & Compensation Details</h3>
+                    <span class="badge-high text-white px-2 py-1 rounded text-xs font-bold">8/10</span>
+                </div>
+                <p class="text-sm text-slate-300 mb-2"><strong>Risk:</strong> No salary range, no benefits, no equity information provided in job posting.</p>
+                <p class="text-sm text-slate-400"><strong>Why it matters:</strong> Young startups often use vague compensation to low-ball salaries. Combined with "fresh graduates" targeting, this suggests potential underpayment for the actual workload.</p>
+                <p class="text-sm text-orange-400 mt-2"><strong>⚠️ Action:</strong> Always ask salary upfront. Research glassdoor/linkedin salaries for AI engineers in Bangalore. Current market: ₹6-15L for fresher/junior roles.</p>
+            </div>
+
+            <div class="flag-item flag-high">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-bold text-slate-100">4. Vague Responsibilities & Lack of Clarity</h3>
+                    <span class="badge-high text-white px-2 py-1 rounded text-xs font-bold">7/10</span>
+                </div>
+                <p class="text-sm text-slate-300 mb-2"><strong>Risk:</strong> Responsibilities use broad terms: "develop," "build," "research," "assist," "perform," "collaborate" without specifics.</p>
+                <p class="text-sm text-slate-400"><strong>Why it matters:</strong> Vague descriptions often hide unclear expectations, which leads to scope creep and frustration. No mention of actual projects, deliverables, or success metrics.</p>
+                <p class="text-sm text-orange-400 mt-2"><strong>⚠️ Action:</strong> Ask: "Can you share a recent project similar to what I'd work on?" Ask for specific deliverables, not generic tasks.</p>
+            </div>
+
+            <div class="flag-item flag-medium">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-bold text-slate-100">5. Hybrid Model Lacks Specifics</h3>
+                    <span class="badge-medium text-white px-2 py-1 rounded text-xs font-bold">6/10</span>
+                </div>
+                <p class="text-sm text-slate-300 mb-2"><strong>Risk:</strong> "Hybrid" mentioned but no details on days/week in office, flexibility, or work-from-home policy.</p>
+                <p class="text-sm text-slate-400"><strong>Why it matters:</strong> Could mean anything from 5 days/week in office to 2 days. Lack of clarity often indicates company hasn't finalized policy or prefers maximum office time.</p>
+                <p class="text-sm text-yellow-400 mt-2"><strong>⚠️ Action:</strong> Ask: "How many days/week do you expect in office?" Get specifics in writing.</p>
+            </div>
+
+            <div class="flag-item flag-medium">
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="font-bold text-slate-100">6. Young Company with High Turnover Signals</h3>
+                    <span class="badge-medium text-white px-2 py-1 rounded text-xs font-bold">6/10</span>
+                </div>
+                <p class="text-sm text-slate-300 mb-2"><strong>Risk:</strong> Company founded in 2021 (5 years old), 50-200 employees, "actively hiring fresh graduates."</p>
+                <p class="text-sm text-slate-400"><strong>Why it matters:</strong> Young startups have higher failure rates & turnover. "Actively hiring fresh graduates" could mean either: (a) intentional junior team building, or (b) high churn and constantly backfilling roles.</p>
+                <p class="text-sm text-yellow-400 mt-2"><strong>⚠️ Action:</strong> Check company on LinkedIn. Ask: "What's your employee retention rate?" Look for rapid hiring/firing patterns.</p>
+            </div>
+        </div>
+
+        <!-- Positive Signals -->
+        <div class="dashboard-card mb-8">
+            <h2 class="text-xl font-bold mb-6 text-slate-100">✅ Positive Signals Found</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-green-50 border-l-4 border-green-600 p-4 rounded">
+                    <h3 class="font-bold text-green-900 mb-2">💼 Clear Industry Focus</h3>
+                    <p class="text-sm text-green-800">Company has a defined niche in AI & ML, not a generic startup. Focused on real applications (business solutions, automation).</p>
+                </div>
+
+                <div class="bg-green-50 border-l-4 border-green-600 p-4 rounded">
+                    <h3 class="font-bold text-green-900 mb-2">🎯 Growth Stage Opportunity</h3>
+                    <p class="text-sm text-green-800">Company is actively expanding. 50-200 employee range suggests they're past early chaos but not yet corporate bureaucracy.</p>
+                </div>
+
+                <div class="bg-green-50 border-l-4 border-green-600 p-4 rounded">
+                    <h3 class="font-bold text-green-900 mb-2">🎓 Beginner-Friendly Hiring</h3>
+                    <p class="text-sm text-green-800">Explicitly targeting fresh graduates & early-career professionals. Could indicate mentorship culture and learning opportunities.</p>
+                </div>
+
+                <div class="bg-green-50 border-l-4 border-green-600 p-4 rounded">
+                    <h3 class="font-bold text-green-900 mb-2">📍 Local Market Relevance</h3>
+                    <p class="text-sm text-green-800">Bangalore headquarters in India. Growing AI hub, good startup ecosystem, strong job market.</p>
+                </div>
+
+                <div class="bg-green-50 border-l-4 border-green-600 p-4 rounded">
+                    <h3 class="font-bold text-green-900 mb-2">🔬 Tech-Focused Domain</h3>
+                    <p class="text-sm text-green-800">AI/ML field is hot. Real skills in demand. Portfolio-building opportunity. Good for resume if company doesn't fail.</p>
+                </div>
+
+                <div class="bg-green-50 border-l-4 border-green-600 p-4 rounded">
+                    <h3 class="font-bold text-green-900 mb-2">🔄 Hybrid Model</h3>
+                    <p class="text-sm text-green-800">Despite lack of details, hybrid is better than full office. Offers some flexibility and work-life balance potential.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Analysis Sections -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Requirements Analysis -->
+            <div class="dashboard-card">
+                <h2 class="text-xl font-bold mb-4 text-slate-100">🎯 Requirements Analysis</h2>
+                <div class="space-y-3">
+                    <div class="bg-red-50 p-3 rounded border-l-4 border-red-600">
+                        <p class="text-sm font-semibold text-slate-100">Required Skills: 12</p>
+                        <p class="text-xs text-slate-400 mt-1">Python, ML, Deep Learning, TensorFlow, Keras, Scikit-learn, SQL, NumPy, Pandas, Data Analysis, Visualization, Git, Communication, Teamwork</p>
+                    </div>
+                    <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-600">
+                        <p class="text-sm font-semibold text-slate-100">Preferred Skills: 6</p>
+                        <p class="text-xs text-slate-400 mt-1">Generative AI, Prompt Engineering, LLMs, API Integration, AI App Dev, Model Deployment</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-600">
+                        <p class="text-sm font-semibold text-slate-100">Verdict: OVERCOMPLICATED</p>
+                        <p class="text-xs text-slate-400 mt-1">For fresh graduates, expect 3-5 core skills. This is 18 total. Red flag for understaffing or misaligned expectations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Culture & Environment Analysis -->
+            <div class="dashboard-card">
+                <h2 class="text-xl font-bold mb-4 text-slate-100">🏛️ Culture & Environment</h2>
+                <div class="space-y-3">
+                    <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-600">
+                        <p class="text-sm font-semibold text-slate-100">Work-Life Balance: UNCLEAR</p>
+                        <p class="text-xs text-slate-400 mt-1">No mention of work hours, vacation policy, crunch expectations, or flexibility.</p>
+                    </div>
+                    <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-600">
+                        <p class="text-sm font-semibold text-slate-100">Burnout Risk: MODERATE-HIGH</p>
+                        <p class="text-xs text-slate-400 mt-1">Broad scope + high skill requirements + vague deliverables = scope creep potential.</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-600">
+                        <p class="text-sm font-semibold text-slate-100">Growth Culture: UNKNOWN</p>
+                        <p class="text-xs text-slate-400 mt-1">No mention of mentorship, training budget, or career progression despite targeting fresh grads.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remote Work Analysis -->
+            <div class="dashboard-card">
+                <h2 class="text-xl font-bold mb-4 text-slate-100">🌍 Remote Work Analysis</h2>
+                <div class="space-y-3">
+                    <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-600">
+                        <p class="text-sm font-semibold text-slate-100">Model Type: HYBRID</p>
+                        <p class="text-xs text-slate-400 mt-1">Not fully remote, not fully office. Somewhere in between.</p>
+                    </div>
+                    <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-600">
+                        <p class="text-sm font-semibold text-slate-100">Details: LACKING</p>
+                        <p class="text-xs text-slate-400 mt-1">No info on: days/week in office, flexible scheduling, WFH policy, or overtime expectations.</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-600">
+                        <p class="text-sm font-semibold text-slate-100">Authenticity: QUESTIONABLE</p>
+                        <p class="text-xs text-slate-400 mt-1">Young startups often claim "hybrid" but expect constant office presence.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hiring Practices Analysis -->
+            <div class="dashboard-card">
+                <h2 class="text-xl font-bold mb-4 text-slate-100">👥 Hiring Practices</h2>
+                <div class="space-y-3">
+                    <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-600">
+                        <p class="text-sm font-semibold text-slate-100">Compensation: UNDISCLOSED</p>
+                        <p class="text-xs text-slate-400 mt-1">No salary, no equity, no benefits mentioned. Major red flag in competitive tech market.</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-600">
+                        <p class="text-sm font-semibold text-slate-100">Target Candidate: JUNIOR/ENTRY-LEVEL</p>
+                        <p class="text-xs text-slate-400 mt-1">Fresh graduates = lower negotiating power, easier to underpay.</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-600">
+                        <p class="text-sm font-semibold text-slate-100">Process: UNKNOWN</p>
+                        <p class="text-xs text-slate-400 mt-1">No info on interview rounds, timeline, or hiring criteria.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company Stability Analysis -->
+            <div class="dashboard-card">
+                <h2 class="text-xl font-bold mb-4 text-slate-100">🏢 Company Stability</h2>
+                <div class="space-y-3">
+                    <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-600">
+                        <p class="text-sm font-semibold text-slate-100">Age: YOUNG (5 Years)</p>
+                        <p class="text-xs text-slate-400 mt-1">Founded 2021. Still in pre-profitability phase likely. Higher failure risk than established companies.</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-600">
+                        <p class="text-sm font-semibold text-slate-100">Size: GROWTH PHASE</p>
+                        <p class="text-xs text-slate-400 mt-1">50-200 employees. Rapidly scaling phase often leads to organizational chaos.</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-600">
+                        <p class="text-sm font-semibold text-slate-100">Funding: UNKNOWN</p>
+                        <p class="text-xs text-slate-400 mt-1">No info on funding status, investor backing, or runway. Critical unknown.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market & Opportunity Analysis -->
+            <div class="dashboard-card">
+                <h2 class="text-xl font-bold mb-4 text-slate-100">📈 Market Opportunity</h2>
+                <div class="space-y-3">
+                    <div class="bg-green-50 p-3 rounded border-l-4 border-green-600">
+                        <p class="text-sm font-semibold text-slate-100">Industry: THRIVING</p>
+                        <p class="text-xs text-slate-400 mt-1">AI/ML is hot. High demand for skills. Good for long-term career.</p>
+                    </div>
+                    <div class="bg-green-50 p-3 rounded border-l-4 border-green-600">
+                        <p class="text-sm font-semibold text-slate-100">Location: STRATEGIC</p>
+                        <p class="text-xs text-slate-400 mt-1">Bangalore is India's tech hub. Strong ecosystem. Good for networking.</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded border-l-4 border-yellow-600">
+                        <p class="text-sm font-semibold text-slate-100">Niche: RELEVANT</p>
+                        <p class="text-xs text-slate-400 mt-1">AI solutions are in demand. But company is young and unproven.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Interview Questions -->
+        <div class="dashboard-card mb-8">
+            <h2 class="text-xl font-bold mb-6 text-slate-100">❓ 5 Smart Interview Questions to Ask</h2>
+            
+            <div class="question-box">
+                <h3 class="font-bold text-slate-100 mb-2">1. Role Clarity & Responsibilities</h3>
+                <p class="text-slate-300">"I see this role involves research, development, deployment, and generative AI work. Can you break down: (a) What are my top 3 priorities in the first 3 months? (b) What % of time do you expect on each major responsibility? (c) Are there any other roles doing similar work, or am I the only one?"</p>
+                <p class="text-xs text-slate-500 mt-2">💡 Why: Reveals if role is realistic or if you'll be spread too thin.</p>
+            </div>
+
+            <div class="question-box">
+                <h3 class="font-bold text-slate-100 mb-2">2. Skill Requirements Authenticity</h3>
+                <p class="text-slate-300">"I see 12 required skills listed. For a fresh graduate joining, which 3-4 are absolutely critical on day 1? Which can I learn on the job? What's your on-boarding training like?"</p>
+                <p class="text-xs text-slate-500 mt-2">💡 Why: Tests if they've realistically assessed candidate needs or if job description is inflated.</p>
+            </div>
+
+            <div class="question-box">
+                <h3 class="font-bold text-slate-100 mb-2">3. Hybrid Work & Work-Life Balance</h3>
+                <p class="text-slate-300">"You mention hybrid work. Specifically: (a) How many days/week in office? (b) Can I vary this or is it fixed? (c) What are typical working hours? (d) Do you expect on-call or weekend work? (e) What's your vacation policy?"</p>
+                <p class="text-xs text-slate-500 mt-2">💡 Why: "Hybrid" can mean anything. Get specifics before signing.</p>
+            </div>
+
+            <div class="question-box">
+                <h3 class="font-bold text-slate-100 mb-2">4. Compensation & Equity</h3>
+                <p class="text-slate-300">"What's the salary range for this role? Are there signing bonuses, stock options, or performance bonuses? What's your benefits package (health, 401k match, learning budget)?"</p>
+                <p class="text-xs text-slate-500 mt-2">💡 Why: Never accept a job without knowing compensation. Research market rates first (₹6-15L for junior AI roles in Bangalore).</p>
+            </div>
+
+            <div class="question-box">
+                <h3 class="font-bold text-slate-100 mb-2">5. Company Stability & Growth</h3>
+                <p class="text-slate-300">"I'm excited about the role. A few questions about company health: (a) What's your current funding status? (b) What's your runway? (c) What's been your employee retention rate in the last 1-2 years? (d) Are you hiring or planning layoffs?"</p>
+                <p class="text-xs text-slate-500 mt-2">💡 Why: Young startups fail. You need to know the company is stable enough to pay you.</p>
+            </div>
+        </div>
+
+        <!-- Final Verdict -->
+        <div class="dashboard-card mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-slate-100">🎯 Final Verdict & Recommendations</h2>
+            
+            <div class="verdict-box verdict-caution mb-6">
+                <div class="text-3xl mb-2">⚠️</div>
+                <h3 class="text-2xl font-bold text-yellow-300 mb-2">APPLY WITH CAUTION</h3>
+                <p class="text-slate-300">This is not a clear "yes" or "no" opportunity. Proceed with eyes open and critical questions.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="bg-green-50 p-4 rounded-lg border-2 border-green-200">
+                    <h3 class="font-bold text-green-900 mb-3">✅ Apply If:</h3>
+                    <ul class="space-y-2 text-sm text-green-800">
+                        <li>✓ You're early-career and want to learn AI/ML fast</li>
+                        <li>✓ You can negotiate realistic skill requirements downward</li>
+                        <li>✓ You get clear answers about role scope & hours</li>
+                        <li>✓ Salary is competitive (₹8L+ for fresher role)</li>
+                        <li>✓ You can verify company funding & stability</li>
+                        <li>✓ You're OK with some ambiguity & chaos (startup life)</li>
+                        <li>✓ You want portfolio-building opportunities</li>
+                    </ul>
+                </div>
+
+                <div class="bg-red-50 p-4 rounded-lg border-2 border-red-200">
+                    <h3 class="font-bold text-red-900 mb-3">❌ Avoid If:</h3>
+                    <ul class="space-y-2 text-sm text-red-800">
+                        <li>✗ You need work-life balance (role too broad)</li>
+                        <li>✗ You want clarity & structure</li>
+                        <li>✗ Company won't disclose salary or funding status</li>
+                        <li>✗ You can't handle potential startup failure/pivots</li>
+                        <li>✗ You need job security (young company)</li>
+                        <li>✗ You're overwhelmed by too many skill requirements</li>
+                        <li>✗ No one at the company can explain what you'll actually do</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-600">
+                <h3 class="font-bold text-blue-900 mb-3">📋 Action Plan:</h3>
+                <ol class="space-y-2 text-sm text-blue-800 list-decimal list-inside">
+                    <li><strong>Research:</strong> Check company on LinkedIn, Glassdoor, AngelList for reviews & funding info</li>
+                    <li><strong>Pre-Screen:</strong> Ask recruiter about salary, hybrid specifics, and role clarity BEFORE interview</li>
+                    <li><strong>Negotiate:</strong> Be prepared to counter with realistic skill requirements & compensation expectations</li>
+                    <li><strong>Interview Preparation:</strong> Use the 5 questions above. Ask for references of current junior employees</li>
+                    <li><strong>Reference Check:</strong> If you get an offer, speak with current/former employees about work culture</li>
+                    <li><strong>Get It In Writing:</strong> Job description, responsibilities, hours, hybrid schedule, compensation - all in writing</li>
+                    <li><strong>Negotiate Equity:</strong> Young startups should offer equity/ESOP. Ask for it</li>
+                    <li><strong>Compare Options:</strong> Don't accept just because it's an offer. Compare with other opportunities</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Risk Summary Card -->
+        <div class="dashboard-card">
+            <h2 class="text-xl font-bold mb-4 text-slate-100">📊 Risk Summary</h2>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center p-3 bg-slate-800 rounded">
+                    <span class="font-semibold text-slate-200">Biggest Concern:</span>
+                    <span class="text-red-400 font-bold">Skills Mismatch + Vague Scope</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-800 rounded">
+                    <span class="font-semibold text-slate-200">Most Critical Question to Ask:</span>
+                    <span class="text-orange-400 font-bold">"What are my actual daily responsibilities?"</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-800 rounded">
+                    <span class="font-semibold text-slate-200">Best Case Scenario:</span>
+                    <span class="text-green-400 font-bold">Quick learning, real AI work, fast growth, great resume builder</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-800 rounded">
+                    <span class="font-semibold text-slate-200">Worst Case Scenario:</span>
+                    <span class="text-red-400 font-bold">Overworked, underpaid, confused role, startup pivot/failure</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-800 rounded">
+                    <span class="font-semibold text-slate-200">Probability You'll Be Happy:</span>
+                    <span class="text-yellow-400 font-bold">55-60% (depends on your answers to interview Qs)</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-slate-900 text-slate-400 text-center py-6 mt-12 border-t border-slate-800">
+        <p class="text-sm">Job Red Flag Detector Report | Generated: June 2026</p>
+        <p class="text-xs text-slate-600 mt-2">This report is for informational purposes. Always conduct your own research and due diligence before making job decisions.</p>
+    </div>
+
+</body>
+</html>
