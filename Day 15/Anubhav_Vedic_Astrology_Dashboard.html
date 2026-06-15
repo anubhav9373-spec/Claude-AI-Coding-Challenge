@@ -1,0 +1,775 @@
+html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Vedic Astrology Dashboard | Anubhav Maurya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #060913;
+            --bg-secondary: #0A0F1F;
+            --purple-deep: #2A1054;
+            --purple-light: #6D28D9;
+            --gold: #D4AF37;
+            --gold-light: #FBE68E;
+            --text-main: #E5E7EB;
+            --text-muted: #9CA3AF;
+            --card-bg: rgba(15, 23, 42, 0.65);
+            --card-border: rgba(212, 175, 55, 0.15);
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(42, 16, 84, 0.4), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.05), transparent 25%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3, h4, .cinzel {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+        }
+
+        /* Typography & Utilities */
+        .text-center { text-align: center; }
+        .text-gold { color: var(--gold); }
+        .text-purple { color: var(--purple-light); }
+        .mt-1 { margin-top: 1rem; }
+        .mt-2 { margin-top: 2rem; }
+        .mb-1 { margin-bottom: 1rem; }
+        .mb-2 { margin-bottom: 2rem; }
+
+        /* Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header / Hero */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 3rem;
+            background: linear-gradient(180deg, rgba(42,16,84,0.2) 0%, rgba(6,9,19,1) 100%);
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px; height: 300px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="48" fill="none" stroke="%23D4AF37" stroke-width="0.5" stroke-dasharray="2 4"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23D4AF37" stroke-width="0.2" stroke-dasharray="1 2"/><polygon points="50,5 95,75 5,75" fill="none" stroke="%23D4AF37" stroke-width="0.2"/><polygon points="50,95 95,25 5,25" fill="none" stroke="%23D4AF37" stroke-width="0.2"/></svg>') no-repeat center center;
+            opacity: 0.15;
+            z-index: 0;
+            animation: spin 60s linear infinite;
+        }
+        @keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(212, 175, 55, 0.1);
+        }
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            opacity: 0.5;
+        }
+
+        /* Grid Systems */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+
+        /* Section Titles */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 4rem 0 2rem 0;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 1rem;
+        }
+        .section-header i {
+            color: var(--gold);
+            font-size: 1.8rem;
+        }
+        .section-header h2 {
+            font-size: 2.2rem;
+            margin: 0;
+        }
+
+        /* Progress Bars */
+        .bar-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            height: 12px;
+            width: 100%;
+            margin-top: 0.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--purple-light), var(--gold));
+            border-radius: 8px;
+            position: relative;
+        }
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        /* Circular Widgets */
+        .circular-widget {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .circular-chart {
+            display: block;
+            margin: 10px auto;
+            max-width: 80%;
+            max-height: 150px;
+        }
+        .circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 3;
+        }
+        .circle {
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            animation: progress 1s ease-out forwards;
+        }
+        .circle.gold { stroke: var(--gold); }
+        .circle.purple { stroke: var(--purple-light); }
+        .percentage {
+            fill: var(--text-main);
+            font-family: 'Cinzel', serif;
+            font-size: 8px;
+            text-anchor: middle;
+            font-weight: bold;
+        }
+        @keyframes progress {
+            0% { stroke-dasharray: 0 100; }
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+        th {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background: var(--card-border);
+            top: 0; bottom: 0; left: 50%;
+            margin-left: -1px;
+        }
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background: inherit;
+            width: 50%;
+        }
+        .timeline-item.left { left: 0; text-align: right; }
+        .timeline-item.right { left: 50%; }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 16px; height: 16px;
+            right: -8px; background: var(--bg-main);
+            border: 4px solid var(--gold);
+            top: 15px; border-radius: 50%; z-index: 1;
+        }
+        .timeline-item.right::after { left: -8px; }
+        .timeline-content {
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+        }
+
+        /* Tags/Pills */
+        .tag {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold);
+            border: 1px solid var(--card-border);
+            margin: 0.2rem;
+        }
+        .tag.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+        .tag.success { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+
+        /* SWOT Grid */
+        .swot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .swot-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid;
+        }
+        .swot-s { border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05); }
+        .swot-w { border-color: rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.05); }
+        .swot-o { border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.05); }
+        .swot-t { border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); }
+
+        .swot-card h3 { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+        .swot-s h3 { color: var(--success); font-family: 'Inter'; font-weight: 600; font-size: 1.2rem; }
+        .swot-w h3 { color: var(--warning); font-family: 'Inter'; font-weight: 600; font-size: 1.2rem; }
+        .swot-o h3 { color: #60A5FA; font-family: 'Inter'; font-weight: 600; font-size: 1.2rem; }
+        .swot-t h3 { color: var(--danger); font-family: 'Inter'; font-weight: 600; font-size: 1.2rem; }
+
+        /* Career Massive Section specifics */
+        .career-hero {
+            background: linear-gradient(135deg, rgba(10,15,31,1) 0%, rgba(42,16,84,0.3) 100%);
+            border: 2px solid var(--gold);
+            padding: 3rem;
+            border-radius: 20px;
+        }
+
+        /* Emphasized Numbers */
+        .big-number {
+            font-size: 3rem;
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-panel {
+            border-left: 4px solid var(--gold);
+            padding: 1.5rem;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1 class="text-gold">Anubhav Maurya</h1>
+            <p>Premium Vedic Astrology & Life Intelligence Report</p>
+            <div class="mt-1">
+                <span class="tag"><i class="fas fa-calendar"></i> Nov 24, 2004</span>
+                <span class="tag"><i class="fas fa-clock"></i> 14:00 (Approx)</span>
+                <span class="tag"><i class="fas fa-map-marker-alt"></i> Fatehpur, India</span>
+                <span class="tag"><i class="fas fa-laptop-code"></i> AI Engineer Focus</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="section-header">
+            <i class="fas fa-gem"></i>
+            <h2>1. Executive Summary</h2>
+        </div>
+        <div class="grid-3">
+            <div class="glass-card text-center">
+                <div class="big-number"><i class="fas fa-microchip"></i></div>
+                <h3 class="mb-1">Core Directive</h3>
+                <p class="text-muted">High cognitive alignment for Deep Tech & AI. Fast processing mind needing structured discipline to yield monumental results.</p>
+            </div>
+            <div class="glass-card text-center">
+                <div class="big-number"><i class="fas fa-coins"></i></div>
+                <h3 class="mb-1">Wealth Trajectory</h3>
+                <p class="text-muted">Early fluctuations transforming into immense long-term wealth via independent ventures, equity, and specialized intellectual property.</p>
+            </div>
+            <div class="glass-card text-center">
+                <div class="big-number"><i class="fas fa-compass"></i></div>
+                <h3 class="mb-1">Life Pattern</h3>
+                <p class="text-muted">Visionary but impatient. Success comes by combining sudden sparks of innovation with persistent, slow-burn execution.</p>
+            </div>
+        </div>
+
+        <div class="grid-2 mt-2">
+            <div>
+                <div class="section-header" style="margin-top:0;">
+                    <i class="fas fa-star-and-crescent"></i>
+                    <h2>2. Birth Chart Summary</h2>
+                </div>
+                <div class="glass-card">
+                    <table style="margin-top:0;">
+                        <tr>
+                            <th>Lagna (Ascendant)</th>
+                            <td>Pisces (Meena) <span class="tag">Jupiter Ruled</span></td>
+                        </tr>
+                        <tr>
+                            <th>Moon Sign</th>
+                            <td>Aries (Mesha)</td>
+                        </tr>
+                        <tr>
+                            <th>Sun Sign</th>
+                            <td>Scorpio (Vrischika)</td>
+                        </tr>
+                        <tr>
+                            <th>Nakshatra & Pada</th>
+                            <td>Ashwini <span class="tag">Ketu Ruled</span></td>
+                        </tr>
+                        <tr>
+                            <th>Functional Benefics</th>
+                            <td class="text-success">Jupiter, Mars, Moon</td>
+                        </tr>
+                        <tr>
+                            <th>Functional Malefics</th>
+                            <td class="text-danger">Venus, Saturn, Sun (mild)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-header" style="margin-top:0;">
+                    <i class="fas fa-globe"></i>
+                    <h2>3. Planetary Placements</h2>
+                </div>
+                <div class="glass-card">
+                    <div class="mb-1">
+                        <h4 class="text-gold">Mars in Scorpio (9th House)</h4>
+                        <p class="text-muted" style="font-size:0.9rem;">Exceptionally strong. Fuels engineering, research, and technical mastery. Excellent for higher education and foreign travel.</p>
+                    </div>
+                    <div class="mb-1">
+                        <h4 class="text-gold">Rahu in 2nd House</h4>
+                        <p class="text-muted" style="font-size:0.9rem;">Creates restless financial energy. Early savings fluctuate, but points to wealth through non-traditional tech avenues.</p>
+                    </div>
+                    <div class="mb-1">
+                        <h4 class="text-gold">Saturn in 5th House</h4>
+                        <p class="text-muted" style="font-size:0.9rem;">Rules over deep coding and intellect. Demands structured, steady discipline. Punishes cutting corners.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-gold">Jupiter in Virgo (7th House)</h4>
+                        <p class="text-muted" style="font-size:0.9rem;">Points to a practical, analytical spouse and partnerships formed in structured, professional environments.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2 mt-2">
+            <div>
+                <div class="section-header">
+                    <i class="fas fa-sun"></i>
+                    <h2>4. Major Yogas & Doshas</h2>
+                </div>
+                <div class="glass-card">
+                    <div class="highlight-panel" style="margin-top:0;">
+                        <h3 class="mb-1 text-gold">Dharma-Karmadhipati Yoga</h3>
+                        <p>This powerful combination is formed by the strong 9th house placements influencing your career sectors. It heavily supports specialized knowledge, ethical leadership, and advanced degrees. Your luck (Bhagya) is directly tied to the depth of your technical expertise (Karma).</p>
+                    </div>
+                    <div class="mt-1">
+                        <span class="tag warning"><i class="fas fa-exclamation-triangle"></i> Rahu Axis Volatility</span>
+                        <p class="text-muted mt-1" style="font-size: 0.9rem;">Impulsive financial decisions and sudden shifts in family dynamics due to the 2nd/8th house Rahu/Ketu axis.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="section-header">
+                    <i class="fas fa-infinity"></i>
+                    <h2>5. Life Pattern Analysis</h2>
+                </div>
+                <div class="glass-card">
+                    <p class="mb-1"><strong class="text-gold">Childhood & Family:</strong> A restless early home environment fostered a strong urge for independent self-sufficiency. Non-traditional values overrode strict conventions.</p>
+                    <p class="mb-1"><strong class="text-gold">Karmic Loop:</strong> "Shiny Object Syndrome." Ashwini energy loves initiating projects, but struggles with completion. You must combat the urge to abandon 80%-finished projects for new ones.</p>
+                    <p><strong class="text-gold">Financial Habit:</strong> Driven to accumulate, but prone to sudden spikes and drops. Financial peace requires automated, strict systems outside of your immediate impulsive control.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <i class="fas fa-user-astronaut"></i>
+            <h2>6. Personality Analysis (SWOT)</h2>
+        </div>
+        <div class="swot-grid">
+            <div class="swot-card swot-s">
+                <h3><i class="fas fa-arrow-up"></i> Strengths</h3>
+                <ul>
+                    <li>Extremely fast cognitive processing.</li>
+                    <li>Highly adaptable visionary (Pisces Asc).</li>
+                    <li>Fearless pioneering spirit (Aries Moon).</li>
+                    <li>Deep logical capacity (Mars in Scorpio).</li>
+                </ul>
+            </div>
+            <div class="swot-card swot-w">
+                <h3><i class="fas fa-arrow-down"></i> Weaknesses</h3>
+                <ul>
+                    <li>Impatience with routine maintenance tasks.</li>
+                    <li>Tendency to overcommit to multiple interests.</li>
+                    <li>Intellectual arrogance under stress.</li>
+                    <li>Inconsistent energy levels (burnout risks).</li>
+                </ul>
+            </div>
+            <div class="swot-card swot-o">
+                <h3><i class="fas fa-lightbulb"></i> Opportunities</h3>
+                <ul>
+                    <li>Bleeding-edge AI tech landscapes.</li>
+                    <li>Foreign education and relocation.</li>
+                    <li>Consulting and independent business ventures.</li>
+                    <li>Pioneering new algorithms or architectures.</li>
+                </ul>
+            </div>
+            <div class="swot-card swot-t">
+                <h3><i class="fas fa-bolt"></i> Threats</h3>
+                <ul>
+                    <li>Get-rich-quick crypto or trading schemes.</li>
+                    <li>Mental exhaustion from poor sleep hygiene.</li>
+                    <li>Leaving formal education incomplete.</li>
+                    <li>Ego clashes with authority figures.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <i class="fas fa-chart-line"></i>
+            <h2>7. Career & Wealth Intelligence Center</h2>
+        </div>
+        <div class="glass-card career-hero mb-2">
+            <h3 class="text-center mb-1">Overall AI Engineering Suitability</h3>
+            <div class="bar-container" style="height: 20px; background: rgba(0,0,0,0.4);">
+                <div class="bar-fill" style="width: 98%; background: linear-gradient(90deg, #10B981, #D4AF37);"></div>
+            </div>
+            <p class="text-center mt-1 text-gold cinzel" style="font-size: 1.5rem;">98% ALIGNMENT</p>
+            <p class="text-center text-muted">Mars (logic) + Ketu (algorithms) + Saturn 5H (coding discipline) creates a textbook chart for Deep Tech.</p>
+        </div>
+
+        <div class="grid-3 mb-2">
+            <div class="glass-card circular-widget">
+                <h4 class="mb-1 text-center">Job vs Business</h4>
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg" d="M18 2 a 16 16 0 0 1 0 32 a 16 16 0 0 1 0 -32" />
+                    <path class="circle gold" stroke-dasharray="90, 100" d="M18 2 a 16 16 0 0 1 0 32 a 16 16 0 0 1 0 -32" />
+                    <text x="18" y="20.5" class="percentage">90%</text>
+                </svg>
+                <p class="text-center text-muted" style="font-size:0.85rem;">Business/Equity</p>
+                <p class="text-center mt-1" style="font-size:0.85rem;">Start in structured jobs (Saturn), but pivot to independent ventures (Rahu) post-28.</p>
+            </div>
+            <div class="glass-card circular-widget">
+                <h4 class="mb-1 text-center">Foreign Opportunities</h4>
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg" d="M18 2 a 16 16 0 0 1 0 32 a 16 16 0 0 1 0 -32" />
+                    <path class="circle purple" stroke-dasharray="95, 100" d="M18 2 a 16 16 0 0 1 0 32 a 16 16 0 0 1 0 -32" />
+                    <text x="18" y="20.5" class="percentage text-gold">95%</text>
+                </svg>
+                <p class="text-center text-muted" style="font-size:0.85rem;">Highly Favorable</p>
+                <p class="text-center mt-1" style="font-size:0.85rem;">Strong 9th house & watery Ascendant heavily favors the West or major tech hubs.</p>
+            </div>
+            <div class="glass-card circular-widget">
+                <h4 class="mb-1 text-center">Government Jobs</h4>
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg" d="M18 2 a 16 16 0 0 1 0 32 a 16 16 0 0 1 0 -32" />
+                    <path class="circle" style="stroke: #EF4444;" stroke-dasharray="40, 100" d="M18 2 a 16 16 0 0 1 0 32 a 16 16 0 0 1 0 -32" />
+                    <text x="18" y="20.5" class="percentage" style="fill:#EF4444;">40%</text>
+                </svg>
+                <p class="text-center text-muted" style="font-size:0.85rem;">Low Alignment</p>
+                <p class="text-center mt-1" style="font-size:0.85rem;">Bureaucracy stifles your Aries Moon. Avoid traditional government track.</p>
+            </div>
+        </div>
+
+        <div class="glass-card mb-2">
+            <h3 class="text-gold mb-1">Wealth & Asset Generation Portfolio</h3>
+            <div class="grid-2">
+                <div>
+                    <div class="bar-label"><span>Intellectual Property / Software</span><span class="text-gold">95%</span></div>
+                    <div class="bar-container"><div class="bar-fill" style="width: 95%;"></div></div>
+                    
+                    <div class="bar-label"><span>Real Estate (Mars strength)</span><span class="text-gold">85%</span></div>
+                    <div class="bar-container"><div class="bar-fill" style="width: 85%;"></div></div>
+                </div>
+                <div>
+                    <div class="bar-label"><span>Index Funds / Safe Stocks</span><span class="text-gold">80%</span></div>
+                    <div class="bar-container"><div class="bar-fill" style="width: 80%;"></div></div>
+                    
+                    <div class="bar-label"><span>Crypto / Day Trading</span><span class="text-danger">20%</span></div>
+                    <div class="bar-container"><div class="bar-fill" style="width: 20%; background: #EF4444;"></div></div>
+                </div>
+            </div>
+            <div class="highlight-panel mt-2">
+                <strong>Strategic Insight:</strong> Wealth is directly tied to the *difficulty* of the problems you solve. Avoid the illusion of easy money. Your wealth explodes during the ages of 28-32 as your specialized skills transition into equity or business ownership.
+            </div>
+        </div>
+
+        <div class="section-header">
+            <i class="fas fa-heart"></i>
+            <h2>8. Relationship & Marriage Dashboard</h2>
+        </div>
+        <div class="grid-2">
+            <div class="glass-card">
+                <h3 class="mb-1 text-gold">Marriage Profiles</h3>
+                <div class="bar-label"><span>Arranged / Networked Match</span><span class="text-gold">85%</span></div>
+                <div class="bar-container"><div class="bar-fill" style="width: 85%;"></div></div>
+                
+                <div class="bar-label"><span>Organic Love Match</span><span class="text-purple">60%</span></div>
+                <div class="bar-container"><div class="bar-fill" style="width: 60%; background: var(--purple-light);"></div></div>
+                
+                <p class="mt-2 text-muted">Jupiter in the 7th house (Virgo) strongly points toward meeting a partner through structured environments—like university, professional networks, or traditional family introductions.</p>
+            </div>
+            <div class="glass-card">
+                <h3 class="mb-1 text-gold">Spouse Characteristics</h3>
+                <ul style="list-style: none; padding:0;">
+                    <li class="mb-1"><i class="fas fa-check text-success"></i> <strong>Highly Analytical:</strong> Grounded, practical, and detail-oriented (Virgo traits).</li>
+                    <li class="mb-1"><i class="fas fa-check text-success"></i> <strong>The Balancer:</strong> They will provide financial prudence to balance your chaotic pioneering energy.</li>
+                    <li class="mb-1"><i class="fas fa-exclamation-circle text-warning"></i> <strong>Risk Area:</strong> Ego clashes. Mars & Sun aspecting 7H means you must not bring intellectual arrogance home.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <i class="fas fa-hourglass-half"></i>
+            <h2>9. Current Dasha Analysis</h2>
+        </div>
+        <div class="glass-card">
+            <h3 class="cinzel text-gold mb-1">Current Period: Rahu Mahadasha -> Mercury/Ketu Antardasha</h3>
+            <p><strong>Opportunities:</strong> Rahu drives an obsession with cutting-edge tech. Mercury governs coding. This is the absolute best celestial weather to dive deep into neural networks, LLMs, and heavy technical research.</p>
+            <p class="mt-1"><strong>Challenges:</strong> Mental burnout. Rahu creates a fog where every new framework seems mandatory. Extreme focus is required to prevent fragmented learning.</p>
+        </div>
+
+        <div class="section-header">
+            <i class="fas fa-calendar-alt"></i>
+            <h2>11. 5-Year Forecast Dashboard (2026 - 2030)</h2>
+        </div>
+        <div class="glass-card" style="padding: 0; overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Career Focus</th>
+                        <th>Money & Wealth</th>
+                        <th>Relationships</th>
+                        <th>Health & Vitality</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-gold"><strong>2026</strong></td>
+                        <td>Heavy skill acquisition; building foundations.</td>
+                        <td>Tight; reinvesting in courses/hardware.</td>
+                        <td>Background focus.</td>
+                        <td>Watch sleep deprivation & eyes.</td>
+                    </tr>
+                    <tr style="background: rgba(212,175,55,0.08);">
+                        <td class="text-gold"><strong>2027</strong><br><span class="tag" style="font-size:0.6rem;">Turning Point</span></td>
+                        <td>Graduation or first major job placement.</td>
+                        <td>First stable tech income stream begins.</td>
+                        <td>New professional network connections.</td>
+                        <td>Improving, needs fitness routine.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-gold"><strong>2028</strong></td>
+                        <td>Rapid growth; complex AI architectures.</td>
+                        <td>Savings increase; first investments.</td>
+                        <td>Favorable for serious commitments.</td>
+                        <td>Stable and strong.</td>
+                    </tr>
+                    <tr style="background: rgba(16,185,129,0.1);">
+                        <td class="text-gold"><strong>2029</strong><br><span class="tag success" style="font-size:0.6rem;">Best Year</span></td>
+                        <td>Recognition, foreign travel, major promotion.</td>
+                        <td>High earning potential, equity/bonuses.</td>
+                        <td>Highly supportive phase for marriage.</td>
+                        <td>Excellent vitality.</td>
+                    </tr>
+                    <tr>
+                        <td class="text-gold"><strong>2030</strong></td>
+                        <td>Transitioning to independent ventures.</td>
+                        <td>Wealth consolidation, managing assets.</td>
+                        <td>Balancing demanding career with family.</td>
+                        <td>Watch stress-related digestion.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-header">
+            <i class="fas fa-chess-board"></i>
+            <h2>12. Opportunity vs Risk Matrix</h2>
+        </div>
+        <div class="grid-2">
+            <div class="glass-card" style="border-left: 4px solid var(--success);">
+                <h3 class="text-success mb-1">Strategic Opportunities</h3>
+                <p>1. Mastering complex AI algorithms (Ketu/Saturn).</p>
+                <p>2. Seeking internships or degrees abroad (9H Mars).</p>
+                <p>3. Transitioning from employee to founder by age 28.</p>
+            </div>
+            <div class="glass-card" style="border-left: 4px solid var(--danger);">
+                <h3 class="text-danger mb-1">Critical Risks</h3>
+                <p>1. Abandoning hard learning curves too early.</p>
+                <p>2. Wasting savings on high-risk speculative trading.</p>
+                <p>3. Burning out the nervous system via lack of sleep.</p>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <i class="fas fa-route"></i>
+            <h2>13 & 14. Breakthrough Timelines</h2>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <h3 class="text-gold">Ages 21-22 (Current)</h3>
+                    <p class="text-muted">The Grinding Phase. Delayed visible rewards. Heavy portfolio building.</p>
+                </div>
+            </div>
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <h3 class="text-gold">Ages 23-24</h3>
+                    <p class="text-muted">Career Breakthrough. Landing major role or completing significant AI project.</p>
+                </div>
+            </div>
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <h3 class="text-gold">Ages 26-28</h3>
+                    <p class="text-muted">Relationship Window. High probability of stable marriage and settling down.</p>
+                </div>
+            </div>
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <h3 class="text-gold">Ages 28-32</h3>
+                    <p class="text-muted">Wealth Growth Window. Transition to leadership/independence. Massive wealth accumulation phase begins.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <i class="fas fa-om"></i>
+            <h2>15. Remedies Dashboard</h2>
+        </div>
+        <div class="grid-3">
+            <div class="glass-card text-center">
+                <i class="fas fa-moon text-purple" style="font-size:2rem; margin-bottom:1rem;"></i>
+                <h4 class="text-gold">Brahma Muhurta</h4>
+                <p class="text-muted" style="font-size:0.9rem;">Maintain a strict sleep schedule. Rahu causes coding till 4 AM. Waking before sunrise calms your Pisces ascendant.</p>
+            </div>
+            <div class="glass-card text-center">
+                <i class="fas fa-pray text-purple" style="font-size:2rem; margin-bottom:1rem;"></i>
+                <h4 class="text-gold">Ganesha Mantra</h4>
+                <p class="text-muted" style="font-size:0.9rem;">"Om Ganapataye Namah" on Wednesdays. Strengthens Mercury (coding/intellect) and removes obstacles.</p>
+            </div>
+            <div class="glass-card text-center">
+                <i class="fas fa-hand-holding-heart text-purple" style="font-size:2rem; margin-bottom:1rem;"></i>
+                <h4 class="text-gold">Tech Donations</h4>
+                <p class="text-muted" style="font-size:0.9rem;">Donate tech books or teach basic skills to the underprivileged on Saturdays to appease Saturn's discipline.</p>
+            </div>
+        </div>
+        <div class="highlight-panel text-center mt-1">
+            <em>Gemstone Note: No major gemstones recommended currently. Focus entirely on karma (action) and discipline to navigate Rahu.</em>
+        </div>
+
+        <div class="section-header">
+            <i class="fas fa-tasks"></i>
+            <h2>16. Strategic Action Plan</h2>
+        </div>
+        <div class="glass-card">
+            <ol style="padding-left: 1.5rem; line-height: 2;">
+                <li><strong>Lock Down One Stack:</strong> Choose one deep-tech AI niche and stick with it until mastery. Do not let Rahu shift your focus to the next shiny framework every month.</li>
+                <li><strong>Automate Finances Now:</strong> Set up strict saving structures before you start making large tech salaries. Protect your wealth from your own impulsivity.</li>
+                <li><strong>Structure Your Rest:</strong> Treat sleep and physical fitness as engineering problems to be optimized. Your mind processes too fast for your physical body to handle without discipline.</li>
+            </ol>
+        </div>
+
+        <div class="section-header">
+            <i class="fas fa-flag-checkered"></i>
+            <h2>17. Final Life Intelligence Summary</h2>
+        </div>
+        <div class="glass-card text-center mb-2" style="background: linear-gradient(135deg, rgba(10,15,31,0.9), rgba(109,40,217,0.2)); border: 1px solid var(--purple-light);">
+            <p style="font-size: 1.2rem; font-style: italic; color: var(--text-main);">
+                "Anubhav, you possess the rare combination of a visionary intellect and the logical firepower needed to execute complex technical feats. Your chart is a blueprint for high-level success in artificial intelligence and deep tech. The universe has given you the raw processing power; your sole spiritual task is to develop the grounded discipline required to wield it. Respect your nervous system, build your technical foundations slowly and thoroughly, and the subsequent wealth and recognition will be limitless."
+            </p>
+        </div>
+
+    </div>
+</body>
+</html>"""
+
+with open("Anubhav_Vedic_Astrology_Dashboard.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("[file-tag: Anubhav_Vedic_Astrology_Dashboard.html]")
