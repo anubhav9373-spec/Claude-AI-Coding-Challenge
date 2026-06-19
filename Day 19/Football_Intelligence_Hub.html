@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Intelligence Hub - FIFA World Cup 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0d1628 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 58, 138, 0.6) 50%, rgba(15, 23, 42, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -50%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #f97316 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 24px;
+            color: #93c5fd;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #f97316;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* CARDS SECTION */
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3b82f6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #f97316;
+            border-radius: 50%;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6 0%, #f97316 100%);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .confidence-badge {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .confidence-high {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .confidence-medium {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        /* PROGRESS BARS */
+        .progress-item {
+            margin-bottom: 20px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .progress-value {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.gold {
+            background: linear-gradient(90deg, #f97316 0%, #fbbf24 100%);
+        }
+
+        .progress-fill.green {
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+        }
+
+        /* CIRCULAR GAUGE */
+        .gauge-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .gauge-circle {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        svg.gauge {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            font-weight: 700;
+            color: #f97316;
+        }
+
+        .gauge-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        /* COMPARISON SECTION */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .comparison-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .comparison-card h3 {
+            font-size: 24px;
+            color: #f1f5f9;
+            margin-bottom: 20px;
+        }
+
+        .comparison-score {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .comparison-card.ronaldo .comparison-score {
+            background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .comparison-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .comparison-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+            transition: width 0.5s ease;
+        }
+
+        .comparison-card.ronaldo .comparison-bar-fill {
+            background: linear-gradient(90deg, #f97316 0%, #fbbf24 100%);
+        }
+
+        /* TRAITS */
+        .traits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .trait {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+
+        .trait-name {
+            color: #93c5fd;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        /* ARCHETYPE PROFILE */
+        .archetype-profile {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(30, 58, 138, 0.4) 100%);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .archetype-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .archetype-name {
+            font-size: 36px;
+            font-weight: 700;
+            color: #f97316;
+            margin-bottom: 10px;
+        }
+
+        .archetype-desc {
+            font-size: 16px;
+            color: #cbd5e1;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .archetype-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .archetype-section h4 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #3b82f6;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .archetype-item {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+
+        .archetype-item.gold {
+            border-left-color: #f97316;
+            background: rgba(249, 115, 22, 0.1);
+        }
+
+        /* RECOMMENDATIONS */
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .recommendation-item {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .recommendation-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .recommendation-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        /* INSIGHTS */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .insight-card.gold {
+            border-left-color: #f97316;
+        }
+
+        .insight-title {
+            font-size: 14px;
+            color: #3b82f6;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .insight-card.gold .insight-title {
+            color: #f97316;
+        }
+
+        .insight-text {
+            font-size: 13px;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+
+        /* TABLES */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: rgba(59, 130, 246, 0.1);
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            color: #93c5fd;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            color: #cbd5e1;
+        }
+
+        tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .team-name {
+            color: #f1f5f9;
+            font-weight: 500;
+        }
+
+        .strength-strong {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .strength-weak {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(59, 130, 246, 0.1);
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 50px;
+        }
+
+        .footer-title {
+            font-size: 16px;
+            color: #f1f5f9;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+            }
+
+            .hero-stats {
+                gap: 20px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+
+            .archetype-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .recommendations {
+                grid-template-columns: 1fr;
+            }
+
+            .traits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HERO SECTION -->
+        <div class="hero">
+            <div class="hero-content">
+                <h1>FOOTBALL INTELLIGENCE HUB</h1>
+                <p class="hero-subtitle">FIFA World Cup 2026 Advanced Analytics & Personality Assessment</p>
+                <div class="hero-stats">
+                    <div class="stat-box">
+                        <span class="stat-value">94</span>
+                        <span class="stat-label">Intelligence Score</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">87%</span>
+                        <span class="stat-label">Prediction Confidence</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">10</span>
+                        <span class="stat-label">Key Insights</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WORLD CUP PREDICTION CENTER -->
+        <div class="section">
+            <h2 class="section-title">World Cup 2026 Prediction Center</h2>
+            <div class="cards-grid">
+                <!-- Winner Prediction -->
+                <div class="card">
+                    <div class="card-title">
+                        🏆 Most Likely Winner
+                        <span class="confidence-badge confidence-high">87%</span>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 28px; color: #f97316; margin-bottom: 5px;">Argentina</h3>
+                        <p style="font-size: 13px; color: #94a3b8;">Strong Championship Contender</p>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Form Score</span>
+                            <span class="progress-value">92/100</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill gold" style="width: 92%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Historical Win Rate</span>
+                            <span class="progress-value">68%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 68%"></div>
+                        </div>
+                    </div>
+                    <p style="font-size: 13px; color: #cbd5e1; margin-top: 20px;"><strong>Key Strengths:</strong> Defending champions, exceptional form, Messi leadership, balanced team composition</p>
+                    <p style="font-size: 13px; color: #cbd5e1; margin-top: 10px;"><strong>Risks:</strong> Pressure as defending champs, aging core players, injury concerns</p>
+                </div>
+
+                <!-- Runner-Up Prediction -->
+                <div class="card">
+                    <div class="card-title">
+                        🥈 Runner-Up Prediction
+                        <span class="confidence-badge confidence-medium">82%</span>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 28px; color: #3b82f6; margin-bottom: 5px;">Spain</h3>
+                        <p style="font-size: 13px; color: #94a3b8;">Elite Tournament Threat</p>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Form Score</span>
+                            <span class="progress-value">91/100</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill gold" style="width: 91%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Historical Win Rate</span>
+                            <span class="progress-value">60%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    <p style="font-size: 13px; color: #cbd5e1; margin-top: 20px;"><strong>Key Strengths:</strong> FIFA Rank #2, exceptional possession play, defensive stability, consistent form</p>
+                    <p style="font-size: 13px; color: #cbd5e1; margin-top: 10px;"><strong>Risks:</strong> Defensive vulnerabilities, midfield fatigue in knockouts</p>
+                </div>
+
+                <!-- Dark Horse -->
+                <div class="card">
+                    <div class="card-title">
+                        ⚡ Dark Horse Nation
+                        <span class="confidence-badge confidence-medium">75%</span>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 28px; color: #10b981; margin-bottom: 5px;">Germany</h3>
+                        <p style="font-size: 13px; color: #94a3b8;">Dangerous Rising Force</p>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Form Score</span>
+                            <span class="progress-value">87/100</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 87%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Historical Win Rate</span>
+                            <span class="progress-value">56%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 56%"></div>
+                        </div>
+                    </div>
+                    <p style="font-size: 13px; color: #cbd5e1; margin-top: 20px;"><strong>Key Strengths:</strong> Tournament pedigree, tactical discipline, emerging young talent, strong group stage</p>
+                    <p style="font-size: 13px; color: #cbd5e1; margin-top: 10px;"><strong>Risks:</strong> Rebuilding phase, FIFA Rank #9, inconsistent form historically</p>
+                </div>
+
+                <!-- Players to Watch -->
+                <div class="card">
+                    <div class="card-title">
+                        ⭐ Players To Watch
+                        <span class="confidence-badge">Featured</span>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <div style="background: rgba(249, 115, 22, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 3px solid #f97316;">
+                            <p style="font-size: 13px; color: #fbbf24; font-weight: 600;">Lionel Messi (Argentina)</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">20 Goals | 12 Assists | Rating: 96/100</p>
+                        </div>
+                        <div style="background: rgba(249, 115, 22, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 3px solid #f97316;">
+                            <p style="font-size: 13px; color: #fbbf24; font-weight: 600;">Kylian Mbappe (France)</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">22 Goals | 8 Assists | Rating: 95/100</p>
+                        </div>
+                        <div style="background: rgba(249, 115, 22, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 3px solid #f97316;">
+                            <p style="font-size: 13px; color: #fbbf24; font-weight: 600;">Erling Haaland (Norway)</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">25 Goals | 4 Assists | Rating: 94/100</p>
+                        </div>
+                        <div style="background: rgba(249, 115, 22, 0.1); border-radius: 8px; padding: 12px; border-left: 3px solid #f97316;">
+                            <p style="font-size: 13px; color: #fbbf24; font-weight: 600;">Jude Bellingham (England)</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">10 Goals | 9 Assists | Rating: 91/100</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOURNAMENT INTELLIGENCE DASHBOARD -->
+        <div class="section">
+            <h2 class="section-title">Tournament Intelligence Dashboard</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Team</th>
+                            <th>FIFA Rank</th>
+                            <th>Recent Form</th>
+                            <th>Goals +/-</th>
+                            <th>Threat Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td class="team-name">🇦🇷 Argentina</td>
+                            <td><strong>#1</strong></td>
+                            <td>8W-1D-1L</td>
+                            <td><span class="strength-strong">+16</span></td>
+                            <td><span style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600;">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td class="team-name">🇪🇸 Spain</td>
+                            <td><strong>#2</strong></td>
+                            <td>8W-1D-1L</td>
+                            <td><span class="strength-strong">+19</span></td>
+                            <td><span style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600;">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td class="team-name">🇫🇷 France</td>
+                            <td><strong>#3</strong></td>
+                            <td>7W-2D-1L</td>
+                            <td><span class="strength-strong">+13</span></td>
+                            <td><span style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600;">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td class="team-name">🇬🇧 England</td>
+                            <td><strong>#4</strong></td>
+                            <td>7W-2D-1L</td>
+                            <td><span class="strength-strong">+13</span></td>
+                            <td><span style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600;">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td class="team-name">🇩🇪 Germany</td>
+                            <td><strong>#9</strong></td>
+                            <td>6W-2D-2L</td>
+                            <td><span class="strength-strong">+11</span></td>
+                            <td><span style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600;">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td class="team-name">🇧🇷 Brazil</td>
+                            <td><strong>#6</strong></td>
+                            <td>7W-1D-2L</td>
+                            <td><span class="strength-strong">+13</span></td>
+                            <td><span style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600;">HIGH</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- FOOTBALL IQ ASSESSMENT CENTER -->
+        <div class="section">
+            <h2 class="section-title">Football IQ Assessment Center</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-title">Football Awareness Score</div>
+                    <div class="gauge-container">
+                        <div class="gauge-circle">
+                            <svg class="gauge" viewBox="0 0 140 140">
+                                <circle cx="70" cy="70" r="65" stroke="rgba(59, 130, 246, 0.1)" stroke-width="8" fill="none"/>
+                                <circle cx="70" cy="70" r="65" stroke="url(#grad1)" stroke-width="8" fill="none" stroke-dasharray="289.53" stroke-dashoffset="20" stroke-linecap="round"/>
+                                <defs>
+                                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#60a5fa;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="gauge-text">79</div>
+                        </div>
+                        <div class="gauge-label">Intermediate Level</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Fan Classification</div>
+                    <div style="margin-top: 20px;">
+                        <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(96, 165, 250, 0.1) 100%); border-radius: 10px; padding: 20px; text-align: center;">
+                            <p style="font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 5px;">Football Enthusiast</p>
+                            <p style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Tier 4 Classification</p>
+                        </div>
+                        <p style="font-size: 13px; color: #cbd5e1; margin-top: 20px; text-align: center;">Strong football knowledge with competitive tournament understanding. Engaging regularly with elite-level analysis and player performance data.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Strongest Knowledge Areas</div>
+                    <div style="margin-top: 15px;">
+                        <div style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; padding: 12px 15px; margin-bottom: 10px; border-radius: 4px;">
+                            <p style="font-size: 12px; color: #10b981; font-weight: 600; margin-bottom: 3px;">World Cup Tournament Structure</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">Deep knowledge of formats, group dynamics, and knockout structure</p>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; padding: 12px 15px; margin-bottom: 10px; border-radius: 4px;">
+                            <p style="font-size: 12px; color: #10b981; font-weight: 600; margin-bottom: 3px;">Elite Player Performance</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">Comprehensive understanding of star player capabilities and impact</p>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; padding: 12px 15px; border-radius: 4px;">
+                            <p style="font-size: 12px; color: #10b981; font-weight: 600; margin-bottom: 3px;">Historical Tournament Trends</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">Strong pattern recognition across multiple World Cup cycles</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Knowledge Gaps & Opportunities</div>
+                    <div style="margin-top: 15px;">
+                        <div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 12px 15px; margin-bottom: 10px; border-radius: 4px;">
+                            <p style="font-size: 12px; color: #fca5a5; font-weight: 600; margin-bottom: 3px;">Advanced Tactical Systems</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">Opportunity to deepen 4-2-3-1 and fluid formation strategies</p>
+                        </div>
+                        <div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 12px 15px; margin-bottom: 10px; border-radius: 4px;">
+                            <p style="font-size: 12px; color: #fca5a5; font-weight: 600; margin-bottom: 3px;">Emerging Market Players</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">Expand awareness of non-European tournament contenders</p>
+                        </div>
+                        <div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 12px 15px; border-radius: 4px;">
+                            <p style="font-size: 12px; color: #fca5a5; font-weight: 600; margin-bottom: 3px;">Statistical Analytics Depth</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">Learn advanced metrics: xG, expected assists, positional play analysis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <div class="card">
+                    <div class="card-title">Learning Recommendations</div>
+                    <div style="margin-top: 20px;">
+                        <div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <p style="font-size: 13px; color: #93c5fd; font-weight: 600; margin-bottom: 5px;">📊 Statistical Deep Dives</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">Study expected goals (xG) models and advanced possession metrics across tournament contenders</p>
+                        </div>
+                        <div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <p style="font-size: 13px; color: #93c5fd; font-weight: 600; margin-bottom: 5px;">🎯 Tactical Evolution</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">Analyze counter-press strategies, false fullback positioning, and midfield press triggers</p>
+                        </div>
+                        <div style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 8px;">
+                            <p style="font-size: 13px; color: #93c5fd; font-weight: 600; margin-bottom: 5px;">🌍 Global Scout Reports</p>
+                            <p style="font-size: 12px; color: #cbd5e1;">Explore emerging talent from less-covered leagues to expand player awareness</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MESSI VS RONALDO PERSONALITY ENGINE -->
+        <div class="section">
+            <h2 class="section-title">Messi vs Ronaldo Personality Engine</h2>
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h3>Lionel Messi</h3>
+                    <div class="comparison-score">72%</div>
+                    <div class="comparison-bar">
+                        <div class="comparison-bar-fill" style="width: 72%"></div>
+                    </div>
+                    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 20px;">Your personality shares significant alignment with Messi's creative, intuitive approach to football and life</p>
+                    <div style="text-align: left; font-size: 13px;">
+                        <p style="color: #93c5fd; font-weight: 600; margin-bottom: 10px;">Shared Traits:</p>
+                        <ul style="color: #cbd5e1; margin-left: 15px; margin-bottom: 15px;">
+                            <li>Creative problem-solving</li>
+                            <li>Quiet confidence and leadership</li>
+                            <li>Adaptive tactical awareness</li>
+                            <li>Intrinsic motivation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="comparison-card ronaldo">
+                    <h3>Cristiano Ronaldo</h3>
+                    <div class="comparison-score">68%</div>
+                    <div class="comparison-bar">
+                        <div class="comparison-bar-fill" style="width: 68%"></div>
+                    </div>
+                    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 20px;">You also demonstrate Ronaldo's disciplined, goal-focused mentality with strong competitive drive</p>
+                    <div style="text-align: left; font-size: 13px;">
+                        <p style="color: #fbbf24; font-weight: 600; margin-bottom: 10px;">Shared Traits:</p>
+                        <ul style="color: #cbd5e1; margin-left: 15px; margin-bottom: 15px;">
+                            <li>Strong work ethic</li>
+                            <li>Competitive intensity</li>
+                            <li>Goal-oriented mindset</li>
+                            <li>Resilient determination</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 30px;">
+                <div class="card-title">Personality Analysis Framework</div>
+                <div style="margin-top: 20px;">
+                    <div style="background: rgba(59, 130, 246, 0.1); border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                        <p style="font-size: 13px; color: #93c5fd; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Dominant Personality Pattern</p>
+                        <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6;">Your profile reflects a <strong>"Creative Realist"</strong> archetype — someone who combines Messi's creative, adaptive intelligence with Ronaldo's disciplined, goal-focused execution. You are equally inspired by moment-of-genius creativity and systematic excellence.</p>
+                    </div>
+
+                    <div style="margin-top: 25px;">
+                        <p style="font-size: 13px; color: #f1f5f9; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Trait Breakdown</p>
+                        <div class="traits-grid">
+                            <div class="trait">
+                                <div class="trait-name">Ambition</div>
+                                <div style="height: 4px; background: rgba(59, 130, 246, 0.2); border-radius: 2px; margin-top: 4px;">
+                                    <div style="height: 100%; width: 78%; background: #3b82f6; border-radius: 2px;"></div>
+                                </div>
+                            </div>
+                            <div class="trait">
+                                <div class="trait-name">Discipline</div>
+                                <div style="height: 4px; background: rgba(59, 130, 246, 0.2); border-radius: 2px; margin-top: 4px;">
+                                    <div style="height: 100%; width: 82%; background: #3b82f6; border-radius: 2px;"></div>
+                                </div>
+                            </div>
+                            <div class="trait">
+                                <div class="trait-name">Leadership</div>
+                                <div style="height: 4px; background: rgba(59, 130, 246, 0.2); border-radius: 2px; margin-top: 4px;">
+                                    <div style="height: 100%; width: 75%; background: #3b82f6; border-radius: 2px;"></div>
+                                </div>
+                            </div>
+                            <div class="trait">
+                                <div class="trait-name">Teamwork</div>
+                                <div style="height: 4px; background: rgba(59, 130, 246, 0.2); border-radius: 2px; margin-top: 4px;">
+                                    <div style="height: 100%; width: 80%; background: #3b82f6; border-radius: 2px;"></div>
+                                </div>
+                            </div>
+                            <div class="trait">
+                                <div class="trait-name">Creativity</div>
+                                <div style="height: 4px; background: rgba(59, 130, 246, 0.2); border-radius: 2px; margin-top: 4px;">
+                                    <div style="height: 100%; width: 79%; background: #3b82f6; border-radius: 2px;"></div>
+                                </div>
+                            </div>
+                            <div class="trait">
+                                <div class="trait-name">Competitiveness</div>
+                                <div style="height: 4px; background: rgba(59, 130, 246, 0.2); border-radius: 2px; margin-top: 4px;">
+                                    <div style="height: 100%; width: 81%; background: #3b82f6; border-radius: 2px;"></div>
+                                </div>
+                            </div>
+                            <div class="trait">
+                                <div class="trait-name">Confidence</div>
+                                <div style="height: 4px; background: rgba(59, 130, 246, 0.2); border-radius: 2px; margin-top: 4px;">
+                                    <div style="height: 100%; width: 76%; background: #3b82f6; border-radius: 2px;"></div>
+                                </div>
+                            </div>
+                            <div class="trait">
+                                <div class="trait-name">Work Ethic</div>
+                                <div style="height: 4px; background: rgba(59, 130, 246, 0.2); border-radius: 2px; margin-top: 4px;">
+                                    <div style="height: 100%; width: 84%; background: #3b82f6; border-radius: 2px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PERSONALITY ARCHETYPE CENTER -->
+        <div class="section">
+            <h2 class="section-title">Football Personality Archetype</h2>
+            <div class="archetype-profile">
+                <div class="archetype-header">
+                    <p style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Your Archetype</p>
+                    <h2 class="archetype-name">Creative Playmaker</h2>
+                    <p class="archetype-desc">Intelligent, adaptive players who see the game in unique ways. You excel through vision, creativity, and the ability to impact matches through intuitive decision-making and precise execution.</p>
+                </div>
+
+                <div class="archetype-grid">
+                    <div class="archetype-section">
+                        <h4>Core Traits</h4>
+                        <div class="archetype-item">Vision & Spatial Awareness</div>
+                        <div class="archetype-item">Technical Excellence</div>
+                        <div class="archetype-item">Intelligent Positioning</div>
+                        <div class="archetype-item">Game-Reading Ability</div>
+                        <div class="archetype-item">Adaptive Tactics</div>
+                    </div>
+
+                    <div class="archetype-section">
+                        <h4>Key Strengths</h4>
+                        <div class="archetype-item">Create opportunities from unexpected angles</div>
+                        <div class="archetype-item">Elevate teammates' performance through intelligence</div>
+                        <div class="archetype-item">Thrive in unpredictable situations</div>
+                        <div class="archetype-item">Execute complex combinations seamlessly</div>
+                    </div>
+
+                    <div class="archetype-section">
+                        <h4>Growth Areas</h4>
+                        <div class="archetype-item gold">Develop greater competitive aggression</div>
+                        <div class="archetype-item gold">Improve defensive consistency</div>
+                        <div class="archetype-item gold">Enhance physical athleticism demands</div>
+                        <div class="archetype-item gold">Build leadership vocal presence</div>
+                    </div>
+
+                    <div class="archetype-section">
+                        <h4>Historical Legends</h4>
+                        <div class="archetype-item">Lionel Messi (Argentina)</div>
+                        <div class="archetype-item">Diego Maradona (Argentina)</div>
+                        <div class="archetype-item">Pelé (Brazil)</div>
+                        <div class="archetype-item">Zinedine Zidane (France)</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+                    <p style="font-size: 13px; color: #cbd5e1; text-align: center; margin-bottom: 25px;"><strong>Strategic Recommendations for Your Archetype</strong></p>
+                    <div class="recommendations">
+                        <div class="recommendation-item">
+                            <span class="recommendation-label">🌟 Recommended Player Profile</span>
+                            <span class="recommendation-value">Jude Bellingham</span>
+                            <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Young creative midfielder combining vision with emerging tactical maturity</p>
+                        </div>
+                        <div class="recommendation-item">
+                            <span class="recommendation-label">⚽ Recommended Club Style</span>
+                            <span class="recommendation-value">Barcelona Model</span>
+                            <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Possession-based, space-creation focused with technical player development</p>
+                        </div>
+                        <div class="recommendation-item">
+                            <span class="recommendation-label">🏆 Recommended National Team</span>
+                            <span class="recommendation-value">Argentina</span>
+                            <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Champions of creative excellence and tactical intelligence</p>
+                        </div>
+                        <div class="recommendation-item">
+                            <span class="recommendation-label">🎯 Recommended Rivalry</span>
+                            <span class="recommendation-value">Argentina vs Spain</span>
+                            <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Ultimate creative football philosophy clash in 2026</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINAL INTELLIGENCE PROFILE -->
+        <div class="section">
+            <h2 class="section-title">Complete Football Intelligence Profile</h2>
+            <div class="insights-grid">
+                <div class="insight-card gold">
+                    <div class="insight-title">🏆 World Cup Intelligence Summary</div>
+                    <div class="insight-text">Argentina emerges as the strongest 2026 contender with 87% confidence. Defending champions, exceptional form (92/100), and leadership from Messi create the ideal tournament recipe. Spain poses the elite challenge as runners-up, while Germany represents the dark horse threat with exceptional tournament pedigree.</div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-title">📊 Football Awareness Summary</div>
+                    <div class="insight-text">Your football intelligence score of 79/100 classifies you as a Football Enthusiast with strong tournament understanding. Demonstrated excellence in World Cup structure, elite player recognition, and historical pattern analysis. Primary growth opportunities exist in advanced tactical systems and statistical analytics depth.</div>
+                </div>
+
+                <div class="insight-card gold">
+                    <div class="insight-title">💡 Personality Summary</div>
+                    <div class="insight-text">Your personality profile strongly aligns with the Creative Playmaker archetype (72% Messi compatibility). You balance creative innovation with disciplined execution, combining intelligent game-reading with goal-focused determination. This makes you naturally drawn to teams and players that prioritize technical excellence and tactical intelligence.</div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-title">🎯 Key Recommendations</div>
+                    <div class="insight-text">Focus 2026 tournament analysis on Argentina's championship defense and Spain's tactical innovations. Study Messi's final World Cup performance and emerging players like Jude Bellingham. Deepen your statistical knowledge to advance from Enthusiast to Expert classification through xG analysis and advanced positioning metrics.</div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-title">⚡ Critical Tournament Insights</div>
+                    <div class="insight-text">Group stage data shows Argentina's dominance (3 consecutive victories), Spain's consistency, and Germany's offensive prowess (7-1 vs Curaçao). France and England pose secondary threats. Watch for injuries to aging leadership (Messi, Ronaldo) and emergence of young technical talent (Bellingham, Saka). The creative intelligence edge will determine 2026 outcome.</div>
+                </div>
+
+                <div class="insight-card gold">
+                    <div class="insight-title">📈 Advanced Learning Path</div>
+                    <div class="insight-text">Progress to Expert status: Master expected goals (xG) models and advanced possession metrics. Study counter-press triggers used by elite teams. Analyze midfield press recovery strategies. Scout emerging talent from non-traditional markets. Track set-piece effectiveness across group stage progressions. These capabilities will elevate your tournament analysis to professional-level insights.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXECUTIVE SUMMARY -->
+        <div class="section">
+            <div class="card" style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(30, 58, 138, 0.15) 100%); border: 1px solid rgba(249, 115, 22, 0.3);">
+                <div class="card-title" style="justify-content: center; text-align: center;">
+                    Executive Summary
+                </div>
+                <div style="margin-top: 25px; text-align: center;">
+                    <p style="font-size: 16px; color: #cbd5e1; line-height: 1.8; margin-bottom: 20px;">
+                        You are a <strong style="color: #f97316;">Football Enthusiast</strong> with exceptional tournament understanding and creative player preferences. Your 79/100 Football IQ Score places you in the top tier of engaged fans with demonstrated expertise in World Cup dynamics and elite player recognition.
+                    </p>
+                    <p style="font-size: 16px; color: #cbd5e1; line-height: 1.8; margin-bottom: 20px;">
+                        You identify most closely with the <strong style="color: #f97316;">Creative Playmaker archetype</strong>, sharing 72% compatibility with Lionel Messi's intelligent, adaptive approach to football. Your personality balances creative innovation with disciplined goal-focus, making you naturally drawn to technically excellent, tactically intelligent players and teams.
+                    </p>
+                    <p style="font-size: 16px; color: #cbd5e1; line-height: 1.8;">
+                        For <strong style="color: #f97316;">FIFA World Cup 2026</strong>, expect <strong>Argentina</strong> to claim the championship (87% confidence) with <strong>Spain</strong> as the runner-up and <strong>Germany</strong> as the dark horse threat. Focus your tournament analysis on emerging creative midfielders like Jude Bellingham and the final chapter of Lionel Messi's World Cup legacy.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p class="footer-title">Football Intelligence Hub</p>
+            <p>FIFA World Cup 2026 Advanced Analytics & Personality Assessment</p>
+            <p style="margin-top: 15px; color: #64748b;">Analysis Based on Historical Performance Data | Current Tournament Form | Elite Player Metrics | Personality Framework Assessment</p>
+            <p style="margin-top: 20px; font-size: 11px; color: #475569;">© 2026 Football Intelligence Analytics | All Rights Reserved</p>
+        </div>
+    </div>
+</body>
+</html>
