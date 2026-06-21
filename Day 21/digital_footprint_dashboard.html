@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Privacy Intelligence Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, rgba(15, 76, 129, 0.2) 0%, rgba(88, 44, 131, 0.15) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #64c8ff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1em;
+            color: #b0b0c0;
+            margin-bottom: 30px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(100, 200, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64c8ff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #a0a0b0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* SCORE CARDS */
+        .score-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .score-card {
+            background: linear-gradient(135deg, rgba(15, 76, 129, 0.15) 0%, rgba(88, 44, 131, 0.1) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .score-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #e0e0e0;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .circular-progress {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            flex-shrink: 0;
+        }
+
+        .progress-bg {
+            fill: none;
+            stroke: rgba(100, 200, 255, 0.1);
+            stroke-width: 8;
+        }
+
+        .progress-fill {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .progress-number {
+            font-size: 2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64c8ff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-unit {
+            font-size: 0.8em;
+            color: #a0a0b0;
+        }
+
+        .score-details {
+            flex: 1;
+        }
+
+        .score-status {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .status-minimal { color: #4ade80; }
+        .status-moderate { color: #facc15; }
+        .status-significant { color: #fb923c; }
+        .status-extensive { color: #ef4444; }
+        .status-weak { color: #ef4444; }
+        .status-fair { color: #fb923c; }
+        .status-good { color: #facc15; }
+        .status-strong { color: #4ade80; }
+
+        .score-description {
+            font-size: 0.95em;
+            color: #b0b0c0;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .score-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+            color: #a0a0b0;
+        }
+
+        /* GRID SECTIONS */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, rgba(15, 76, 129, 0.15) 0%, rgba(88, 44, 131, 0.1) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.15em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-badge {
+            display: inline-block;
+            background: rgba(100, 200, 255, 0.2);
+            color: #64c8ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* HEATMAP */
+        .heatmap {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .heatmap-cell {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(100, 200, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .heatmap-cell:hover {
+            background: rgba(100, 200, 255, 0.1);
+            border-color: rgba(100, 200, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .heatmap-label {
+            font-size: 0.9em;
+            color: #a0a0b0;
+            margin-bottom: 10px;
+        }
+
+        .heatmap-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        /* COMPANY RANKING */
+        .company-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .company-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(100, 200, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .company-item:hover {
+            background: rgba(100, 200, 255, 0.08);
+            border-color: rgba(100, 200, 255, 0.3);
+        }
+
+        .company-rank {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #64c8ff;
+            min-width: 30px;
+        }
+
+        .company-info {
+            flex: 1;
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 5px;
+        }
+
+        .company-services {
+            font-size: 0.85em;
+            color: #a0a0b0;
+        }
+
+        .company-exposure {
+            text-align: right;
+        }
+
+        .exposure-bar {
+            height: 6px;
+            background: rgba(100, 200, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .exposure-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #64c8ff 0%, #a78bfa 100%);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .exposure-percent {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #64c8ff;
+        }
+
+        /* DATA COLLECTION MATRIX */
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .matrix-cell {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(100, 200, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.85em;
+        }
+
+        .matrix-cell-label {
+            color: #a0a0b0;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .matrix-cell-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64c8ff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* FULL WIDTH SECTIONS */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* TWIN PROFILE */
+        .twin-profile {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .twin-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(100, 200, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .twin-item:hover {
+            background: rgba(100, 200, 255, 0.08);
+            border-color: rgba(100, 200, 255, 0.3);
+        }
+
+        .twin-label {
+            font-size: 0.85em;
+            color: #a0a0b0;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .twin-value {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #64c8ff;
+            margin-bottom: 8px;
+        }
+
+        .twin-note {
+            font-size: 0.75em;
+            color: #808090;
+            font-style: italic;
+        }
+
+        /* VALUABLE ASSETS */
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .asset-card {
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.1) 0%, rgba(167, 139, 250, 0.05) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .asset-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .asset-name {
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+        }
+
+        .asset-value {
+            font-size: 0.9em;
+            color: #a0a0b0;
+            margin-bottom: 12px;
+        }
+
+        .value-indicator {
+            display: inline-block;
+            background: rgba(100, 200, 255, 0.2);
+            color: #64c8ff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        /* IMPROVEMENT PLAN */
+        .improvement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .improvement-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(100, 200, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+        }
+
+        .improvement-item:hover {
+            background: rgba(100, 200, 255, 0.08);
+            border-color: rgba(100, 200, 255, 0.3);
+        }
+
+        .improvement-number {
+            min-width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #64c8ff 0%, #a78bfa 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #0f0f1e;
+            flex-shrink: 0;
+        }
+
+        .improvement-content {
+            flex: 1;
+        }
+
+        .improvement-title {
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 5px;
+        }
+
+        .improvement-description {
+            font-size: 0.9em;
+            color: #a0a0b0;
+            margin-bottom: 10px;
+        }
+
+        .improvement-impact {
+            display: inline-block;
+            font-size: 0.75em;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: rgba(100, 200, 255, 0.15);
+            color: #64c8ff;
+            font-weight: 600;
+        }
+
+        /* VERDICT */
+        .verdict-section {
+            background: linear-gradient(135deg, rgba(15, 76, 129, 0.2) 0%, rgba(88, 44, 131, 0.15) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .verdict-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+        }
+
+        .verdict-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .verdict-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(100, 200, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .verdict-box-title {
+            font-weight: 600;
+            color: #64c8ff;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .verdict-box-content {
+            font-size: 0.95em;
+            color: #b0b0c0;
+            line-height: 1.7;
+        }
+
+        .verdict-highlight {
+            color: #64c8ff;
+            font-weight: 600;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .verdict-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 30px;
+            }
+            
+            .hero-title {
+                font-size: 1.8em;
+            }
+            
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .assets-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .twin-profile {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ANIMATIONS */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dashboard-card {
+            animation: slideIn 0.6s ease-out forwards;
+        }
+
+        .dashboard-card:nth-child(1) { animation-delay: 0.1s; }
+        .dashboard-card:nth-child(2) { animation-delay: 0.2s; }
+        .dashboard-card:nth-child(3) { animation-delay: 0.3s; }
+        .dashboard-card:nth-child(4) { animation-delay: 0.4s; }
+        .dashboard-card:nth-child(5) { animation-delay: 0.5s; }
+        .dashboard-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HERO SECTION -->
+        <div class="hero">
+            <h1 class="hero-title">Digital Privacy Intelligence Dashboard</h1>
+            <p class="hero-subtitle">Comprehensive analysis of your digital footprint, privacy exposure, and data ecosystem</p>
+            <div class="hero-grid">
+                <div class="stat-box">
+                    <div class="stat-value">15</div>
+                    <div class="stat-label">Services Used</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">9</div>
+                    <div class="stat-label">Parent Companies</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">73%</div>
+                    <div class="stat-label">Ecosystem Concentration</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">118</div>
+                    <div class="stat-label">Tracking Surface Points</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCORE SECTION -->
+        <div class="score-section">
+            <!-- Digital Footprint Score -->
+            <div class="score-card">
+                <div class="score-title">Digital Footprint Score</div>
+                <div class="score-display">
+                    <div class="circular-progress">
+                        <svg viewBox="0 0 160 160" style="width: 100%; height: 100%;">
+                            <circle class="progress-bg" cx="80" cy="80" r="70"></circle>
+                            <circle class="progress-fill" cx="80" cy="80" r="70" 
+                                style="stroke: url(#gradient1); stroke-dasharray: 439.8; stroke-dashoffset: 145.93;"
+                                transform="rotate(-90 80 80)"></circle>
+                            <defs>
+                                <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#64c8ff;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="progress-text">
+                            <div class="progress-number">67</div>
+                            <div class="progress-unit">/ 100</div>
+                        </div>
+                    </div>
+                    <div class="score-details">
+                        <div class="score-status status-significant">🟠 Significant Exposure</div>
+                        <div class="score-description">Your digital footprint spans across major tech ecosystems with moderate-to-high data collection intensity.</div>
+                        <div class="score-indicator">
+                            <span>↑</span>
+                            <span>Based on 15 active services</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Score -->
+            <div class="score-card">
+                <div class="score-title">Privacy Score</div>
+                <div class="score-display">
+                    <div class="circular-progress">
+                        <svg viewBox="0 0 160 160" style="width: 100%; height: 100%;">
+                            <circle class="progress-bg" cx="80" cy="80" r="70"></circle>
+                            <circle class="progress-fill" cx="80" cy="80" r="70" 
+                                style="stroke: url(#gradient2); stroke-dasharray: 439.8; stroke-dashoffset: 174.78;"
+                                transform="rotate(-90 80 80)"></circle>
+                            <defs>
+                                <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#facc15;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#fb923c;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="progress-text">
+                            <div class="progress-number">60</div>
+                            <div class="progress-unit">/ 100</div>
+                        </div>
+                    </div>
+                    <div class="score-details">
+                        <div class="score-status status-fair">🟠 Fair Privacy Practices</div>
+                        <div class="score-description">Multiple services with varying privacy standards. Significant data collection occurs across social, entertainment, and commerce platforms.</div>
+                        <div class="score-indicator">
+                            <span>⚠</span>
+                            <span>Requires active privacy management</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD GRID -->
+        <div class="dashboard-grid">
+            <!-- Exposure Heatmap -->
+            <div class="dashboard-card">
+                <div class="card-title">
+                    Exposure Heatmap
+                    <span class="card-badge">Real-Time</span>
+                </div>
+                <div class="heatmap">
+                    <div class="heatmap-cell">
+                        <div class="heatmap-label">Social Media</div>
+                        <div class="heatmap-value" style="color: #ef4444;">🔴</div>
+                        <div style="font-size: 0.8em; color: #a0a0b0;">5 services</div>
+                    </div>
+                    <div class="heatmap-cell">
+                        <div class="heatmap-label">Entertainment</div>
+                        <div class="heatmap-value" style="color: #fb923c;">🟠</div>
+                        <div style="font-size: 0.8em; color: #a0a0b0;">3 services</div>
+                    </div>
+                    <div class="heatmap-cell">
+                        <div class="heatmap-label">Commerce</div>
+                        <div class="heatmap-value" style="color: #facc15;">🟡</div>
+                        <div style="font-size: 0.8em; color: #a0a0b0;">2 services</div>
+                    </div>
+                    <div class="heatmap-cell">
+                        <div class="heatmap-label">Communication</div>
+                        <div class="heatmap-value" style="color: #ef4444;">🔴</div>
+                        <div style="font-size: 0.8em; color: #a0a0b0;">3 services</div>
+                    </div>
+                    <div class="heatmap-cell">
+                        <div class="heatmap-label">Search & Cloud</div>
+                        <div class="heatmap-value" style="color: #fb923c;">🟠</div>
+                        <div style="font-size: 0.8em; color: #a0a0b0;">3 services</div>
+                    </div>
+                    <div class="heatmap-cell">
+                        <div class="heatmap-label">Gaming</div>
+                        <div class="heatmap-value" style="color: #facc15;">🟡</div>
+                        <div style="font-size: 0.8em; color: #a0a0b0;">2 services</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company Exposure Ranking -->
+            <div class="dashboard-card">
+                <div class="card-title">
+                    Company Exposure Ranking
+                    <span class="card-badge">9 Companies</span>
+                </div>
+                <div class="company-list">
+                    <div class="company-item">
+                        <div class="company-rank">1</div>
+                        <div class="company-info">
+                            <div class="company-name">Google</div>
+                            <div class="company-services">Search, YouTube, Pay, Photos, Drive</div>
+                        </div>
+                        <div class="company-exposure">
+                            <div class="exposure-bar"><div class="exposure-fill" style="width: 100%;"></div></div>
+                            <div class="exposure-percent">38%</div>
+                        </div>
+                    </div>
+                    <div class="company-item">
+                        <div class="company-rank">2</div>
+                        <div class="company-info">
+                            <div class="company-name">Meta</div>
+                            <div class="company-services">Instagram, WhatsApp</div>
+                        </div>
+                        <div class="company-exposure">
+                            <div class="exposure-bar"><div class="exposure-fill" style="width: 75%;"></div></div>
+                            <div class="exposure-percent">28%</div>
+                        </div>
+                    </div>
+                    <div class="company-item">
+                        <div class="company-rank">3</div>
+                        <div class="company-info">
+                            <div class="company-name">ByteDance</div>
+                            <div class="company-services">TikTok</div>
+                        </div>
+                        <div class="company-exposure">
+                            <div class="exposure-bar"><div class="exposure-fill" style="width: 60%;"></div></div>
+                            <div class="exposure-percent">22%</div>
+                        </div>
+                    </div>
+                    <div class="company-item">
+                        <div class="company-rank">4</div>
+                        <div class="company-info">
+                            <div class="company-name">Amazon</div>
+                            <div class="company-services">Shopping, Cloud Infrastructure</div>
+                        </div>
+                        <div class="company-exposure">
+                            <div class="exposure-bar"><div class="exposure-fill" style="width: 45%;"></div></div>
+                            <div class="exposure-percent">18%</div>
+                        </div>
+                    </div>
+                    <div class="company-item">
+                        <div class="company-rank">5</div>
+                        <div class="company-info">
+                            <div class="company-name">Apple</div>
+                            <div class="company-services">iMessage</div>
+                        </div>
+                        <div class="company-exposure">
+                            <div class="exposure-bar"><div class="exposure-fill" style="width: 30%;"></div></div>
+                            <div class="exposure-percent">12%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Collection Matrix -->
+            <div class="dashboard-card">
+                <div class="card-title">
+                    Data Collection Matrix
+                    <span class="card-badge">Estimated</span>
+                </div>
+                <div class="matrix-grid">
+                    <div class="matrix-cell">
+                        <div class="matrix-cell-label">Behavioral</div>
+                        <div class="matrix-cell-value">94</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-cell-label">Demographic</div>
+                        <div class="matrix-cell-value">87</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-cell-label">Location</div>
+                        <div class="matrix-cell-value">76</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-cell-label">Device ID</div>
+                        <div class="matrix-cell-value">89</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-cell-label">Communication</div>
+                        <div class="matrix-cell-value">92</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-cell-label">Financial</div>
+                        <div class="matrix-cell-value">71</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-cell-label">Biometric</div>
+                        <div class="matrix-cell-value">34</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-cell-label">Health</div>
+                        <div class="matrix-cell-value">28</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="matrix-cell-label">Content</div>
+                        <div class="matrix-cell-value">95</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Radar -->
+            <div class="dashboard-card">
+                <div class="card-title">
+                    Risk Radar
+                    <span class="card-badge">Priority</span>
+                </div>
+                <svg viewBox="0 0 400 400" style="width: 100%; height: 300px;">
+                    <!-- Grid circles -->
+                    <circle cx="200" cy="200" r="30" fill="none" stroke="rgba(100, 200, 255, 0.1)" stroke-width="1"></circle>
+                    <circle cx="200" cy="200" r="60" fill="none" stroke="rgba(100, 200, 255, 0.1)" stroke-width="1"></circle>
+                    <circle cx="200" cy="200" r="90" fill="none" stroke="rgba(100, 200, 255, 0.1)" stroke-width="1"></circle>
+                    <circle cx="200" cy="200" r="120" fill="none" stroke="rgba(100, 200, 255, 0.15)" stroke-width="2"></circle>
+                    
+                    <!-- Axes -->
+                    <line x1="200" y1="80" x2="200" y2="320" stroke="rgba(100, 200, 255, 0.1)" stroke-width="1"></line>
+                    <line x1="80" y1="200" x2="320" y2="200" stroke="rgba(100, 200, 255, 0.1)" stroke-width="1"></line>
+                    
+                    <!-- Data collection risk -->
+                    <polygon points="200,120 240,180 200,240 160,180" fill="rgba(100, 200, 255, 0.2)" stroke="#64c8ff" stroke-width="2"></polygon>
+                    
+                    <!-- Privacy leakage risk -->
+                    <polygon points="260,200 290,240 260,280 230,240" fill="rgba(167, 139, 250, 0.2)" stroke="#a78bfa" stroke-width="2"></polygon>
+                    
+                    <!-- Third-party sharing -->
+                    <polygon points="140,200 110,240 140,280 170,240" fill="rgba(251, 146, 60, 0.2)" stroke="#fb923c" stroke-width="2"></polygon>
+                    
+                    <!-- Labels -->
+                    <text x="200" y="60" fill="#64c8ff" font-size="12" text-anchor="middle" font-weight="600">Data Collection</text>
+                    <text x="330" y="210" fill="#a78bfa" font-size="12" font-weight="600">Privacy Leakage</text>
+                    <text x="45" y="210" fill="#fb923c" font-size="12" font-weight="600">3rd Party</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Digital Twin Profile -->
+        <div class="dashboard-card full-width">
+            <div class="card-title">Digital Twin Profile <span class="card-badge">Inferred Profile</span></div>
+            <div class="twin-profile">
+                <div class="twin-item">
+                    <div class="twin-label">Primary Interest</div>
+                    <div class="twin-value">Entertainment & Social</div>
+                    <div class="twin-note">Estimate based on platform usage</div>
+                </div>
+                <div class="twin-item">
+                    <div class="twin-label">Tech Savviness</div>
+                    <div class="twin-value">Moderate to High</div>
+                    <div class="twin-note">Estimate based on service diversity</div>
+                </div>
+                <div class="twin-item">
+                    <div class="twin-label">Engagement Level</div>
+                    <div class="twin-value">Very Active</div>
+                    <div class="twin-note">Estimate based on platform types</div>
+                </div>
+                <div class="twin-item">
+                    <div class="twin-label">Data Footprint</div>
+                    <div class="twin-value">Extensive</div>
+                    <div class="twin-note">Fact: 15 services actively tracking</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Most Valuable Data Assets -->
+        <div class="dashboard-card full-width">
+            <div class="card-title">Most Valuable Data Assets <span class="card-badge">High Value</span></div>
+            <div class="assets-grid">
+                <div class="asset-card">
+                    <div class="asset-icon">🎯</div>
+                    <div class="asset-name">Behavioral Profile</div>
+                    <div class="asset-value">Activity patterns, interests, content preferences</div>
+                    <div class="value-indicator">CRITICAL ASSET</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-icon">📍</div>
+                    <div class="asset-name">Location History</div>
+                    <div class="asset-value">Movement patterns, frequency, temporal data</div>
+                    <div class="value-indicator">HIGH VALUE</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-icon">💬</div>
+                    <div class="asset-name">Communication Graph</div>
+                    <div class="asset-value">Contacts, conversations, social networks</div>
+                    <div class="value-indicator">CRITICAL ASSET</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-icon">🛍️</div>
+                    <div class="asset-name">Purchase History</div>
+                    <div class="asset-value">Spending patterns, preferences, price sensitivity</div>
+                    <div class="value-indicator">HIGH VALUE</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-icon">⏰</div>
+                    <div class="asset-name">Temporal Patterns</div>
+                    <div class="asset-value">Daily routines, habits, availability</div>
+                    <div class="value-indicator">MEDIUM VALUE</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-icon">🎮</div>
+                    <div class="asset-name">Gaming & Entertainment</div>
+                    <div class="asset-value">Preferences, skill levels, play time</div>
+                    <div class="value-indicator">MEDIUM VALUE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy Improvement Plan -->
+        <div class="dashboard-card full-width">
+            <div class="card-title">Privacy Improvement Simulator</div>
+            <div class="improvement-list">
+                <div class="improvement-item">
+                    <div class="improvement-number">1</div>
+                    <div class="improvement-content">
+                        <div class="improvement-title">Enable Privacy Settings Across All Platforms</div>
+                        <div class="improvement-description">Restrict data collection permissions, disable location tracking, limit ad targeting. Estimated impact: Privacy Score +15, Footprint Score -10</div>
+                        <div class="improvement-impact">HIGH PRIORITY</div>
+                    </div>
+                </div>
+                <div class="improvement-item">
+                    <div class="improvement-number">2</div>
+                    <div class="improvement-content">
+                        <div class="improvement-title">Consolidate Communication Channels</div>
+                        <div class="improvement-description">Reduce reliance on multiple messaging platforms. Use end-to-end encrypted alternatives. Estimated impact: Privacy Score +8, Footprint Score -8</div>
+                        <div class="improvement-impact">MEDIUM PRIORITY</div>
+                    </div>
+                </div>
+                <div class="improvement-item">
+                    <div class="improvement-number">3</div>
+                    <div class="improvement-content">
+                        <div class="improvement-title">Implement VPN & Privacy Browser Extensions</div>
+                        <div class="improvement-description">Mask IP address, block tracking pixels, prevent data leakage. Estimated impact: Privacy Score +10, Footprint Score -5</div>
+                        <div class="improvement-impact">HIGH PRIORITY</div>
+                    </div>
+                </div>
+                <div class="improvement-item">
+                    <div class="improvement-number">4</div>
+                    <div class="improvement-content">
+                        <div class="improvement-title">Audit & Delete Inactive Accounts</div>
+                        <div class="improvement-description">Remove or deactivate unused services to reduce tracking surface. Estimated impact: Privacy Score +5, Footprint Score -15</div>
+                        <div class="improvement-impact">MEDIUM PRIORITY</div>
+                    </div>
+                </div>
+                <div class="improvement-item">
+                    <div class="improvement-number">5</div>
+                    <div class="improvement-content">
+                        <div class="improvement-title">Manage Data Sharing Permissions</div>
+                        <div class="improvement-description">Review and revoke third-party access, limit API integrations, disable data marketplace participation. Estimated impact: Privacy Score +12, Footprint Score -7</div>
+                        <div class="improvement-impact">HIGH PRIORITY</div>
+                    </div>
+                </div>
+                <div class="improvement-item">
+                    <div class="improvement-number">6</div>
+                    <div class="improvement-content">
+                        <div class="improvement-title">Exercise Data Rights Under GDPR/Privacy Laws</div>
+                        <div class="improvement-description">Request data access, corrections, and deletion. File data portability requests to major platforms. Estimated impact: Privacy Score +7</div>
+                        <div class="improvement-impact">MEDIUM PRIORITY</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Verdict -->
+        <div class="verdict-section">
+            <div class="verdict-title">⚠️ Final Verdict & Executive Summary</div>
+            <div class="verdict-content">
+                <div class="verdict-box">
+                    <div class="verdict-box-title">Current Risk Assessment</div>
+                    <div class="verdict-box-content">
+                        <p style="margin-bottom: 15px;"><span class="verdict-highlight">FACT:</span> You maintain an active presence across 15 services controlled by 9 major tech companies. Google dominates with 38% ecosystem concentration.</p>
+                        <p style="margin-bottom: 15px;"><span class="verdict-highlight">FACT:</span> Communication platforms (WhatsApp, iMessage, Discord) and social media (Instagram, Snapchat, TikTok) represent your highest exposure vectors.</p>
+                        <p><span class="verdict-highlight">ESTIMATE:</span> Your digital profile likely contains comprehensive behavioral, demographic, and communication data across multiple independent databases.</p>
+                    </div>
+                </div>
+                <div class="verdict-box">
+                    <div class="verdict-box-title">Privacy Recommendations</div>
+                    <div class="verdict-box-content">
+                        <p style="margin-bottom: 15px;">🔐 <span class="verdict-highlight">Priority 1:</span> Enable granular privacy controls on all platforms within 30 days. Target: +20 privacy score.</p>
+                        <p style="margin-bottom: 15px;">🔐 <span class="verdict-highlight">Priority 2:</span> Implement technical privacy measures (VPN, tracker blocking) within 15 days. Expected result: 25% reduction in tracking surface.</p>
+                        <p>🔐 <span class="verdict-highlight">Priority 3:</span> Audit third-party access permissions quarterly and exercise data rights annually under applicable privacy regulations.</p>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid rgba(100, 200, 255, 0.1); color: #a0a0b0; font-size: 0.85em; text-align: center;">
+                <p><strong>Disclaimer:</strong> This analysis is based on platform metadata and publicly known data collection practices. Actual data collection may vary. Conclusions marked as "Estimate" are inferences and should not be considered factual claims about collected data. This dashboard does not claim access to private databases or actual datasets held by service providers.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animate progress circles on load
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.progress-fill').forEach(circle => {
+                const circumference = 2 * Math.PI * 70;
+                circle.style.strokeDasharray = circumference;
+            });
+        });
+
+        // Add hover effects
+        document.querySelectorAll('.company-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(8px)';
+            });
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+
+        document.querySelectorAll('.improvement-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(8px)';
+            });
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+</body>
+</html>
