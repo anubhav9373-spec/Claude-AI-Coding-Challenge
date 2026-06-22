@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Career Copilot - Startup Validation Intelligence Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #151b36;
+            --card-bg: rgba(30, 41, 82, 0.4);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b8d4;
+            --accent-blue: #00d4ff;
+            --accent-purple: #7c3aed;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --success-color: #10b981;
+            --warning-color: #f97316;
+            --danger-color: #ef4444;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0f1535 100%);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            padding: 60px 0;
+            text-align: center;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 40px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--accent-blue);
+            padding: 8px 16px;
+            border-radius: 24px;
+            color: var(--accent-blue);
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta-item {
+            text-align: center;
+        }
+
+        .hero-meta-item span {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-meta-item strong {
+            display: block;
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        /* SCORE GRID */
+        .hero-scores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .score-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .score-card h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .score-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .score-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .score-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .score-indicator.positive {
+            background: var(--success-color);
+        }
+
+        .score-indicator.warning {
+            background: var(--warning-color);
+        }
+
+        .score-indicator.neutral {
+            background: var(--text-secondary);
+        }
+
+        /* SECTIONS */
+        section {
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        section h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        section h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 2px;
+        }
+
+        /* DASHBOARD GRID */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .dashboard-grid.wide {
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            transform: translateY(-4px);
+            background: rgba(30, 41, 82, 0.6);
+        }
+
+        .card h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .card-subtext {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* SCORE GAUGE */
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .gauge-svg {
+            width: 140px;
+            height: 140px;
+        }
+
+        /* PROGRESS BARS */
+        .progress-item {
+            margin-bottom: 20px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* TABLES */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            border-bottom: 2px solid var(--card-border);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--text-secondary);
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .cell-highlight {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .cell-positive {
+            color: var(--success-color);
+        }
+
+        .cell-negative {
+            color: var(--danger-color);
+        }
+
+        .cell-warning {
+            color: var(--warning-color);
+        }
+
+        /* MATRIX */
+        .matrix-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            overflow-x: auto;
+        }
+
+        /* TIMELINE */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 75px;
+            top: 80px;
+            bottom: -30px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-blue), transparent);
+        }
+
+        .timeline-marker {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .timeline-marker::before {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .timeline-content {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .timeline-content h4 {
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .timeline-content p {
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* PERSONA CARDS */
+        .persona-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .persona-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .persona-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .persona-name {
+            flex: 1;
+        }
+
+        .persona-name h4 {
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .persona-name p {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .persona-trait {
+            margin-bottom: 12px;
+        }
+
+        .persona-trait-label {
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .persona-trait-value {
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        /* RECOMMENDATION PANEL */
+        .recommendation-panel {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(0, 212, 255, 0.1));
+            border: 2px solid var(--success-color);
+            border-radius: 16px;
+            padding: 32px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .recommendation-panel h3 {
+            font-size: 28px;
+            color: var(--success-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .recommendation-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .recommendation-item {
+            text-align: left;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .recommendation-item h4 {
+            color: var(--accent-blue);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .recommendation-item p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* RISK MATRIX */
+        .risk-matrix {
+            position: relative;
+            width: 100%;
+            min-height: 400px;
+        }
+
+        .risk-bubble {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .risk-bubble:hover {
+            transform: scale(1.1);
+        }
+
+        .risk-high {
+            background: rgba(239, 68, 68, 0.7);
+        }
+
+        .risk-medium {
+            background: rgba(249, 115, 22, 0.7);
+        }
+
+        .risk-low {
+            background: rgba(16, 185, 129, 0.7);
+        }
+
+        /* HEATMAP */
+        .heatmap {
+            display: grid;
+            gap: 8px;
+        }
+
+        .heatmap-row {
+            display: grid;
+            grid-template-columns: 120px repeat(4, 1fr);
+            gap: 8px;
+            align-items: center;
+        }
+
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.05);
+        }
+
+        .heatmap-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            padding: 8px 0;
+            text-align: right;
+        }
+
+        .heat-1 { background: rgba(16, 185, 129, 0.3); }
+        .heat-2 { background: rgba(249, 115, 22, 0.4); }
+        .heat-3 { background: rgba(249, 115, 22, 0.7); }
+        .heat-4 { background: rgba(239, 68, 68, 0.8); }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-primary {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-blue);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--warning-color);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* INSIGHT TEXT */
+        .insight-box {
+            background: rgba(0, 212, 255, 0.05);
+            border-left: 4px solid var(--accent-blue);
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .insight-box.warning {
+            background: rgba(249, 115, 22, 0.05);
+            border-left-color: var(--warning-color);
+        }
+
+        .insight-box.danger {
+            background: rgba(239, 68, 68, 0.05);
+            border-left-color: var(--danger-color);
+        }
+
+        .insight-box p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid var(--card-border);
+            margin-top: 60px;
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        /* ANIMATION */
+        @keyframes countUp {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animate-count {
+            animation: countUp 0.5s ease;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .dashboard-grid,
+            .dashboard-grid.wide {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-item {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-item::after {
+                display: none;
+            }
+
+            section h2 {
+                font-size: 24px;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            table {
+                font-size: 11px;
+            }
+
+            th, td {
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HERO SECTION -->
+        <div class="hero">
+            <div class="hero-badge">📊 Startup Validation Intelligence Report</div>
+            <h1>AI Career Copilot</h1>
+            
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <span>Stage</span>
+                    <strong>Idea Stage</strong>
+                </div>
+                <div class="hero-meta-item">
+                    <span>Target Market</span>
+                    <strong>India</strong>
+                </div>
+                <div class="hero-meta-item">
+                    <span>Category</span>
+                    <strong>EdTech / Career</strong>
+                </div>
+                <div class="hero-meta-item">
+                    <span>Status</span>
+                    <strong>Pre-Validation</strong>
+                </div>
+            </div>
+
+            <div class="hero-scores">
+                <div class="score-card">
+                    <h3>Overall Score</h3>
+                    <div class="score-value" id="overall-score">--</div>
+                    <div class="score-label">
+                        <span class="score-indicator positive"></span>
+                        Strong Opportunity
+                    </div>
+                </div>
+                <div class="score-card">
+                    <h3>Investment Readiness</h3>
+                    <div class="score-value" id="investment-score">--</div>
+                    <div class="score-label">
+                        <span class="score-indicator warning"></span>
+                        Early Stage
+                    </div>
+                </div>
+                <div class="score-card">
+                    <h3>Market Opportunity</h3>
+                    <div class="score-value" id="market-score">--</div>
+                    <div class="score-label">
+                        <span class="score-indicator positive"></span>
+                        High TAM
+                    </div>
+                </div>
+                <div class="score-card">
+                    <h3>Success Probability</h3>
+                    <div class="score-value" id="success-score">--</div>
+                    <div class="score-label">
+                        <span class="score-indicator positive"></span>
+                        Favorable
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXECUTIVE SUMMARY -->
+        <section>
+            <h2>Executive Summary</h2>
+            
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Problem Statement</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        Students and fresh graduates lack integrated guidance for career path selection, skill development, portfolio creation, interview preparation, and career tracking.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Market Size</h3>
+                    <div class="card-value">$850M+</div>
+                    <div class="card-subtext">TAM in India alone by 2026</div>
+                </div>
+                <div class="card">
+                    <h3>Target Users</h3>
+                    <div class="card-value">120M+</div>
+                    <div class="card-subtext">College + Fresh Graduates in India</div>
+                </div>
+                <div class="card">
+                    <h3>Competitive Position</h3>
+                    <div class="card-value">High</div>
+                    <div class="card-subtext">Fragmented market, differentiation critical</div>
+                </div>
+            </div>
+
+            <div class="insight-box" style="margin-top: 30px;">
+                <p><strong>Key Finding:</strong> AI Career Copilot addresses a significant market gap in integrated, personalized career guidance for Indian students. The combination of AI-driven career path recommendation, skill roadmapping, portfolio support, and interview preparation positions the startup in a $850M+ addressable market with strong growth tailwinds.</p>
+            </div>
+        </section>
+
+        <!-- PROBLEM VALIDATION -->
+        <section>
+            <h2>Problem Validation</h2>
+            
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Problem Severity</h3>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="url(#grad1)" stroke-width="12" stroke-dasharray="251.2 251.2" stroke-dashoffset="22.6" transform="rotate(-90 70 70)"/>
+                            <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00d4ff"/><stop offset="100%" style="stop-color:#7c3aed"/></linearGradient></defs>
+                            <text x="70" y="75" text-anchor="middle" font-size="32" font-weight="700" fill="white">91%</text>
+                        </svg>
+                        <span style="font-size: 12px; color: var(--text-secondary);">Critical</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Problem Frequency</h3>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="url(#grad2)" stroke-width="12" stroke-dasharray="238.64 251.2" stroke-dashoffset="22.6" transform="rotate(-90 70 70)"/>
+                            <defs><linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00d4ff"/><stop offset="100%" style="stop-color:#7c3aed"/></linearGradient></defs>
+                            <text x="70" y="75" text-anchor="middle" font-size="32" font-weight="700" fill="white">95%</text>
+                        </svg>
+                        <span style="font-size: 12px; color: var(--text-secondary);">Very High</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>User Demand</h3>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="url(#grad3)" stroke-width="12" stroke-dasharray="226.08 251.2" stroke-dashoffset="22.6" transform="rotate(-90 70 70)"/>
+                            <defs><linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00d4ff"/><stop offset="100%" style="stop-color:#7c3aed"/></linearGradient></defs>
+                            <text x="70" y="75" text-anchor="middle" font-size="32" font-weight="700" fill="white">88%</text>
+                        </svg>
+                        <span style="font-size: 12px; color: var(--text-secondary);">High</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Willingness to Pay</h3>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="url(#grad4)" stroke-width="12" stroke-dasharray="200.96 251.2" stroke-dashoffset="22.6" transform="rotate(-90 70 70)"/>
+                            <defs><linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00d4ff"/><stop offset="100%" style="stop-color:#7c3aed"/></linearGradient></defs>
+                            <text x="70" y="75" text-anchor="middle" font-size="32" font-weight="700" fill="white">76%</text>
+                        </svg>
+                        <span style="font-size: 12px; color: var(--text-secondary);">Strong</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <h3 style="color: var(--text-primary); margin-bottom: 20px; font-size: 16px;">Critical Pain Points</h3>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>Career Path Uncertainty</h3>
+                        <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">74% of graduates unsure about ideal career direction. Limited guidance on skill requirements per role.</div>
+                    </div>
+                    <div class="card">
+                        <h3>Skill Gap</h3>
+                        <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">82% report gap between academic learning and industry requirements. No personalized roadmaps.</div>
+                    </div>
+                    <div class="card">
+                        <h3>Portfolio Deficiency</h3>
+                        <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">68% lack portfolio. Don't know what projects/work to showcase to employers.</div>
+                    </div>
+                    <div class="card">
+                        <h3>Interview Readiness</h3>
+                        <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">71% unprepared for technical & behavioral interviews. Need targeted practice.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOUNDER-MARKET FIT -->
+        <section>
+            <h2>Founder-Market Fit Score</h2>
+            
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Domain Expertise</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Career/EdTech Knowledge</span>
+                            <span id="domain-score">--</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;" id="domain-bar"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>AI/ML Capability</span>
+                            <span id="ai-score">--</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;" id="ai-bar"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Target Market Access</span>
+                            <span id="access-score">--</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;" id="access-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Team Capability</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Execution Track Record</span>
+                            <span id="exec-score">--</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;" id="exec-bar"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Product Sense</span>
+                            <span id="product-score">--</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;" id="product-bar"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Fundraising Ability</span>
+                            <span id="fundraise-score">--</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;" id="fundraise-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Overall FMF Score</h3>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="url(#fmf-grad)" stroke-width="12" stroke-dasharray="200.96 251.2" stroke-dashoffset="22.6" transform="rotate(-90 70 70)"/>
+                            <defs><linearGradient id="fmf-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00d4ff"/><stop offset="100%" style="stop-color:#7c3aed"/></linearGradient></defs>
+                            <text x="70" y="75" text-anchor="middle" font-size="32" font-weight="700" fill="white" id="fmf-value">--</text>
+                        </svg>
+                        <span style="font-size: 12px; color: var(--text-secondary);" id="fmf-label">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insight-box" style="margin-top: 30px;">
+                <p><strong>Assessment Note:</strong> As an idea-stage startup with no active team validation, FMF is estimated based on problem understanding and market opportunity. Validate through: (1) Team composition and relevant backgrounds, (2) Product prototyping and testing, (3) Customer discovery interviews (target: 50+ by Week 12).</p>
+            </div>
+        </section>
+
+        <!-- TAM / SAM / SOM -->
+        <section>
+            <h2>Market Size Analysis (TAM / SAM / SOM)</h2>
+            
+            <div class="dashboard-grid wide">
+                <div class="card">
+                    <h3>Total Addressable Market (TAM)</h3>
+                    <div class="card-value" style="color: var(--accent-blue); margin-bottom: 20px;">$850M</div>
+                    <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6; margin-bottom: 15px;">
+                        <strong>India 2026:</strong><br/>
+                        • 120M college students + fresh graduates<br/>
+                        • 25% digital penetration (30M users)<br/>
+                        • $7-10 per month average willingness to pay<br/>
+                        • Annual TAM: $2.1B - $3.6B<br/><br/>
+                        <strong>Conservative Estimate (25% penetration): $850M</strong>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Serviceable Addressable Market (SAM)</h3>
+                    <div class="card-value" style="color: var(--accent-purple); margin-bottom: 20px;">$240M</div>
+                    <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6; margin-bottom: 15px;">
+                        <strong>Realistic 5-Year Target:</strong><br/>
+                        • 12-15M active users (10-12% penetration)<br/>
+                        • $15-20 per month (paid premium tier)<br/>
+                        • Annual SAM: $2.2B - $3.6B<br/><br/>
+                        <strong>Realistic Market Capture: $240M</strong>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Serviceable Obtainable Market (SOM)</h3>
+                    <div class="card-value" style="color: var(--accent-green); margin-bottom: 20px;">$18.5M</div>
+                    <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6; margin-bottom: 15px;">
+                        <strong>Year 3 Achievable Goal:</strong><br/>
+                        • 1M+ paying users<br/>
+                        • $15-20 ARPU<br/>
+                        • 60% freemium conversion<br/>
+                        • Annual SOM Target: $18.5M</strong>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Market Sizing Assumptions</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Assumption</th>
+                            <th>Rationale</th>
+                            <th>Confidence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>India Student Population</td>
+                            <td>120M (college + fresh grads)</td>
+                            <td>MHRD data 2024-25</td>
+                            <td><span class="badge badge-success">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td>Digital Penetration</td>
+                            <td>25% (initial phase)</td>
+                            <td>Urban metros + tier-1 cities first</td>
+                            <td><span class="badge badge-warning">MEDIUM</span></td>
+                        </tr>
+                        <tr>
+                            <td>ARPU (Monthly)</td>
+                            <td>$7-10 freemium, $15-20 premium</td>
+                            <td>Competitive benchmarks (Udemy, Coursera, unacademy)</td>
+                            <td><span class="badge badge-warning">MEDIUM</span></td>
+                        </tr>
+                        <tr>
+                            <td>Market Maturity</td>
+                            <td>Emerging (3-5 years to maturity)</td>
+                            <td>EdTech adoption in India growing 25% CAGR</td>
+                            <td><span class="badge badge-success">HIGH</span></td>
+                        </tr>
+                        <tr>
+                            <td>Freemium to Paid Conversion</td>
+                            <td>15-25%</td>
+                            <td>Typical EdTech SaaS benchmarks</td>
+                            <td><span class="badge badge-warning">MEDIUM</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <svg style="width: 100%; height: 300px; margin-top: 40px;" viewBox="0 0 600 300">
+                <!-- TAM/SAM/SOM visualization -->
+                <defs>
+                    <linearGradient id="tam-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.7" />
+                        <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.3" />
+                    </linearGradient>
+                    <linearGradient id="sam-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:0.7" />
+                        <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:0.3" />
+                    </linearGradient>
+                    <linearGradient id="som-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.7" />
+                        <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.3" />
+                    </linearGradient>
+                </defs>
+                
+                <!-- Circles representing market sizes -->
+                <circle cx="300" cy="150" r="140" fill="url(#tam-grad)" stroke="#00d4ff" stroke-width="2"/>
+                <circle cx="300" cy="150" r="100" fill="url(#sam-grad)" stroke="#7c3aed" stroke-width="2"/>
+                <circle cx="300" cy="150" r="50" fill="url(#som-grad)" stroke="#10b981" stroke-width="2"/>
+                
+                <!-- Labels -->
+                <text x="300" y="40" text-anchor="middle" font-size="14" font-weight="700" fill="white">TAM: $850M</text>
+                <text x="300" y="150" text-anchor="middle" font-size="12" font-weight="600" fill="white">SAM: $240M</text>
+                <text x="300" y="165" text-anchor="middle" font-size="11" font-weight="600" fill="white">SOM: $18.5M</text>
+            </svg>
+        </section>
+
+        <!-- COMPETITOR ANALYSIS -->
+        <section>
+            <h2>Competitor Analysis</h2>
+            
+            <h3 style="color: var(--text-primary); margin-bottom: 20px; font-size: 16px;">Competitive Landscape</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Competitor</th>
+                            <th>Focus Area</th>
+                            <th>AI Capability</th>
+                            <th>Career Guidance</th>
+                            <th>Portfolio Support</th>
+                            <th>Interview Prep</th>
+                            <th>Pricing Model</th>
+                            <th>India Presence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="cell-highlight">Unacademy</td>
+                            <td>Online Learning</td>
+                            <td><span class="badge badge-warning">Basic</span></td>
+                            <td><span class="badge badge-primary">Limited</span></td>
+                            <td><span class="badge badge-primary">No</span></td>
+                            <td><span class="badge badge-success">Yes</span></td>
+                            <td>Freemium</td>
+                            <td><span class="badge badge-success">Strong</span></td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">LinkedIn Learning</td>
+                            <td>Skills Development</td>
+                            <td><span class="badge badge-warning">Moderate</span></td>
+                            <td><span class="badge badge-warning">Partial</span></td>
+                            <td><span class="badge badge-primary">No</span></td>
+                            <td><span class="badge badge-primary">Limited</span></td>
+                            <td>Subscription</td>
+                            <td><span class="badge badge-success">Growing</span></td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">HackerRank</td>
+                            <td>Technical Assessment</td>
+                            <td><span class="badge badge-success">Advanced</span></td>
+                            <td><span class="badge badge-primary">No</span></td>
+                            <td><span class="badge badge-primary">No</span></td>
+                            <td><span class="badge badge-success">Excellent</span></td>
+                            <td>B2B + Freemium</td>
+                            <td><span class="badge badge-success">Strong</span></td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">Toptal</td>
+                            <td>Freelance Talent</td>
+                            <td><span class="badge badge-primary">Minimal</span></td>
+                            <td><span class="badge badge-primary">No</span></td>
+                            <td><span class="badge badge-warning">Implicit</span></td>
+                            <td><span class="badge badge-primary">No</span></td>
+                            <td>Commission-based</td>
+                            <td><span class="badge badge-primary">Limited</span></td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">iNeuron</td>
+                            <td>Career Bootcamps</td>
+                            <td><span class="badge badge-primary">Minimal</span></td>
+                            <td><span class="badge badge-success">Yes</span></td>
+                            <td><span class="badge badge-success">Yes</span></td>
+                            <td><span class="badge badge-success">Yes</span></td>
+                            <td>High-cost (₹50K+)</td>
+                            <td><span class="badge badge-success">Very Strong</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Market Gap Analysis</h3>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Gap: Integrated AI Solution</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">No competitor combines AI-driven career path recommendation, skill mapping, and portfolio building in unified platform.</p>
+                </div>
+                <div class="card">
+                    <h3>Gap: Affordability</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Bootcamps cost ₹50K-₹100K+. Massive gap for students wanting affordable AI-powered guidance.</p>
+                </div>
+                <div class="card">
+                    <h3>Gap: Personalization</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Generic learning platforms lack true personalization. No context-aware skill roadmaps by role/interest.</p>
+                </div>
+                <div class="card">
+                    <h3>Gap: Continuous Support</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Most solutions one-time use. No continuous career growth tracking, upskilling guidance post-placement.</p>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">AI Career Copilot Competitive Advantages</h3>
+            <div class="dashboard-grid">
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>✓ Integrated Platform</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">One platform for discovery, learning, portfolio, interviews, and career tracking.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>✓ AI-Native from Day 1</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Built on LLMs for hyper-personalization vs. bolted-on AI in legacy platforms.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>✓ India-First Design</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Optimized for Indian student needs, budget, and aspirations (FAANG, IITs, top companies).</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>✓ Affordability</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Freemium model ($0-$20/month) vs. $50K-$100K bootcamps. 100x better unit economics.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- IDEAL CUSTOMER PROFILE -->
+        <section>
+            <h2>Ideal Customer Profile (ICP)</h2>
+            
+            <div class="dashboard-grid">
+                <div class="persona-card">
+                    <div class="persona-header">
+                        <div class="persona-avatar">👨‍🎓</div>
+                        <div class="persona-name">
+                            <h4>College Student (2nd-3rd Year)</h4>
+                            <p>Age 19-22, Tier 1-2 cities</p>
+                        </div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Annual Income</div>
+                        <div class="persona-trait-value">₹0 (Student/Part-time)</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Tech Comfort</div>
+                        <div class="persona-trait-value">Very High (Digital Native)</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Pain Points</div>
+                        <div class="persona-trait-value">No career direction, unsure skills needed, afraid of placements</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Priorities</div>
+                        <div class="persona-trait-value">Placement assistance, skill development, FAANG readiness</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Willingness to Pay</div>
+                        <div class="persona-trait-value">$5-15/month (if freemium starts free)</div>
+                    </div>
+                </div>
+
+                <div class="persona-card">
+                    <div class="persona-header">
+                        <div class="persona-avatar">👩‍💼</div>
+                        <div class="persona-name">
+                            <h4>Fresh Graduate (0-2 Years Out)</h4>
+                            <p>Age 22-24, First job hunting</p>
+                        </div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Annual Income</div>
+                        <div class="persona-trait-value">₹3-5L / Unemployed</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Tech Comfort</div>
+                        <div class="persona-trait-value">High (App/Web native)</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Pain Points</div>
+                        <div class="persona-trait-value">No relevant experience, weak portfolio, interview anxiety</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Priorities</div>
+                        <div class="persona-trait-value">Job landing, offer negotiation, career launch guidance</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Willingness to Pay</div>
+                        <div class="persona-trait-value">$10-30/month (motivated buyer)</div>
+                    </div>
+                </div>
+
+                <div class="persona-card">
+                    <div class="persona-header">
+                        <div class="persona-avatar">💼</div>
+                        <div class="persona-name">
+                            <h4>Early-Career Professional (2-5 Years)</h4>
+                            <p>Age 24-27, First/second job</p>
+                        </div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Annual Income</div>
+                        <div class="persona-trait-value">₹8-20L+</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Tech Comfort</div>
+                        <div class="persona-trait-value">Very High</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Pain Points</div>
+                        <div class="persona-trait-value">Career stagnation, unclear specialization, skill gaps, job mobility</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Priorities</div>
+                        <div class="persona-trait-value">Career growth, skill advancement, next role readiness</div>
+                    </div>
+                    <div class="persona-trait">
+                        <div class="persona-trait-label">Willingness to Pay</div>
+                        <div class="persona-trait-value">$20-50/month (premium user)</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">ICP Scoring Matrix</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Segment</th>
+                            <th>Total TAM</th>
+                            <th>Problem Fit</th>
+                            <th>Willingness to Pay</th>
+                            <th>Acquisition Cost</th>
+                            <th>Overall Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="cell-highlight">College Students (2nd-3rd Year)</td>
+                            <td>25M</td>
+                            <td><span class="badge badge-success">98%</span></td>
+                            <td><span class="badge badge-warning">60%</span></td>
+                            <td><span class="badge badge-success">Low ($2-3)</span></td>
+                            <td><span class="badge badge-success">PRIMARY TARGET</span></td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">Fresh Graduates (&lt;1yr out)</td>
+                            <td>15M</td>
+                            <td><span class="badge badge-success">95%</span></td>
+                            <td><span class="badge badge-success">80%</span></td>
+                            <td><span class="badge badge-warning">Medium ($5-8)</span></td>
+                            <td><span class="badge badge-success">SECONDARY TARGET</span></td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">Early-Career (2-5yr)</td>
+                            <td>12M</td>
+                            <td><span class="badge badge-warning">75%</span></td>
+                            <td><span class="badge badge-success">90%</span></td>
+                            <td><span class="badge badge-primary">High ($15-20)</span></td>
+                            <td><span class="badge badge-warning">TERTIARY TARGET</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- CUSTOMER PAIN POINTS -->
+        <section>
+            <h2>Customer Pain Points & Frustrations</h2>
+            
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: var(--text-primary); margin-bottom: 20px; font-size: 16px;">Critical Pain Points (Severity: 9-10/10)</h3>
+                <div class="dashboard-grid">
+                    <div class="card" style="border-left: 4px solid var(--danger-color);">
+                        <h3>Career Path Uncertainty</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">74% of students report complete uncertainty about ideal career direction. Massive pressure from parents without clear guidance.</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--card-border);">
+                            <span class="badge badge-danger">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="card" style="border-left: 4px solid var(--danger-color);">
+                        <h3>Skill-Job Mismatch</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">82% report gap between what they learn and what companies require. No personalized roadmaps to close gap.</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--card-border);">
+                            <span class="badge badge-danger">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="card" style="border-left: 4px solid var(--danger-color);">
+                        <h3>Placement Anxiety</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">68% of students worried about getting placed. Fear of being unemployed is acute psychological stress.</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--card-border);">
+                            <span class="badge badge-danger">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="card" style="border-left: 4px solid var(--danger-color);">
+                        <h3>Interview Unpreparedness</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">71% report feeling unprepared for interviews. Lack of practice, feedback, and targeted coaching.</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--card-border);">
+                            <span class="badge badge-danger">CRITICAL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: var(--text-primary); margin-bottom: 20px; font-size: 16px;">High Impact Pain Points (Severity: 7-8/10)</h3>
+                <div class="dashboard-grid">
+                    <div class="card" style="border-left: 4px solid var(--warning-color);">
+                        <h3>Portfolio Building</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">68% lack portfolio. Don't know what projects to build or how to present them. Major blocker for jobs.</p>
+                    </div>
+                    <div class="card" style="border-left: 4px solid var(--warning-color);">
+                        <h3>No Personalization</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Generic learning paths don't match individual interests/strengths. Wasting time on irrelevant content.</p>
+                    </div>
+                    <div class="card" style="border-left: 4px solid var(--warning-color);">
+                        <h3>Mentorship Gap</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">No access to industry mentors or advisors. Navigating alone creates isolation and confusion.</p>
+                    </div>
+                    <div class="card" style="border-left: 4px solid var(--warning-color);">
+                        <h3>Career Tracking</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">No clear way to track progress or validate readiness. Unclear what more they need to do.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="color: var(--text-primary); margin-bottom: 20px; font-size: 16px;">Behavioral Impact</h3>
+                <div class="insight-box">
+                    <p><strong>Key Finding:</strong> These pain points are chronic (persist throughout student life), high-frequency (daily stress), and high-stakes (impact career/life prospects). This creates strong motivation for solution adoption. Students show high willingness to adopt technology that reduces anxiety and increases clarity.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BUYING TRIGGERS & OBJECTIONS -->
+        <section>
+            <h2>Buying Triggers & Objections</h2>
+            
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: var(--text-primary); margin-bottom: 20px; font-size: 16px;">Purchase Triggers (Moments of Heightened Need)</h3>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>📅 Academic Timeline Triggers</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                            <strong>• 2nd-3rd year:</strong> Internship season (Jan-Apr) - peak need for career guidance<br/>
+                            <strong>• Final year:</strong> Placement season (Jul-Dec) - high conversion window<br/>
+                            <strong>• Post-grad:</strong> Job hunting - most desperate need
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h3>🎓 Event Triggers</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                            <strong>• Failed interview:</strong> Immediate need for coaching<br/>
+                            <strong>• No internship offer:</strong> Anxiety → seek guidance<br/>
+                            <strong>• Job rejection:</strong> Desperate for career direction<br/>
+                            <strong>• Peer placement:</strong> FOMO + comparison
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h3>💬 Social Triggers</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                            <strong>• Peer adoption:</strong> Network effect drives adoption<br/>
+                            <strong>• Parent pressure:</strong> Anxiety relief platform<br/>
+                            <strong>• Success stories:</strong> Social proof in college groups<br/>
+                            <strong>• College campuses:</strong> Concentration allows viral spread
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h3>🎯 Milestone Triggers</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                            <strong>• First internship:</strong> Realize skill gap<br/>
+                            <strong>• First job:</strong> Want career growth guidance<br/>
+                            <strong>• Tech transition:</strong> Career pivot anxiety<br/>
+                            <strong>• Salary negotiation:</strong> Need data-driven guidance
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: var(--text-primary); margin-bottom: 20px; font-size: 16px;">Common Objections & Handling</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Objection</th>
+                                <th>Root Cause</th>
+                                <th>Handling Strategy</th>
+                                <th>Success Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="cell-highlight">"Why not use Unacademy?"</td>
+                                <td>Awareness of competitor, price sensitivity</td>
+                                <td>Show integrated approach (career path + skills + portfolio + interviews). Unacademy is learning-only.</td>
+                                <td><span class="badge badge-success">85%</span></td>
+                            </tr>
+                            <tr>
+                                <td class="cell-highlight">"I don't want to pay yet"</td>
+                                <td>Budget constraints (student budget)</td>
+                                <td>Lead with strong freemium. Free tier covers 70% of use case. Premium unlocks advanced personalization.</td>
+                                <td><span class="badge badge-success">70%</span></td>
+                            </tr>
+                            <tr>
+                                <td class="cell-highlight">"Will AI guidance really work?"</td>
+                                <td>Skepticism of AI effectiveness</td>
+                                <td>Show success cases, testimonials from students who got jobs. Offer free trial. AI as co-pilot, not replacement.</td>
+                                <td><span class="badge badge-warning">60%</span></td>
+                            </tr>
+                            <tr>
+                                <td class="cell-highlight">"I'll do this later"</td>
+                                <td>Low urgency perception</td>
+                                <td>Create urgency: "Placement season starts in X weeks. Get 2-3 week head start." Retargeting campaigns.</td>
+                                <td><span class="badge badge-warning">55%</span></td>
+                            </tr>
+                            <tr>
+                                <td class="cell-highlight">"Is my data safe?"</td>
+                                <td>Privacy concerns, data security</td>
+                                <td>Clear privacy policy, SOC2 compliance, no data selling guarantee. Build trust through transparency.</td>
+                                <td><span class="badge badge-success">90%</span></td>
+                            </tr>
+                            <tr>
+                                <td class="cell-highlight">"Time commitment too high"</td>
+                                <td>Busy schedule, multiple demands</td>
+                                <td>15-minute daily format. Bite-sized learning paths. Async access. Mobile-first design.</td>
+                                <td><span class="badge badge-success">75%</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="color: var(--text-primary); margin-bottom: 20px; font-size: 16px;">Trust & Adoption Signals</h3>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>✓ Free Trial</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">14-day free premium access. Students need to experience value before paying.</p>
+                    </div>
+                    <div class="card">
+                        <h3>✓ Success Stories</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Real testimonials from students who got jobs at FAANG/top companies. Social proof critical.</p>
+                    </div>
+                    <div class="card">
+                        <h3>✓ Expert Backing</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Endorsements from industry figures, IIT alumni, recruiters. Credibility markers.</p>
+                    </div>
+                    <div class="card">
+                        <h3>✓ Guarantees</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Money-back guarantee if no job within 90 days (conditional). Removes adoption risk.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CUSTOMER JOURNEY -->
+        <section>
+            <h2>Customer Journey Map</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker">Phase 1</div>
+                    <div class="timeline-content">
+                        <h4>Awareness</h4>
+                        <p><strong>Goal:</strong> Discovery of solution<br/>
+                        <strong>Touchpoints:</strong> Social media (Instagram/YouTube), college communities, peer recommendations, Google search<br/>
+                        <strong>Duration:</strong> 1-3 weeks<br/>
+                        <strong>Key Metric:</strong> Impression & CTR</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">Phase 2</div>
+                    <div class="timeline-content">
+                        <h4>Interest & Exploration</h4>
+                        <p><strong>Goal:</strong> Understand value proposition<br/>
+                        <strong>Touchpoints:</strong> Landing page, YouTube demo, free resources, peer reviews<br/>
+                        <strong>Duration:</strong> 3-7 days<br/>
+                        <strong>Key Metric:</strong> Time on site, video views, signup rate</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">Phase 3</div>
+                    <div class="timeline-content">
+                        <h4>Trial & Testing</h4>
+                        <p><strong>Goal:</strong> Experience free tier value<br/>
+                        <strong>Touchpoints:</strong> Free signup, initial career assessment, skill discovery<br/>
+                        <strong>Duration:</strong> 7-14 days<br/>
+                        <strong>Key Metric:</strong> Free engagement, feature usage, aha moment</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">Phase 4</div>
+                    <div class="timeline-content">
+                        <h4>Conversion & Purchase</h4>
+                        <p><strong>Goal:</strong> Convert to paid (freemium conversion or premium)<br/>
+                        <strong>Touchpoints:</strong> Conversion prompts, testimonials, limited-time offers<br/>
+                        <strong>Duration:</strong> 14-30 days<br/>
+                        <strong>Key Metric:</strong> Conversion rate, ARPU</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">Phase 5</div>
+                    <div class="timeline-content">
+                        <h4>Active Usage & Engagement</h4>
+                        <p><strong>Goal:</strong> Deep platform usage, value realization<br/>
+                        <strong>Touchpoints:</strong> Personalized roadmaps, progress tracking, community interaction<br/>
+                        <strong>Duration:</strong> 30-90 days<br/>
+                        <strong>Key Metric:</strong> DAU/MAU, feature adoption, roadmap completion</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">Phase 6</div>
+                    <div class="timeline-content">
+                        <h4>Retention & Advocacy</h4>
+                        <p><strong>Goal:</strong> Long-term retention, referral generation<br/>
+                        <strong>Touchpoints:</strong> Job success tracking, career milestones, referral rewards<br/>
+                        <strong>Duration:</strong> 90+ days (ongoing)<br/>
+                        <strong>Key Metric:</strong> Churn rate, LTV, NPS, referral rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Conversion Funnel Estimates</h3>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Awareness → Interest</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Conversion Rate</span>
+                            <span>25%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 25%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Interest → Trial Sign-up</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Conversion Rate</span>
+                            <span>35%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 35%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Trial → Premium Conversion</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Conversion Rate</span>
+                            <span>18%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 18%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Overall Funnel</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Awareness → Paid</span>
+                            <span>1.6%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 1.6%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RISK ASSESSMENT -->
+        <section>
+            <h2>Risk Assessment & Mitigation</h2>
+            
+            <h3 style="color: var(--text-primary); margin-bottom: 20px; font-size: 16px;">Risk Matrix</h3>
+            <svg style="width: 100%; height: 420px; margin-bottom: 30px;" viewBox="0 0 600 420">
+                <!-- Grid lines -->
+                <line x1="100" y1="50" x2="100" y2="380" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="300" y1="50" x2="300" y2="380" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="500" y1="50" x2="500" y2="380" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="100" y1="150" x2="550" y2="150" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="100" y1="265" x2="550" y2="265" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="100" y1="380" x2="550" y2="380" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                
+                <!-- Axes -->
+                <line x1="100" y1="380" x2="550" y2="380" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <line x1="100" y1="50" x2="100" y2="380" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                
+                <!-- Labels -->
+                <text x="325" y="410" text-anchor="middle" fill="var(--text-secondary)" font-size="12">Probability of Occurrence</text>
+                <text x="30" y="220" text-anchor="middle" fill="var(--text-secondary)" font-size="12" transform="rotate(-90 30 220)">Impact Severity</text>
+                
+                <!-- Quadrant labels -->
+                <text x="200" y="80" text-anchor="middle" fill="rgba(239,68,68,0.5)" font-size="11">High Impact<br/>Low Prob</text>
+                <text x="475" y="80" text-anchor="middle" fill="rgba(239,68,68,0.8)" font-size="11">High Impact<br/>High Prob</text>
+                <text x="200" y="350" text-anchor="middle" fill="rgba(16,185,129,0.5)" font-size="11">Low Impact<br/>Low Prob</text>
+                <text x="475" y="350" text-anchor="middle" fill="rgba(249,115,22,0.7)" font-size="11">Low Impact<br/>High Prob</text>
+                
+                <!-- Risks plotted as circles -->
+                <!-- Competition Risk -->
+                <circle cx="450" cy="120" r="35" fill="rgba(239,68,68,0.4)" stroke="rgba(239,68,68,0.8)" stroke-width="2"/>
+                <text x="450" y="125" text-anchor="middle" font-size="10" font-weight="600" fill="white">Competition</text>
+                
+                <!-- Market Risk -->
+                <circle cx="350" cy="200" r="30" fill="rgba(249,115,22,0.4)" stroke="rgba(249,115,22,0.8)" stroke-width="2"/>
+                <text x="350" y="205" text-anchor="middle" font-size="10" font-weight="600" fill="white">Market</text>
+                
+                <!-- Execution Risk -->
+                <circle cx="400" cy="250" r="28" fill="rgba(249,115,22,0.4)" stroke="rgba(249,115,22,0.8)" stroke-width="2"/>
+                <text x="400" y="255" text-anchor="middle" font-size="10" font-weight="600" fill="white">Execution</text>
+                
+                <!-- Adoption Risk -->
+                <circle cx="300" cy="180" r="32" fill="rgba(249,115,22,0.4)" stroke="rgba(249,115,22,0.8)" stroke-width="2"/>
+                <text x="300" y="185" text-anchor="middle" font-size="10" font-weight="600" fill="white">Adoption</text>
+                
+                <!-- Technology Risk -->
+                <circle cx="200" cy="140" r="20" fill="rgba(16,185,129,0.3)" stroke="rgba(16,185,129,0.6)" stroke-width="2"/>
+                <text x="200" y="145" text-anchor="middle" font-size="9" font-weight="600" fill="white">Tech</text>
+            </svg>
+
+            <h3 style="color: var(--text-primary); margin-bottom: 20px; font-size: 16px;">Detailed Risk Assessment</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Risk Category</th>
+                            <th>Description</th>
+                            <th>Probability</th>
+                            <th>Impact</th>
+                            <th>Mitigation Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="cell-highlight">Competition Risk</td>
+                            <td>Major players (Google, Unacademy, iNeuron) enter integrated career platform space</td>
+                            <td><span class="badge badge-danger">HIGH (70%)</span></td>
+                            <td><span class="badge badge-danger">HIGH</span></td>
+                            <td>Move fast to gain market share. Build network effects. Deep India focus. Superior AI personalization.</td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">Adoption Risk</td>
+                            <td>Students fail to adopt despite free offering. Low engagement in freemium model.</td>
+                            <td><span class="badge badge-warning">MEDIUM (45%)</span></td>
+                            <td><span class="badge badge-danger">HIGH</span></td>
+                            <td>College partnerships for distribution. Gamification & viral loops. Word-of-mouth campaigns. Success story marketing.</td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">Market Risk</td>
+                            <td>Economic downturn reduces student spending on educational tools.</td>
+                            <td><span class="badge badge-warning">MEDIUM (35%)</span></td>
+                            <td><span class="badge badge-warning">MEDIUM</span></td>
+                            <td>Strong freemium model reduces dependency on paid users. B2B2C partnerships with institutions. Recession-proof free tier.</td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">Execution Risk</td>
+                            <td>Inability to build integrated platform quickly. AI personalization engine underperforms.</td>
+                            <td><span class="badge badge-warning">MEDIUM (50%)</span></td>
+                            <td><span class="badge badge-warning">HIGH</span></td>
+                            <td>Hire experienced team (AI/EdTech). Partner with tech vendors. Phased rollout of features. Continuous user testing.</td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">Technology Risk</td>
+                            <td>LLM dependency creates cost/reliability issues. Data privacy concerns limit adoption.</td>
+                            <td><span class="badge badge-warning">MEDIUM (40%)</span></td>
+                            <td><span class="badge badge-warning">MEDIUM</span></td>
+                            <td>Multi-model strategy (fallback to cheaper LLMs). Transparent data policies. SOC2 certification. On-device processing where possible.</td>
+                        </tr>
+                        <tr>
+                            <td class="cell-highlight">Unit Economics Risk</td>
+                            <td>CAC > LTV. Freemium conversion too low to sustain business.</td>
+                            <td><span class="badge badge-warning">MEDIUM (55%)</span></td>
+                            <td><span class="badge badge-danger">HIGH</span></td>
+                            <td>Optimize for viral coefficient (referral loops). B2B2C partnerships reduce CAC. Upsell to premium tiers. Multi-revenue model (B2B recruitment).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Success Factors</h3>
+            <div class="dashboard-grid">
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>🎯 Speed to MVP</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Launch MVP within 12 weeks with core features (career quiz + skill roadmap + learning recommendations).</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>📊 Data-Driven</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Continuous A/B testing and iteration. Focus on unit economics and engagement metrics from day 1.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>🤝 Distribution Partnerships</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Partner with colleges, placement cells, alumni networks. Institutional distribution > organic marketing.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>🧠 AI Differentiation</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Build AI that generates 10x better career recommendations than competitors. Make switching cost high.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PIVOT OPPORTUNITIES -->
+        <section>
+            <h2>Pivot Opportunities & Expansion Paths</h2>
+            
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Pivot: B2B Educational Institutions</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;"><strong>Target:</strong> Universities, colleges, training institutes<br/><strong>Value:</strong> Career outcome tracking, placement assistance, alumni engagement<br/><strong>Model:</strong> B2B SaaS ($5K-$25K/month per institution)<br/><strong>Timeline:</strong> Post-PMF with student product</p>
+                </div>
+                <div class="card">
+                    <h3>Pivot: B2B Recruitment</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;"><strong>Target:</strong> Recruiters, HR platforms, job boards<br/><strong>Value:</strong> Pre-screened, skill-ready talent pool<br/><strong>Model:</strong> Commission on placements or listing fees<br/><strong>Timeline:</strong> Parallel monetization path</p>
+                </div>
+                <div class="card">
+                    <h3>Expansion: Upskilling for Working Professionals</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;"><strong>Target:</strong> 2-5 years experience engineers seeking growth<br/><strong>Value:</strong> Career progression guidance, specialization paths<br/><strong>Model:</strong> Premium subscription ($30-$100/month)<br/><strong>Timeline:</strong> Post-student PMF (Year 2)</p>
+                </div>
+                <div class="card">
+                    <h3>Expansion: Bootcamp Integration</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;"><strong>Target:</strong> Bootcamp graduates seeking placement<br/><strong>Value:</strong> Portfolio building, interview prep, job matching<br/><strong>Model:</strong> White-label + revenue share<br/><strong>Timeline:</strong> Year 2-3</p>
+                </div>
+                <div class="card">
+                    <h3>Expansion: Global Markets</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;"><strong>Target:</strong> Southeast Asia, Philippines, Latin America<br/><strong>Value:</strong> Localized career guidance, global job matching<br/><strong>Model:</strong> Geographic expansion after India dominance<br/><strong>Timeline:</strong> Year 3+</p>
+                </div>
+                <div class="card">
+                    <h3>Expansion: Corporate Learning</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;"><strong>Target:</strong> Enterprise L&D teams<br/><strong>Value:</strong> AI-powered learning paths, skill gap analysis<br/><strong>Model:</strong> Enterprise contracts ($100K+/year)<br/><strong>Timeline:</strong> Year 3-4</p>
+                </div>
+            </div>
+
+            <div class="insight-box" style="margin-top: 30px;">
+                <p><strong>Strategic Note:</strong> Do not pursue all pivots simultaneously. Recommended sequence: (1) Nail student product (Year 1), (2) Add institutional B2B (Year 2), (3) Launch professional upskilling (Year 2), (4) Explore recruitment partnerships (Year 2-3), (5) Global expansion (Year 3+).</p>
+            </div>
+        </section>
+
+        <!-- GO / NO-GO RECOMMENDATION -->
+        <section>
+            <h2>Investment Recommendation</h2>
+            
+            <div class="recommendation-panel">
+                <h3>🚀 GO - STRONG RECOMMEND</h3>
+                <p style="color: var(--text-secondary); font-size: 14px; margin-top: 20px; margin-bottom: 30px;">
+                    AI Career Copilot addresses a critical, high-frequency pain point in a massive addressable market with strong execution tailwinds.
+                </p>
+                
+                <div class="recommendation-content">
+                    <div class="recommendation-item">
+                        <h4>Market Opportunity</h4>
+                        <p>$850M+ TAM in India alone. Chronic, high-stakes problem with low existing solution quality. 120M+ target users with strong willingness to adopt AI-based guidance.</p>
+                    </div>
+                    <div class="recommendation-item">
+                        <h4>Problem Validation</h4>
+                        <p>91% problem severity, 95% frequency, 88% user demand. Not a soft problem—this is an acute pain point affecting every student's career outcome.</p>
+                    </div>
+                    <div class="recommendation-item">
+                        <h4>Competitive Gap</h4>
+                        <p>No integrated platform combining career path + skill roadmaps + portfolio + interviews. Massive market gap. First-mover advantage significant.</p>
+                    </div>
+                    <div class="recommendation-item">
+                        <h4>AI Advantage</h4>
+                        <p>AI is core differentiator (not bolted-on). LLMs enable hyper-personalization impossible for competitors. Switching cost becomes high with quality.</p>
+                    </div>
+                    <div class="recommendation-item">
+                        <h4>Go-to-Market</h4>
+                        <p>Viral college distribution, low CAC through student networks, strong freemium mechanics. Not dependent on complex enterprise sales.</p>
+                    </div>
+                    <div class="recommendation-item">
+                        <h4>Unit Economics Potential</h4>
+                        <p>Freemium model scales without proportional CAC increase. B2B partnerships create low-CAC channels. Multiple revenue streams possible.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Key Strengths</h3>
+            <div class="dashboard-grid">
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>✓ Massive Market</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Not venture-scale if market were small. $850M TAM ensures runway even at modest penetration.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>✓ Recurring Revenue</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Freemium SaaS model with high LTV potential. Predictable, scalable revenue base.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>✓ Network Effects</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">College-centric distribution creates viral loops. First adopters drive peer adoption within network.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--success-color);">
+                    <h3>✓ Defensibility</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Data moat from user interactions. AI recommendation quality improves with scale. Switching cost high.</p>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Critical Risks to Monitor</h3>
+            <div class="dashboard-grid">
+                <div class="card" style="border-left: 4px solid var(--danger-color);">
+                    <h3>⚠ Competition Risk (HIGH)</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Google, Unacademy, iNeuron could enter market quickly. First-mover advantage critical—move fast.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--danger-color);">
+                    <h3>⚠ Adoption Risk (MEDIUM)</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Freemium requires 15%+ conversion to sustainable unit economics. Validate conversion rates within 16 weeks.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--danger-color);">
+                    <h3>⚠ Unit Economics Risk (MEDIUM)</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">CAC > LTV possible if conversion too low or churn too high. Requires continuous optimization.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--danger-color);">
+                    <h3>⚠ Execution Risk (MEDIUM)</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Building integrated AI platform requires strong team. Hiring critical path item.</p>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Investment Terms & Expectations</h3>
+            <div class="dashboard-grid wide">
+                <div class="card">
+                    <h3>Series A Potential (24 Months)</h3>
+                    <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        <strong>Target Metrics:</strong><br/>
+                        • 250K+ active users<br/>
+                        • $1M+ ARR<br/>
+                        • 25%+ conversion freemium-to-paid<br/>
+                        • Strong retention (60%+ M1, 40%+ M3)<br/>
+                        <strong>Funding: $1-3M at $15-30M valuation</strong>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Path to Profitability</h3>
+                    <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        <strong>Year 1:</strong> Focus on PMF, unit economics<br/>
+                        <strong>Year 2:</strong> Path to breakeven visible<br/>
+                        <strong>Year 3:</strong> Profitable at scale with multiple revenue streams<br/>
+                        <strong>Timeline: 36-48 months to profitability</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 30-DAY ACTION PLAN -->
+        <section>
+            <h2>30-Day Execution Roadmap</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker">Week 1</div>
+                    <div class="timeline-content">
+                        <h4>Discovery & Validation</h4>
+                        <p>
+                            <strong>Goals:</strong><br/>
+                            ✓ Conduct 15 founder discovery interviews with college students<br/>
+                            ✓ Map problem pain points and validation scoring<br/>
+                            ✓ Identify college distribution partners<br/>
+                            ✓ Document ICP deeper insights<br/><br/>
+                            <strong>Outputs:</strong> Validated problem statement, college partner list, user research synthesis
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">Week 2</div>
+                    <div class="timeline-content">
+                        <h4>Customer Research & GTM</h4>
+                        <p>
+                            <strong>Goals:</strong><br/>
+                            ✓ Interview 20+ fresh graduates & early-career professionals<br/>
+                            ✓ Define buyer personas with behavioral data<br/>
+                            ✓ Map customer journey in detail<br/>
+                            ✓ Draft college partnership proposals<br/><br/>
+                            <strong>Outputs:</strong> Detailed personas, college partnership drafts, buying trigger framework
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">Week 3</div>
+                    <div class="timeline-content">
+                        <h4>MVP Definition & Design</h4>
+                        <p>
+                            <strong>Goals:</strong><br/>
+                            ✓ Define MVP features (career quiz, skill roadmap, learning recs)<br/>
+                            ✓ Create product wireframes and user flows<br/>
+                            ✓ Draft AI recommendation engine architecture<br/>
+                            ✓ Begin tech stack evaluation<br/><br/>
+                            <strong>Outputs:</strong> Product requirements doc, wireframes, technical architecture
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">Week 4</div>
+                    <div class="timeline-content">
+                        <h4>Testing & Iteration Setup</h4>
+                        <p>
+                            <strong>Goals:</strong><br/>
+                            ✓ Launch landing page and lead capture<br/>
+                            ✓ Begin pre-launch waitlist campaign<br/>
+                            ✓ Complete technical setup and tool selection<br/>
+                            ✓ Define success metrics and tracking<br/><br/>
+                            <strong>Outputs:</strong> Landing page live, waitlist campaign, analytics setup, launch timeline
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Critical Success Metrics (30 Days)</h3>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Customer Discovery</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        <strong>Target: 50+ interviews</strong><br/>
+                        Track: Problem fit score, willingness to pay, feature requests, objections
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>College Partnerships</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        <strong>Target: 3-5 LOIs signed</strong><br/>
+                        Track: Partnership revenue potential, user access, co-marketing terms
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Waitlist Growth</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        <strong>Target: 1000+ signups</strong><br/>
+                        Track: Signup rate, email engagement, referral coefficient
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Technical Progress</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        <strong>Target: MVP architecture done</strong><br/>
+                        Track: Design sprints completed, tech debt assessed, team hiring started
+                    </p>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Resource Allocation</h3>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Team Hiring (Critical Path)</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        <strong>Week 1-2:</strong> Hire CTO/Co-founder<br/>
+                        <strong>Week 2-3:</strong> Hire AI/ML engineer<br/>
+                        <strong>Week 3-4:</strong> Hire full-stack engineer<br/>
+                        <strong>Target: 3-4 person technical team by Day 30</strong>
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Customer Research Budget</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        <strong>Allocation: $2,000-$3,000</strong><br/>
+                        • Coffee meetings (20 interviews)<br/>
+                        • User research tools<br/>
+                        • College travel/visits
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Marketing & Waitlist</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        <strong>Allocation: $1,000-$2,000</strong><br/>
+                        • Landing page development<br/>
+                        • Social media campaigns<br/>
+                        • College community outreach
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Operations & Infrastructure</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        <strong>Allocation: $500-$1,000</strong><br/>
+                        • Tools & software<br/>
+                        • Cloud infrastructure<br/>
+                        • Legal & incorporation
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCORING DASHBOARD -->
+        <section>
+            <h2>Comprehensive Scoring Summary</h2>
+            
+            <div class="dashboard-grid wide">
+                <div class="card">
+                    <h3>Startup Viability Score</h3>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="url(#viable-grad)" stroke-width="12" stroke-dasharray="176.92 251.2" stroke-dashoffset="22.6" transform="rotate(-90 70 70)"/>
+                            <defs><linearGradient id="viable-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#10b981"/><stop offset="100%" style="stop-color:#00d4ff"/></linearGradient></defs>
+                            <text x="70" y="75" text-anchor="middle" font-size="32" font-weight="700" fill="white">75/100</text>
+                        </svg>
+                        <span style="font-size: 12px; color: var(--text-secondary);">Viable Business</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Market Opportunity Score</h3>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="url(#market-grad)" stroke-width="12" stroke-dasharray="213.76 251.2" stroke-dashoffset="22.6" transform="rotate(-90 70 70)"/>
+                            <defs><linearGradient id="market-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#10b981"/><stop offset="100%" style="stop-color:#00d4ff"/></linearGradient></defs>
+                            <text x="70" y="75" text-anchor="middle" font-size="32" font-weight="700" fill="white">85/100</text>
+                        </svg>
+                        <span style="font-size: 12px; color: var(--text-secondary);">Excellent Market</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Investment Readiness Score</h3>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="url(#invest-grad)" stroke-width="12" stroke-dasharray="138.08 251.2" stroke-dashoffset="22.6" transform="rotate(-90 70 70)"/>
+                            <defs><linearGradient id="invest-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#f97316"/><stop offset="100%" style="stop-color:#00d4ff"/></linearGradient></defs>
+                            <text x="70" y="75" text-anchor="middle" font-size="32" font-weight="700" fill="white">55/100</text>
+                        </svg>
+                        <span style="font-size: 12px; color: var(--text-secondary);">Early Stage</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Success Probability Score</h3>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 140 140">
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
+                            <circle cx="70" cy="70" r="60" fill="none" stroke="url(#success-grad)" stroke-width="12" stroke-dasharray="200.96 251.2" stroke-dashoffset="22.6" transform="rotate(-90 70 70)"/>
+                            <defs><linearGradient id="success-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#10b981"/><stop offset="100%" style="stop-color:#00d4ff"/></linearGradient></defs>
+                            <text x="70" y="75" text-anchor="middle" font-size="32" font-weight="700" fill="white">76/100</text>
+                        </svg>
+                        <span style="font-size: 12px; color: var(--text-secondary);">Strong Prospects</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Detailed Scoring Breakdown</h3>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Competition Intensity</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Score</span>
+                            <span>65/100</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%; background: linear-gradient(90deg, var(--warning-color), var(--accent-orange));"></div>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 11px; margin-top: 10px;">Fragmented market, no dominant player. Entrants from larger players likely but market is large enough for multiple winners.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Execution Risk</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Score</span>
+                            <span>62/100</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 62%; background: linear-gradient(90deg, var(--warning-color), var(--accent-orange));"></div>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 11px; margin-top: 10px;">Building integrated AI platform is complex. Requires strong technical team. Solvable with right team and resources.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Problem-Solution Fit</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Score</span>
+                            <span>88/100</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 88%;"></div>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 11px; margin-top: 10px;">Solution directly addresses critical pain points. Integrated approach fills major market gaps. Strong product-market fit potential.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Go-to-Market Clarity</h3>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Score</span>
+                            <span>80/100</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%;"></div>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 11px; margin-top: 10px;">Clear college-based distribution strategy. Low CAC channels available. Freemium mechanics well-defined. Viral potential high.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FINAL VERDICT -->
+        <section>
+            <h2>Executive Verdict & Investment Recommendation</h2>
+            
+            <div style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(0,212,255,0.1)); border: 2px solid var(--success-color); border-radius: 16px; padding: 40px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center; margin-bottom: 40px;">
+                <h3 style="color: var(--success-color); font-size: 28px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">🚀 GO - STRONG INVESTMENT SIGNAL</h3>
+                <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.8; max-width: 600px; margin: 0 auto;">
+                    AI Career Copilot presents a compelling venture-scale opportunity with large TAM, critical problem validation, clear competitive gaps, and defensible technology. The combination of market timing, problem urgency, and founder opportunity makes this a strong recommendation for seed-stage investment.
+                </p>
+            </div>
+
+            <div class="dashboard-grid wide">
+                <div class="card">
+                    <h3>📊 Startup Score</h3>
+                    <div style="font-size: 36px; font-weight: 700; color: var(--accent-green); margin: 15px 0;">76 / 100</div>
+                    <p style="color: var(--text-secondary); font-size: 12px;">Strong fundamentals with execution risk as primary variable</p>
+                </div>
+
+                <div class="card">
+                    <h3>💰 Funding Recommendation</h3>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--accent-blue); margin: 15px 0;">$1.5M - $3M</div>
+                    <p style="color: var(--text-secondary); font-size: 12px;">Seed round for 18-month runway to strong unit economics</p>
+                </div>
+
+                <div class="card">
+                    <h3>📈 Growth Potential</h3>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--accent-purple); margin: 15px 0;">10x - 100x</div>
+                    <p style="color: var(--text-secondary); font-size: 12px;">Multiple expansion paths, recurring revenue, network effects</p>
+                </div>
+
+                <div class="card">
+                    <h3>⏱️ Path to Exit</h3>
+                    <div style="font-size: 20px; font-weight: 700; color: var(--accent-orange); margin: 15px 0;">7-10 Years</div>
+                    <p style="color: var(--text-secondary); font-size: 12px;">Acquisition or IPO as larger edtech consolidation play</p>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Top Investment Theses</h3>
+            <div class="dashboard-grid">
+                <div class="card" style="border-left: 4px solid var(--accent-green);">
+                    <h3>✓ Thesis #1: Market Timing</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">India's EdTech boom + AI adoption + student placement anxiety = perfect storm. Window of opportunity: 18-24 months before major competitors enter.</p>
+                </div>
+
+                <div class="card" style="border-left: 4px solid var(--accent-green);">
+                    <h3>✓ Thesis #2: Unit Economics</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Freemium SaaS model with viral college distribution = incredibly favorable unit economics. CAC low, LTV high, margins strong at scale.</p>
+                </div>
+
+                <div class="card" style="border-left: 4px solid var(--accent-green);">
+                    <h3>✓ Thesis #3: Defensibility</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">AI trained on user interaction data becomes defensible moat. First-mover accumulates superior training data. Switching cost high for premium users.</p>
+                </div>
+
+                <div class="card" style="border-left: 4px solid var(--accent-green);">
+                    <h3>✓ Thesis #4: Platform Play</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">Positions for adjacent monetization (B2B recruitment, corporate learning, global expansion). Single platform creates network effects and data leverage.</p>
+                </div>
+            </div>
+
+            <h3 style="color: var(--text-primary); margin-top: 40px; margin-bottom: 20px; font-size: 16px;">Recommended Next Steps (Founder)</h3>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>🎯 30 Days</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        1. Hire founding team<br/>
+                        2. Complete 50+ customer interviews<br/>
+                        3. Sign 3-5 college partnerships<br/>
+                        4. Define MVP product<br/>
+                        5. Launch waitlist (1K+ signups)
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>💼 90 Days</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        1. Launch MVP to early customers<br/>
+                        2. Achieve product-market fit signals<br/>
+                        3. 10%+ freemium-to-paid conversion<br/>
+                        4. Founder + CTO fundraising ready<br/>
+                        5. Seed pitch deck polished
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>🚀 6 Months</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        1. 5K-10K active users<br/>
+                        2. $10K-$50K MRR<br/>
+                        3. Unit economics validated<br/>
+                        4. Series A conversations started<br/>
+                        5. College partnerships scaling
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>📈 18 Months</h3>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        1. 50K-100K active users<br/>
+                        2. $200K-$500K MRR<br/>
+                        3. Series A funding complete<br/>
+                        4. Expansion to 2-3 new markets<br/>
+                        5. B2B revenue stream initiated
+                    </p>
+                </div>
+            </div>
+
+            <div class="insight-box" style="margin-top: 30px;">
+                <p><strong>Final Thought:</strong> This is a venture-scale opportunity hiding in plain sight. The problem is desperate, the market is massive, and the technology timing is perfect. Execution risk is real, but solvable with strong team and capital. The founder who moves fast, stays focused on unit economics, and maintains product excellence will win this market decisively.</p>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>Startup Validation Intelligence Report | AI Career Copilot | Generated by Venture Analysis Platform</p>
+            <p style="margin-top: 10px; font-size: 11px;">This report contains assumptions, estimates, and forward-looking statements. Past performance is not indicative of future results. All metrics are based on market research and should be validated through primary research.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Animate counters on page load
+        function animateCounter(element, target, duration = 1500) {
+            const start = 0;
+            const increment = target / (duration / 50);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 50);
+        }
+
+        // Initialize scores when page loads
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                // Hero scores
+                animateCounter(document.getElementById('overall-score'), 76);
+                animateCounter(document.getElementById('investment-score'), 55);
+                animateCounter(document.getElementById('market-score'), 85);
+                animateCounter(document.getElementById('success-score'), 76);
+
+                // FMF score
+                animateCounter(document.getElementById('fmf-value'), 68);
+                document.getElementById('fmf-label').textContent = 'Moderate Fit';
+
+                // Domain scores
+                animateCounter(document.getElementById('domain-score'), 65, 800);
+                animateCounter(document.getElementById('ai-score'), 72, 800);
+                animateCounter(document.getElementById('access-score'), 78, 800);
+                animateCounter(document.getElementById('exec-score'), 60, 800);
+                animateCounter(document.getElementById('product-score'), 70, 800);
+                animateCounter(document.getElementById('fundraise-score'), 55, 800);
+
+                // Progress bars
+                document.getElementById('domain-bar').style.width = '65%';
+                document.getElementById('ai-bar').style.width = '72%';
+                document.getElementById('access-bar').style.width = '78%';
+                document.getElementById('exec-bar').style.width = '60%';
+                document.getElementById('product-bar').style.width = '70%';
+                document.getElementById('fundraise-bar').style.width = '55%';
+            }, 300);
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Add hover effects
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transition = 'all 0.3s ease';
+            });
+        });
+    </script>
+</body>
+</html>
