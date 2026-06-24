@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Career Copilot - Startup Intelligence Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #141829;
+            --bg-tertiary: #1a1f3a;
+            --bg-hover: #242d52;
+            --border-color: #2d3561;
+            --text-primary: #f5f7fa;
+            --text-secondary: #a8afc4;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --accent-info: #3b82f6;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0f1535 50%, #1a0033 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            background-attachment: fixed;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            padding: 60px 20px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 25s infinite ease-in-out reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(30px) translateX(20px); }
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 40px;
+        }
+
+        .hero-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 50%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        .hero-verdict {
+            display: inline-block;
+            padding: 16px 32px;
+            background: rgba(245, 158, 11, 0.15);
+            border: 2px solid var(--accent-warning);
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #fcd34d;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            width: 100%;
+        }
+
+        .kpi-card {
+            background: rgba(20, 24, 41, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .kpi-card:hover::before {
+            opacity: 1;
+        }
+
+        .kpi-value {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            position: sticky;
+            top: 0;
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 16px 20px;
+            z-index: 50;
+            max-width: 1400px;
+            margin: 0 auto 40px;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .section-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-card {
+            background: rgba(20, 24, 41, 0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 14px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .insight-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.1);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .card-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Score Gauge */
+        .score-gauge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .gauge-svg {
+            width: 140px;
+            height: 140px;
+        }
+
+        .gauge-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        .metric-tile {
+            background: rgba(20, 24, 41, 0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-tile:hover {
+            border-color: var(--accent-primary);
+            transform: scale(1.05);
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Table */
+        .table-wrapper {
+            background: rgba(20, 24, 41, 0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(26, 31, 58, 0.8);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        tbody tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        /* Verdict Panel */
+        .verdict-panel {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+            border: 2px solid var(--accent-warning);
+            border-radius: 18px;
+            padding: 48px;
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .verdict-emoji {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .verdict-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .verdict-subtitle {
+            font-size: 18px;
+            color: #fcd34d;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .verdict-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 60px;
+        }
+
+        /* SVG Chart */
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            margin-bottom: 24px;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: 3px solid var(--bg-primary);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 28px;
+            width: 2px;
+            height: 40px;
+            background: var(--border-color);
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .timeline-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Health Indicator */
+        .health-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(20, 24, 41, 0.5);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .health-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .health-dot.good { background: var(--accent-success); box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
+        .health-dot.warning { background: var(--accent-warning); box-shadow: 0 0 12px rgba(245, 158, 11, 0.5); }
+        .health-dot.danger { background: var(--accent-danger); box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); }
+
+        .health-text {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .health-text-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .health-text-desc {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-title {
+                font-size: 48px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                min-height: auto;
+                padding: 40px 20px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .nav-tabs {
+                padding: 12px 10px;
+            }
+
+            .nav-tab {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+
+            .verdict-panel {
+                padding: 32px 20px;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse { animation: pulse 2s infinite; }
+
+        /* Blur Backdrop */
+        .glass {
+            background: rgba(20, 24, 41, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">🚀 AI Career Copilot</h1>
+            <p class="hero-subtitle">Comprehensive Business Sustainability Analysis & Investment Intelligence Platform</p>
+            <div class="hero-verdict">🟡 Validate Grade — Conditional Go</div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-value">63</div>
+                    <div class="kpi-label">Business Viability Score</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">68</div>
+                    <div class="kpi-label">Revenue Potential</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">66</div>
+                    <div class="kpi-label">GTM Strength</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">60</div>
+                    <div class="kpi-label">Competitive Strength</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('founder')">👨‍💼 Founder Dashboard</button>
+        <button class="nav-tab" onclick="switchTab('investor')">💰 Investor Dashboard</button>
+        <button class="nav-tab" onclick="switchTab('growth')">📈 Growth Dashboard</button>
+        <button class="nav-tab" onclick="switchTab('analysis')">🔬 Deep Analysis</button>
+    </div>
+
+    <div class="container">
+        <!-- FOUNDER DASHBOARD -->
+        <div id="founder" class="tab-content active">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🎯</div>
+                    <h2 class="section-title">Executive Summary for Founders</h2>
+                </div>
+                <div class="cards-grid">
+                    <div class="insight-card">
+                        <div class="card-title">💡 The Opportunity</div>
+                        <div class="card-text">50M+ students & graduates in India face career path confusion, skill gaps, and interview anxiety. No integrated AI-driven solution exists. $150M+ addressable market with 78-95% pain point validation.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="card-title">🎯 Your Position</div>
+                        <div class="card-text">White space in India-first, outcome-focused career platform. Competitors (LinkedIn, Coursera) optimize for content, not career guidance. Speed-to-PMF is your only moat in next 12 months.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="card-title">⚠️ Critical Assumption</div>
+                        <div class="card-text">25% free-to-paid conversion is optimistic; industry average is 5-8%. Current Year 1 revenue (₹77.86L) insufficient to cover team costs (₹1Cr+). Need 3K+ users or pivot to B2B.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="card-title">🚀 Validation Path</div>
+                        <div class="card-text">60 days to MVP launch. 90 days to validate PMF with 10K+ users + 25% D30 retention. 180 days to prove unit economics positive + lock 10 college partnerships (₹50K+/year each).</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🔥</div>
+                    <h2 class="section-title">Startup Health Check</h2>
+                </div>
+                <div>
+                    <div class="health-indicator">
+                        <div class="health-dot good"></div>
+                        <div class="health-text">
+                            <div class="health-text-label">Problem Validation</div>
+                            <div class="health-text-desc">85/100 — Strong pain point severity across all segments</div>
+                        </div>
+                    </div>
+                    <div class="health-indicator">
+                        <div class="health-dot warning"></div>
+                        <div class="health-text">
+                            <div class="health-text-label">Product Readiness</div>
+                            <div class="health-text-desc">MVP not built yet — AI differentiation unvalidated</div>
+                        </div>
+                    </div>
+                    <div class="health-indicator">
+                        <div class="health-dot danger"></div>
+                        <div class="health-text">
+                            <div class="health-text-label">Revenue Model</div>
+                            <div class="health-text-desc">Unit economics fragile below 20% conversion — needs de-risking</div>
+                        </div>
+                    </div>
+                    <div class="health-indicator">
+                        <div class="health-dot warning"></div>
+                        <div class="health-text">
+                            <div class="health-text-label">Competitive Moat</div>
+                            <div class="health-text-desc">Weak — incumbents can copy in 6-9 months</div>
+                        </div>
+                    </div>
+                    <div class="health-indicator">
+                        <div class="health-dot good"></div>
+                        <div class="health-text">
+                            <div class="health-text-label">Market Size</div>
+                            <div class="health-text-desc">$150M+ TAM with strong growth tailwinds</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">✅</div>
+                    <h2 class="section-title">Top 10 Actions (Next 30 Days)</h2>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-title">1. Validate CAC Assumption (Days 1-5)</div>
+                        <div class="timeline-desc">Launch landing page. If CAC >₹300, de-risk now via B2B or outcome commissions.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">2. Secure 5 College Partnerships (Days 1-10)</div>
+                        <div class="timeline-desc">Personal outreach to 20 colleges. Offer free access for 100+ student signups. Lock supply early.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">3. Build & Launch MVP (Days 1-15)</div>
+                        <div class="timeline-desc">Ship core features. Focus on onboarding + retention, not fancy AI initially.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">4. Recruit Influencer Partners (Days 3-7)</div>
+                        <div class="timeline-desc">DM 20 creators. Land 3-5 commitments with 50% commission or free access.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">5. Validate Free-to-Paid Conversion (Days 15-30)</div>
+                        <div class="timeline-desc">Launch Pro tier. If <15% conversion, pause growth; fix funnel first.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">6. Build Outcome Tracking (Days 10-20)</div>
+                        <div class="timeline-desc">Add post-use survey. Collect job titles, salary, feedback. Build case studies.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">7. Launch Content Marketing (Days 1-30)</div>
+                        <div class="timeline-desc">10 LinkedIn posts, 5 YouTube shorts, 20 tweets. Goal: organic reach, low CAC.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">8. Prepare Fundraising Deck (Days 15-30)</div>
+                        <div class="timeline-desc">10-slide deck for pre-seed investors. Identify 20 targets for pitch meetings.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">9. Setup Analytics Dashboards (Days 5-10)</div>
+                        <div class="timeline-desc">Implement Mixpanel. Track CAC, LTV, retention daily. Data-driven decisions only.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">10. Validate B2B Opportunity (Days 10-30)</div>
+                        <div class="timeline-desc">Talk to 10 colleges about licensing at ₹10K/year. De-risk 30-40% revenue.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVESTOR DASHBOARD -->
+        <div id="investor" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">💼</div>
+                    <h2 class="section-title">Investment Thesis</h2>
+                </div>
+                <div class="cards-grid">
+                    <div class="insight-card">
+                        <div class="card-title">Market Size</div>
+                        <div class="card-text"><strong>$150M+ TAM</strong> in India; 50M annual target audience. Global expansion potential: $500M+ TAM across Southeast Asia & Africa.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="card-title">Problem-Solution Fit</div>
+                        <div class="card-text"><strong>85/100</strong> problem validation. 78-95% pain point severity. Real demand signal. Solution positioning strong vs. competitors.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="card-title">Business Model</div>
+                        <div class="card-text"><strong>Freemium SaaS</strong> + B2B Licensing. Year 1: ₹77.86L ($93K). Year 3 projection: ₹2-3Cr with 70%+ SaaS margins.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="card-title">Exit Potential</div>
+                        <div class="card-text">Acquihire target: LinkedIn, Coursera, Byju's, Unacademy. IPO potential if 10M+ users by Year 5. 3-5 year horizon to $10M ARR.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">📊</div>
+                    <h2 class="section-title">Investment Scorecard (0-100)</h2>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-tile">
+                        <div class="metric-value">63</div>
+                        <div class="metric-label">Business Viability</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">68</div>
+                        <div class="metric-label">Revenue Potential</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">66</div>
+                        <div class="metric-label">GTM Strength</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">60</div>
+                        <div class="metric-label">Competitive Strength</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">58</div>
+                        <div class="metric-label">Investor Readiness</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">63</div>
+                        <div class="metric-label">Average Score</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">⚠️</div>
+                    <h2 class="section-title">Investment Risks & Mitigation</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Risk</th>
+                                <th>Impact</th>
+                                <th>Probability</th>
+                                <th>Mitigation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Competitive Response</strong><br/>LinkedIn/Coursera launch AI features</td>
+                                <td>Critical (9/10)</td>
+                                <td>70%</td>
+                                <td>Speed-to-PMF; Lock college partnerships; Build outcome data moat</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CAC Inflation</strong><br/>YouTube/influencer costs rising</td>
+                                <td>High (8/10)</td>
+                                <td>65%</td>
+                                <td>Target <₹500 CAC; Organic content focus; College distribution</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Conversion Collapse</strong><br/>Free-to-paid <10% vs. 25% assumption</td>
+                                <td>Critical (10/10)</td>
+                                <td>40%</td>
+                                <td>Outcome guarantees; Mentorship upsells; B2B pivot</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PMF Gap</strong><br/>Product doesn't resonate with users</td>
+                                <td>Critical (10/10)</td>
+                                <td>35%</td>
+                                <td>Rapid MVP iteration; Weekly user interviews; Pivot channels if needed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Seasonal Churn</strong><br/>May-July, Nov-Dec: user drop-off</td>
+                                <td>High (7/10)</td>
+                                <td>60%</td>
+                                <td>Continuous enrollment model; Job tracking features; Community retention</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">💡</div>
+                    <h2 class="section-title">Funding Recommendation</h2>
+                </div>
+                <div class="insight-card" style="grid-column: 1 / -1;">
+                    <div class="card-title">Pre-Seed Round: ₹25-50L</div>
+                    <div class="card-text" style="font-size: 14px; line-height: 1.8;">
+                        <strong>Stage:</strong> MVP validation (30-60 days) with 1,000 beta users. <br/>
+                        <strong>Use of Funds:</strong> Team (40%), Influencer partnerships (25%), Infrastructure (10%), Content (15%), Operations (10%). <br/>
+                        <strong>Milestones:</strong> PMF validation within 90 days; 10K+ users + 25% D30 retention; <₹500 CAC proof; 10+ college partnerships. <br/>
+                        <strong>Series A Readiness:</strong> Requires demonstrated unit economics positive + 5K+ paying users by Month 12. Current path: NOT Series A-ready without major validation.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GROWTH DASHBOARD -->
+        <div id="growth" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🎯</div>
+                    <h2 class="section-title">Customer Acquisition Strategy</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Channel</th>
+                                <th>CAC</th>
+                                <th>Users/Month</th>
+                                <th>% Mix</th>
+                                <th>Payback Period</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>College Partnerships</td>
+                                <td>₹200</td>
+                                <td>200</td>
+                                <td>35%</td>
+                                <td>10 months</td>
+                                <td style="color: var(--accent-success);">✓ Sustainable</td>
+                            </tr>
+                            <tr>
+                                <td>Influencer Marketing</td>
+                                <td>₹500</td>
+                                <td>150</td>
+                                <td>26%</td>
+                                <td>12 months</td>
+                                <td style="color: var(--accent-warning);">⚠ Marginal</td>
+                            </tr>
+                            <tr>
+                                <td>Content (Organic)</td>
+                                <td>₹100</td>
+                                <td>100</td>
+                                <td>18%</td>
+                                <td>6 months</td>
+                                <td style="color: var(--accent-success);">✓ Strong</td>
+                            </tr>
+                            <tr>
+                                <td>Referral/Viral</td>
+                                <td>₹50</td>
+                                <td>80</td>
+                                <td>14%</td>
+                                <td>3 months</td>
+                                <td style="color: var(--accent-success);">✓ Excellent</td>
+                            </tr>
+                            <tr style="font-weight: 700;">
+                                <td>Blended CAC</td>
+                                <td>₹285</td>
+                                <td>530</td>
+                                <td>100%</td>
+                                <td>8.5 months</td>
+                                <td style="color: var(--accent-success);">✓ Achievable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">💰</div>
+                    <h2 class="section-title">Revenue Trajectory & Assumptions</h2>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-tile">
+                        <div class="metric-value">₹77.86L</div>
+                        <div class="metric-label">Year 1 Revenue</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">1,000</div>
+                        <div class="metric-label">Pro Users Target</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">150</div>
+                        <div class="metric-label">Premium+ Users</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">25%</div>
+                        <div class="metric-label">Free-to-Paid Conv.</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">₹5,988</div>
+                        <div class="metric-label">Pro ARR</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">8-10%</div>
+                        <div class="metric-label">Monthly Churn</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">⚠️</div>
+                    <h2 class="section-title">Growth Risks & Mitigation</h2>
+                </div>
+                <div class="cards-grid">
+                    <div class="insight-card">
+                        <div class="card-title">🔴 CAC Inflation Risk</div>
+                        <div class="card-text"><strong>Probability: 65%</strong> | YouTube costs rising 20-30% YoY. Blended CAC could reach ₹500+ by Q3 2024. <strong>Mitigation:</strong> Focus on organic content (₹100 CAC) and college partnerships (₹200 CAC). Target college mix to 50% of new users.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="card-title">🟡 College MOU Friction</div>
+                        <div class="card-text"><strong>Probability: 55%</strong> | Procurement cycles 6-12 months. Realistic target: 3-5 colleges, not 20. <strong>Mitigation:</strong> Personal relationships with placement directors. Free pilot → paid license model. Start with Tier-2/3 colleges (faster decisions).</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="card-title">🔴 Conversion Collapse</div>
+                        <div class="card-text"><strong>Probability: 40%</strong> | If conversion <10%, Year 1 revenue halves to ₹25-30L. <strong>Mitigation:</strong> Outcome guarantees ("job or money back"). Mentorship tier at ₹999/mo. Build job placement tracking early.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="card-title">🟡 Viral Loop Failure</div>
+                        <div class="card-text"><strong>Probability: 50%</strong> | Viral coefficient assumption (>1.2) untested. Reality: typical edtech 0.8-1.0. <strong>Mitigation:</strong> In-app referral incentives. Success story amplification. Weekly viral coefficient tracking.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🚀</div>
+                    <h2 class="section-title">First 100 Users Plan (Days 1-60)</h2>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-title">Phase 1: Days 1-14 (Foundation)</div>
+                        <div class="timeline-desc">Internal beta (20 friends), contact 10 colleges, pitch 5 creators, prepare ProductHunt, create content library.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">Phase 2: Days 15-30 (Launch)</div>
+                        <div class="timeline-desc">ProductHunt launch (target 100 upvotes, 200+ signups), 3-5 YouTube videos, secure 2-3 college pilots, media mentions.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">Phase 3: Days 31-45 (Acceleration)</div>
+                        <div class="timeline-desc">Referral program launch, showcase first wins, 30 TikTok shorts, ₹2-3L influencer spend, daily iteration.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-title">Phase 4: Days 46-60 (Conversion)</div>
+                        <div class="timeline-desc">A/B test pricing, email nurture campaigns, track D7/D30 retention, target 20-30 paid users, analytics deep dive.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYSIS TAB -->
+        <div id="analysis" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🏰</div>
+                    <h2 class="section-title">Competitive Landscape & Moat</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Competitor</th>
+                                <th>Strength</th>
+                                <th>Weakness</th>
+                                <th>Threat Level</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>LinkedIn Learning</strong></td>
+                                <td>100M+ users, brand moat, distribution</td>
+                                <td>Generic content; no career guidance; global pricing</td>
+                                <td style="color: var(--accent-danger);">HIGH (70%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Coursera</strong></td>
+                                <td>Brand, certificates, course quality</td>
+                                <td>Course-focused; ₹2K-5K price; no interview prep; slow</td>
+                                <td style="color: var(--accent-warning);">MEDIUM (40%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Udemy</strong></td>
+                                <td>Content library, low price</td>
+                                <td>Quality varies; no personalization; fragmented</td>
+                                <td style="color: var(--accent-success);">LOW (15%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Internshala</strong></td>
+                                <td>India-first, brand, internship marketplace</td>
+                                <td>Internship-only; limited guidance; no upskilling</td>
+                                <td style="color: var(--accent-success);">LOW (10%)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">💪</div>
+                    <h2 class="section-title">Current Moat Assessment</h2>
+                </div>
+                <div class="cards-grid">
+                    <div class="insight-card" style="border-left: 4px solid var(--accent-danger);">
+                        <div class="card-title">🔴 Product Moat (WEAK)</div>
+                        <div class="card-text">AI features can be copied by LinkedIn/Coursera in 6 months. Only moat if product quality + India-first UX locked early. Defensibility requires continuous innovation.</div>
+                    </div>
+                    <div class="insight-card" style="border-left: 4px solid var(--accent-danger);">
+                        <div class="card-title">🔴 Brand Moat (WEAK)</div>
+                        <div class="card-text">Early-stage, unproven brand. No moat until 10K+ users and measurable outcomes. Vulnerable to well-funded competitor entering market.</div>
+                    </div>
+                    <div class="insight-card" style="border-left: 4px solid var(--accent-warning);">
+                        <div class="card-title">🟡 Data Moat (EMERGING)</div>
+                        <div class="card-text">Job market data + user success data valuable, but takes 12+ months to accumulate. Only becomes defensible after 50K+ users with outcome tracking.</div>
+                    </div>
+                    <div class="insight-card" style="border-left: 4px solid var(--accent-success);">
+                        <div class="card-title">🟢 Distribution Moat (EMERGING)</div>
+                        <div class="card-text">College partnerships create channel lock-in if 50+ colleges signed. Campus distribution is difficult for competitors to replicate quickly. Real moat if executed well.</div>
+                    </div>
+                    <div class="insight-card" style="border-left: 4px solid var(--accent-success);">
+                        <div class="card-title">🟢 Speed Moat (TIME-LIMITED)</div>
+                        <div class="card-text">Only moat is speed-to-PMF. 6-month head start before incumbents respond. Must achieve 10K+ users + positive unit economics within 12 months.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">📋</div>
+                    <h2 class="section-title">Business Model Canvas</h2>
+                </div>
+                <svg viewBox="0 0 1000 600" style="background: rgba(20, 24, 41, 0.3); border-radius: 14px; margin-bottom: 20px;">
+                    <!-- Grid -->
+                    <rect x="20" y="20" width="160" height="160" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+                    <rect x="200" y="20" width="160" height="160" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+                    <rect x="380" y="20" width="240" height="160" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+                    <rect x="640" y="20" width="160" height="160" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+                    <rect x="820" y="20" width="160" height="160" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+                    
+                    <rect x="20" y="200" width="160" height="160" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+                    <rect x="200" y="200" width="240" height="160" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+                    <rect x="460" y="200" width="240" height="160" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+                    <rect x="720" y="200" width="160" height="160" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+                    <rect x="900" y="200" width="80" height="160" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+                    
+                    <rect x="20" y="380" width="940" height="200" fill="none" stroke="rgba(99, 102, 241, 0.2)" stroke-width="1"/>
+
+                    <!-- Labels -->
+                    <text x="100" y="45" text-anchor="middle" font-size="12" font-weight="700" fill="#6366f1">KEY PARTNERS</text>
+                    <text x="100" y="130" text-anchor="middle" font-size="10" fill="#a8afc4">Colleges, YouTube, Content Creators, Payment, Cloud</text>
+
+                    <text x="280" y="45" text-anchor="middle" font-size="12" font-weight="700" fill="#6366f1">KEY ACTIVITIES</text>
+                    <text x="280" y="130" text-anchor="middle" font-size="10" fill="#a8afc4">AI Development, Content, Acquisition, Iteration</text>
+
+                    <text x="500" y="45" text-anchor="middle" font-size="12" font-weight="700" fill="#6366f1">VALUE PROPOSITION</text>
+                    <text x="500" y="130" text-anchor="middle" font-size="10" fill="#a8afc4">Integrated, AI-personalized, India-first, Outcome-focused</text>
+
+                    <text x="720" y="45" text-anchor="middle" font-size="12" font-weight="700" fill="#6366f1">CUSTOMER RELATIONSHIPS</text>
+                    <text x="720" y="130" text-anchor="middle" font-size="10" fill="#a8afc4">Freemium, Support, Email, Community</text>
+
+                    <text x="900" y="45" text-anchor="middle" font-size="12" font-weight="700" fill="#6366f1">CHANNELS</text>
+                    <text x="900" y="130" text-anchor="middle" font-size="10" fill="#a8afc4">Colleges, YouTube, LinkedIn, Influencers, ProductHunt</text>
+
+                    <text x="100" y="225" text-anchor="middle" font-size="12" font-weight="700" fill="#6366f1">KEY RESOURCES</text>
+                    <text x="100" y="310" text-anchor="middle" font-size="10" fill="#a8afc4">Engineers, Designers, Content, Brand, Data, Capital</text>
+
+                    <text x="320" y="225" text-anchor="middle" font-size="12" font-weight="700" fill="#6366f1">CUSTOMER SEGMENTS</text>
+                    <text x="320" y="310" text-anchor="middle" font-size="10" fill="#a8afc4">College students, Fresh grads, Job seekers, Colleges (B2B)</text>
+
+                    <text x="580" y="225" text-anchor="middle" font-size="12" font-weight="700" fill="#6366f1">REVENUE STREAMS</text>
+                    <text x="580" y="310" text-anchor="middle" font-size="10" fill="#a8afc4">Subscription Pro/Premium+, B2B Licensing, Commissions, Affiliate</text>
+
+                    <text x="800" y="225" text-anchor="middle" font-size="12" font-weight="700" fill="#6366f1">COST STRUCTURE</text>
+                    <text x="800" y="310" text-anchor="middle" font-size="10" fill="#a8afc4">Engineering 40%, Acquisition 25%, Content 15%</text>
+
+                    <text x="500" y="490" text-anchor="middle" font-size="12" font-weight="700" fill="#6366f1">CUSTOMER JOURNEY</text>
+                    <text x="500" y="520" text-anchor="middle" font-size="10" fill="#a8afc4">Awareness (College/YouTube) → Consideration (Free Trial) → Purchase (Pro ₹499/mo) → Retention (Outcomes) → Loyalty (Premium+)</text>
+                </svg>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🎭</div>
+                    <h2 class="section-title">Investor One-Liner & Founder Pitch</h2>
+                </div>
+                <div class="cards-grid">
+                    <div class="insight-card" style="grid-column: 1 / -1;">
+                        <div class="card-title">💡 Investor One-Liner</div>
+                        <div class="card-text" style="font-size: 14px; font-style: italic;">
+                            "AI Career Copilot is the India-first, outcome-focused alternative to fragmented YouTube/Udemy for 50M annual job seekers, targeting ₹77L Year 1 revenue with 25% free-to-paid conversion and $150M market opportunity."
+                        </div>
+                    </div>
+                    <div class="insight-card" style="grid-column: 1 / -1;">
+                        <div class="card-title">🎤 30-Second Founder Pitch</div>
+                        <div class="card-text" style="font-size: 13px;">
+                            "50 million students and fresh graduates in India struggle with three things: finding the right career path, knowing what skills to learn, and preparing for interviews. They're scattered across YouTube, Coursera, and LinkedIn—wasting time and getting generic advice. We're building an AI career copilot that's personalized, India-priced, and outcome-focused. In 30 days, we'll validate product-market fit with 1,000 beta users. Our goal: $150M market opportunity with 25% free-to-paid conversion. We're launching in placement season when demand peaks. Who here has felt lost in their career?"
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VERDICT -->
+        <div class="verdict-panel">
+            <div class="verdict-emoji">🟡</div>
+            <div class="verdict-title">Validate Grade</div>
+            <div class="verdict-subtitle">Conditional Path to Sustainability</div>
+            <div class="verdict-text">
+                AI Career Copilot addresses a real, high-severity problem in a $150M+ market with strong demand signals. The business model is sound in theory (freemium SaaS), but critically dependent on three unvalidated assumptions: (1) product differentiation through AI delivers measurable job outcomes, (2) free-to-paid conversion reaches 20%+ (industry average: 5-8%), and (3) CAC remains <₹500 despite competitive saturation.
+                <br/><br/>
+                <strong>Current Sustainability Assessment:</strong> NOT SUSTAINABLE at projected Year 1 revenue (₹77.86L insufficient to cover ₹1Cr+ team costs). Requires either: (a) 3X more users, (b) 2X higher pricing, or (c) B2B licensing (30-40% revenue mix).
+                <br/><br/>
+                <strong>Path to Sustainability:</strong> (1) Achieve PMF within 90 days (10K+ users + 25% D30 retention). (2) Prove 20%+ conversion via outcome guarantees. (3) Lock 10+ college partnerships (₹50K+/year). (4) Raise pre-seed ₹25-50L for 18-month runway. (5) Hit 5K paying users by Month 12.
+                <br/><br/>
+                <strong>Suitable for:</strong> Pre-seed/early-seed only (₹25-50L). Series A unsuitable until 10K+ users + positive unit economics proven. 2-3 tranche structure recommended based on validation milestones.
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div style="margin-bottom: 12px;">
+                <strong>AI Career Copilot</strong> | Startup Intelligence Platform
+            </div>
+            <div style="font-size: 11px; opacity: 0.7;">
+                Business content, analysis, scores, findings, and recommendations remain unchanged from original report. Design and presentation redesigned for premium startup intelligence experience.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.nav-tab');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Animate counters on page load
+        window.addEventListener('load', () => {
+            const counters = document.querySelectorAll('.kpi-value, .metric-value');
+            counters.forEach(counter => {
+                const final = parseInt(counter.textContent) || counter.textContent;
+                if (typeof final === 'number') {
+                    let current = 0;
+                    const increment = final / 30;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= final) {
+                            counter.textContent = final;
+                            clearInterval(timer);
+                        } else {
+                            counter.textContent = Math.ceil(current);
+                        }
+                    }, 30);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
