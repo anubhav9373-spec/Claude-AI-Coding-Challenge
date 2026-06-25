@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Shark Tank Simulator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --secondary: #a855f7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: rgba(15, 23, 42, 0.8);
+            --card-border: rgba(59, 130, 246, 0.1);
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent-blue: #0ea5e9;
+            --accent-purple: #d946ef;
+            --accent-green: #14b8a6;
+            --accent-orange: #f97316;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .screen {
+            display: none;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Landing Screen */
+        .landing {
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 50%, #2d1b4e 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .landing::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .landing::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -150px;
+            left: -150px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        .landing-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .landing-logo {
+            font-size: 4rem;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .landing h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .landing p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 50px;
+            max-width: 600px;
+        }
+
+        .landing-btn {
+            padding: 16px 48px;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .landing-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        /* Startup Details Screen */
+        .startup-details {
+            min-height: 100vh;
+            padding: 60px 0;
+        }
+
+        .details-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .details-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 12px 16px;
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.5);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .details-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--card-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Pitch Screen */
+        .pitch-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stage-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 60px;
+        }
+
+        .stage {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(45, 27, 78, 0.8) 100%);
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            padding: 60px 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            text-align: center;
+            animation: stageSlide 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .spotlight {
+            position: absolute;
+            top: -300px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: spotlightPulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes stageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spotlightPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .judges-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .judge-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(45, 27, 78, 0.6) 100%);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: judgeEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .judge-card:nth-child(1) {
+            border-color: rgba(59, 130, 246, 0.3);
+            animation-delay: 0.1s;
+        }
+
+        .judge-card:nth-child(2) {
+            border-color: rgba(168, 85, 247, 0.3);
+            animation-delay: 0.2s;
+        }
+
+        .judge-card:nth-child(3) {
+            border-color: rgba(16, 185, 129, 0.3);
+            animation-delay: 0.3s;
+        }
+
+        .judge-card:nth-child(4) {
+            border-color: rgba(249, 115, 22, 0.3);
+            animation-delay: 0.4s;
+        }
+
+        .judge-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        @keyframes judgeEnter {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .judge-avatar {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .judge-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .judge-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .pitch-content {
+            animation: fadeIn 0.8s ease-in-out 0.5s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .typing-effect {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            min-height: 100px;
+        }
+
+        /* Questions Screen */
+        .questions-screen {
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+
+        .questions-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .questions-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .questions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(45, 27, 78, 0.6) 100%);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .judge-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            border: 2px solid var(--card-border);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .answer-box {
+            margin-top: 20px;
+        }
+
+        .answer-box textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.5);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .answer-box textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .question-status {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .question-status.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .questions-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        /* Scoring Screen */
+        .scoring-screen {
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+
+        .scoring-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .overall-score {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+
+        .score-circle {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(var(--primary) 0deg, var(--secondary) 360deg);
+            padding: 8px;
+            animation: scoreReveal 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes scoreReveal {
+            from {
+                opacity: 0;
+                transform: scale(0.5) rotateZ(-180deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotateZ(0deg);
+            }
+        }
+
+        .score-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--dark-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .score-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(45, 27, 78, 0.6) 100%);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            animation: categorySlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes categorySlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .category-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            animation: fillProgress 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fillProgress {
+            from {
+                width: 0;
+            }
+            to {
+                width: var(--progress);
+            }
+        }
+
+        .category-score {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .insights-section {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(45, 27, 78, 0.6) 100%);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+            animation: insightFade 0.8s ease-in-out;
+        }
+
+        @keyframes insightFade {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .insights-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .insight-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            animation: insightSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes insightSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .insight-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .insight-text {
+            flex: 1;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Investment Decision Screen */
+        .investment-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        .decision-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(45, 27, 78, 0.8) 100%);
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            padding: 60px 40px;
+            max-width: 700px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            animation: decisionReveal 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes decisionReveal {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .decision-emoji {
+            font-size: 5rem;
+            margin-bottom: 30px;
+            animation: emojiPulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes emojiPulse {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .decision-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .decision-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .detail-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .decision-reasoning {
+            margin-top: 40px;
+            text-align: left;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .investment-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        /* Report Screen */
+        .report-screen {
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        #report-content {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(45, 27, 78, 0.6) 100%);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .report-section {
+            margin-bottom: 40px;
+        }
+
+        .report-section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            color: var(--text-primary);
+        }
+
+        .report-content {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .report-section ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .report-section li {
+            padding: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .report-section li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        /* Leaderboard */
+        .leaderboard-screen {
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(45, 27, 78, 0.6) 100%);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .leaderboard-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            background: rgba(59, 130, 246, 0.2);
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--card-border);
+            color: var(--text-primary);
+        }
+
+        .leaderboard-table td {
+            padding: 20px;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--text-secondary);
+        }
+
+        .leaderboard-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .leaderboard-table tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
+            font-weight: 700;
+            color: white;
+        }
+
+        .decision-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-invest {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .badge-later {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .badge-acquire {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .badge-reject {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(45, 27, 78, 0.95) 100%);
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            animation: modalSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .landing h1 {
+                font-size: 2.5rem;
+            }
+
+            .landing p {
+                font-size: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .judges-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .decision-details {
+                grid-template-columns: 1fr;
+            }
+
+            .details-header h1 {
+                font-size: 2rem;
+            }
+
+            .questions-header h1 {
+                font-size: 2rem;
+            }
+
+            .decision-title {
+                font-size: 2rem;
+            }
+
+            .decision-emoji {
+                font-size: 3.5rem;
+            }
+
+            .stage {
+                padding: 30px 20px;
+            }
+
+            .modal-content {
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .landing h1 {
+                font-size: 2rem;
+            }
+
+            .judges-row {
+                grid-template-columns: 1fr;
+            }
+
+            .decision-details {
+                grid-template-columns: 1fr;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .score-circle {
+                width: 200px;
+                height: 200px;
+            }
+
+            .score-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 2000;
+        }
+
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-4 {
+            margin-top: 30px;
+        }
+
+        .gap-4 {
+            gap: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Screen -->
+    <div class="screen active" id="landing-screen">
+        <div class="landing">
+            <div class="spotlight"></div>
+            <div class="landing-content">
+                <div class="landing-logo">🦈</div>
+                <h1>AI Shark Tank</h1>
+                <p>Get investment feedback from AI judges representing different investor perspectives</p>
+                <button class="landing-btn" onclick="goToStartupDetails()">Start Pitch</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Startup Details Screen -->
+    <div class="screen" id="startup-screen">
+        <div class="container">
+            <div class="details-header">
+                <h1>Your Startup</h1>
+                <p>Edit your startup details and review before pitching to the sharks</p>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="startup-name">Startup Name</label>
+                    <input type="text" id="startup-name" placeholder="e.g., AI Career Copilot">
+                </div>
+
+                <div class="form-group">
+                    <label for="funding-ask">Funding Ask</label>
+                    <input type="text" id="funding-ask" placeholder="e.g., $750,000 for 12% Equity">
+                </div>
+
+                <div class="form-group">
+                    <label for="problem-statement">Problem Statement</label>
+                    <textarea id="problem-statement" placeholder="What problem does your startup solve?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="solution">Solution</label>
+                    <textarea id="solution" placeholder="How does your startup solve this problem?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="revenue-model">Revenue Model</label>
+                    <textarea id="revenue-model" placeholder="How do you make money?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="target-audience">Target Audience</label>
+                    <textarea id="target-audience" placeholder="Who are your customers?"></textarea>
+                </div>
+            </div>
+
+            <div class="details-actions">
+                <button class="btn btn-secondary" onclick="goToLanding()">← Back</button>
+                <button class="btn btn-primary" onclick="startPitch()">Start Pitch →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pitch Screen -->
+    <div class="screen" id="pitch-screen">
+        <div class="container">
+            <div class="stage-container">
+                <div class="stage">
+                    <div class="spotlight"></div>
+                    <div class="pitch-content">
+                        <h2 id="pitch-startup-name" style="font-size: 2.5rem; margin-bottom: 30px;"></h2>
+                        <div class="typing-effect" id="pitch-text"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="judges-row" id="judges-container"></div>
+
+            <div class="text-center mt-4">
+                <button class="btn btn-primary" onclick="goToQuestions()">Ask Questions →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Questions Screen -->
+    <div class="screen" id="questions-screen">
+        <div class="container">
+            <div class="questions-header">
+                <h1>Question Round</h1>
+                <p>Answer questions from the investors</p>
+            </div>
+
+            <div class="questions-list" id="questions-container"></div>
+
+            <div class="details-actions mt-4">
+                <button class="btn btn-secondary" onclick="goToPitch()">← Back</button>
+                <button class="btn btn-primary" onclick="goToScoring()">View Scores →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scoring Screen -->
+    <div class="screen" id="scoring-screen">
+        <div class="container">
+            <div class="scoring-header">
+                <h1>Evaluation Scores</h1>
+            </div>
+
+            <div class="overall-score">
+                <div class="score-circle">
+                    <div class="score-inner">
+                        <div class="score-number" id="overall-score">0</div>
+                        <div class="score-label">Overall Score</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="score-categories" id="categories-container"></div>
+
+            <div class="insights-section">
+                <div class="insights-title">🎯 Strengths</div>
+                <div id="strengths-container"></div>
+            </div>
+
+            <div class="insights-section">
+                <div class="insights-title">⚠️ Weaknesses</div>
+                <div id="weaknesses-container"></div>
+            </div>
+
+            <div class="insights-section">
+                <div class="insights-title">💡 Growth Opportunities</div>
+                <div id="opportunities-container"></div>
+            </div>
+
+            <div class="insights-section">
+                <div class="insights-title">🛡️ Competitive Advantages</div>
+                <div id="advantages-container"></div>
+            </div>
+
+            <div class="details-actions mt-4">
+                <button class="btn btn-secondary" onclick="goToQuestions()">← Back</button>
+                <button class="btn btn-primary" onclick="goToInvestment()">Investment Decision →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Investment Decision Screen -->
+    <div class="screen" id="investment-screen">
+        <div class="container">
+            <div class="investment-screen">
+                <div class="decision-card">
+                    <div class="decision-emoji" id="decision-emoji">🟢</div>
+                    <h2 class="decision-title" id="decision-title">Investment Offered</h2>
+
+                    <div class="decision-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Suggested Valuation</div>
+                            <div class="detail-value" id="decision-valuation">$6.25M</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Recommended Equity</div>
+                            <div class="detail-value" id="decision-equity">12%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Investment Amount</div>
+                            <div class="detail-value" id="decision-amount">$750k</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Success Probability</div>
+                            <div class="detail-value" id="decision-probability">85%</div>
+                        </div>
+                    </div>
+
+                    <div class="decision-reasoning" id="decision-reasoning">
+                        Reasoning will appear here...
+                    </div>
+                </div>
+
+                <div class="investment-actions mt-4">
+                    <button class="btn btn-secondary" onclick="goToScoring()">← Back</button>
+                    <button class="btn btn-primary" onclick="goToReport()">View Report →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Screen -->
+    <div class="screen" id="report-screen">
+        <div class="container">
+            <div class="report-header">
+                <h1>Investment Report</h1>
+                <p>Complete evaluation and recommendations</p>
+            </div>
+
+            <div id="report-content"></div>
+
+            <div class="report-actions mt-4">
+                <button class="btn btn-secondary" onclick="goToInvestment()">← Back</button>
+                <button class="btn btn-primary" onclick="downloadPDF()">📥 Download PDF</button>
+                <button class="btn btn-secondary" onclick="printReport()">🖨️ Print Report</button>
+                <button class="btn btn-secondary" onclick="goToLeaderboard()">📊 Leaderboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Screen -->
+    <div class="screen" id="leaderboard-screen">
+        <div class="container">
+            <div class="leaderboard-header">
+                <h1>Leaderboard</h1>
+                <p>Top 10 startups by investment score</p>
+            </div>
+
+            <div class="leaderboard-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Startup Name</th>
+                            <th>Score</th>
+                            <th>Decision</th>
+                            <th>Valuation</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="details-actions mt-4">
+                <button class="btn btn-secondary" onclick="goToReport()">← Back</button>
+                <button class="btn btn-primary" onclick="startOver()">🚀 Pitch New Startup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        const appState = {
+            currentScreen: 'landing',
+            startup: {
+                name: 'AI Career Copilot',
+                problemStatement: 'Students and fresh graduates struggle to discover suitable career paths, prepare for interviews, build portfolios, improve resumes, and find personalized learning roadmaps.',
+                solution: 'An AI-powered career platform that combines resume analysis, ATS optimization, interview preparation, personalized learning roadmaps, skill-gap analysis, portfolio recommendations, AI career mentoring, internship guidance, and job readiness dashboards into one platform.',
+                revenueModel: 'Freemium SaaS\nPremium Subscription\nCareer Coaching\nResume Services\nCollege Partnerships\nRecruitment Partnerships\nEnterprise Hiring Dashboard',
+                targetAudience: 'College Students\nFresh Graduates\nJob Seekers\nCareer Switchers\nEducational Institutions',
+                fundingAsk: '$750,000 for 12% Equity'
+            },
+            questions: [],
+            answers: {},
+            scores: {
+                marketPotential: 0,
+                innovation: 0,
+                businessModel: 0,
+                execution: 0,
+                investmentWorthiness: 0
+            },
+            overallScore: 0,
+            investment: {}
+        };
+
+        // Judge Definitions
+        const judges = [
+            {
+                name: 'VC Investor',
+                title: 'Venture Capitalist',
+                emoji: '📊',
+                color: '#0ea5e9',
+                focus: 'Market Size, Scalability, Competition'
+            },
+            {
+                name: 'CEO',
+                title: 'Founder & Builder',
+                emoji: '🚀',
+                color: '#d946ef',
+                focus: 'Execution, Team, Vision'
+            },
+            {
+                name: 'Customer',
+                title: 'Early Adopter',
+                emoji: '💚',
+                color: '#14b8a6',
+                focus: 'Usability, Value, Real Problem'
+            },
+            {
+                name: 'Angel',
+                title: 'Angel Investor',
+                emoji: '✨',
+                color: '#f97316',
+                focus: 'Profitability, Revenue, Risk'
+            }
+        ];
+
+        // Question Bank
+        function generateQuestions() {
+            const questionBank = [
+                {
+                    judge: 0,
+                    text: `What is your total addressable market (TAM) and how do you plan to capture your first 1% market share?`
+                },
+                {
+                    judge: 0,
+                    text: `How will you differentiate against existing competitors in this space, and what is your competitive advantage?`
+                },
+                {
+                    judge: 1,
+                    text: `Tell us about your team. What specific experience do they have in this industry?`
+                },
+                {
+                    judge: 1,
+                    text: `What is your product roadmap for the next 12-24 months, and what are your key milestones?`
+                },
+                {
+                    judge: 2,
+                    text: `What feedback have you received from actual customers, and how has it shaped your product?`
+                },
+                {
+                    judge: 2,
+                    text: `What specific problem are you solving better than anyone else, and how do you know customers will pay for it?`
+                },
+                {
+                    judge: 3,
+                    text: `Walk us through your unit economics. What's your CAC, LTV, and path to profitability?`
+                },
+                {
+                    judge: 3,
+                    text: `What are the biggest risks to your business, and how do you plan to mitigate them?`
+                }
+            ];
+            return questionBank;
+        }
+
+        // Navigation Functions
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            appState.currentScreen = screenId;
+            window.scrollTo(0, 0);
+        }
+
+        function goToLanding() {
+            switchScreen('landing-screen');
+        }
+
+        function goToStartupDetails() {
+            populateStartupForm();
+            switchScreen('startup-screen');
+        }
+
+        function goToPitch() {
+            switchScreen('pitch-screen');
+        }
+
+        function goToQuestions() {
+            generateAndRenderQuestions();
+            switchScreen('questions-screen');
+        }
+
+        function goToScoring() {
+            calculateScores();
+            renderScoring();
+            switchScreen('scoring-screen');
+        }
+
+        function goToInvestment() {
+            generateInvestmentDecision();
+            renderInvestmentDecision();
+            switchScreen('investment-screen');
+        }
+
+        function goToReport() {
+            generateReport();
+            switchScreen('report-screen');
+        }
+
+        function goToLeaderboard() {
+            saveToLeaderboard();
+            renderLeaderboard();
+            switchScreen('leaderboard-screen');
+        }
+
+        function startOver() {
+            appState.answers = {};
+            appState.scores = {
+                marketPotential: 0,
+                innovation: 0,
+                businessModel: 0,
+                execution: 0,
+                investmentWorthiness: 0
+            };
+            goToStartupDetails();
+        }
+
+        // Startup Details Functions
+        function populateStartupForm() {
+            document.getElementById('startup-name').value = appState.startup.name;
+            document.getElementById('problem-statement').value = appState.startup.problemStatement;
+            document.getElementById('solution').value = appState.startup.solution;
+            document.getElementById('revenue-model').value = appState.startup.revenueModel;
+            document.getElementById('target-audience').value = appState.startup.targetAudience;
+            document.getElementById('funding-ask').value = appState.startup.fundingAsk;
+        }
+
+        function startPitch() {
+            appState.startup.name = document.getElementById('startup-name').value;
+            appState.startup.problemStatement = document.getElementById('problem-statement').value;
+            appState.startup.solution = document.getElementById('solution').value;
+            appState.startup.revenueModel = document.getElementById('revenue-model').value;
+            appState.startup.targetAudience = document.getElementById('target-audience').value;
+            appState.startup.fundingAsk = document.getElementById('funding-ask').value;
+
+            renderPitchScreen();
+            switchScreen('pitch-screen');
+        }
+
+        // Pitch Screen Functions
+        function renderPitchScreen() {
+            document.getElementById('pitch-startup-name').textContent = appState.startup.name;
+            
+            const pitchText = `
+                <strong>Problem:</strong> ${appState.startup.problemStatement}<br><br>
+                <strong>Solution:</strong> ${appState.startup.solution}<br><br>
+                <strong>Revenue Models:</strong> ${appState.startup.revenueModel.replace(/\n/g, ', ')}<br><br>
+                <strong>Target Audience:</strong> ${appState.startup.targetAudience.replace(/\n/g, ', ')}<br><br>
+                <strong>Funding Ask:</strong> ${appState.startup.fundingAsk}
+            `;
+            
+            document.getElementById('pitch-text').innerHTML = pitchText;
+
+            const judgesContainer = document.getElementById('judges-container');
+            judgesContainer.innerHTML = judges.map((judge, idx) => `
+                <div class="judge-card" style="border-color: rgba(${hexToRgb(judge.color)}, 0.3);">
+                    <div class="judge-avatar">${judge.emoji}</div>
+                    <div class="judge-name">${judge.name}</div>
+                    <div class="judge-title">${judge.title}</div>
+                </div>
+            `).join('');
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '59, 130, 246';
+        }
+
+        // Questions Functions
+        function generateAndRenderQuestions() {
+            appState.questions = generateQuestions();
+            const container = document.getElementById('questions-container');
+            container.innerHTML = appState.questions.map((q, idx) => `
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="judge-badge" style="background: ${judges[q.judge].color}40; border-color: ${judges[q.judge].color};">
+                            ${judges[q.judge].emoji}
+                        </div>
+                        <div>
+                            <div class="judge-name">${judges[q.judge].name}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">${judges[q.judge].focus}</div>
+                        </div>
+                    </div>
+                    <div class="question-text">${q.text}</div>
+                    <div class="answer-box">
+                        <textarea id="answer-${idx}" placeholder="Your answer..."></textarea>
+                    </div>
+                    <div class="question-status" id="status-${idx}"></div>
+                </div>
+            `).join('');
+        }
+
+        // Scoring Functions
+        function calculateScores() {
+            let total = 0;
+            const categoryScores = [
+                Math.random() * 30 + 70,
+                Math.random() * 30 + 70,
+                Math.random() * 30 + 65,
+                Math.random() * 30 + 75,
+                Math.random() * 30 + 70
+            ];
+
+            appState.scores.marketPotential = Math.round(categoryScores[0]);
+            appState.scores.innovation = Math.round(categoryScores[1]);
+            appState.scores.businessModel = Math.round(categoryScores[2]);
+            appState.scores.execution = Math.round(categoryScores[3]);
+            appState.scores.investmentWorthiness = Math.round(categoryScores[4]);
+
+            appState.overallScore = Math.round((Object.values(appState.scores).reduce((a, b) => a + b) / 5));
+        }
+
+        function renderScoring() {
+            document.getElementById('overall-score').textContent = appState.overallScore;
+
+            const categories = [
+                { name: 'Market Potential', key: 'marketPotential', icon: '📊' },
+                { name: 'Innovation', key: 'innovation', icon: '💡' },
+                { name: 'Business Model', key: 'businessModel', icon: '💼' },
+                { name: 'Execution', key: 'execution', icon: '⚙️' },
+                { name: 'Investment Worthiness', key: 'investmentWorthiness', icon: '💰' }
+            ];
+
+            const container = document.getElementById('categories-container');
+            container.innerHTML = categories.map(cat => {
+                const score = appState.scores[cat.key];
+                return `
+                    <div class="category-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="category-name">${cat.icon} ${cat.name}</div>
+                            <div class="category-score">${score}</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="--progress: ${score}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            renderInsights();
+        }
+
+        function renderInsights() {
+            const strengths = [
+                'Strong market opportunity in the education/career development space',
+                'Comprehensive solution addressing multiple pain points',
+                'Viable revenue model with multiple income streams',
+                'Clear target audience with significant market size'
+            ];
+
+            const weaknesses = [
+                'Highly competitive market with established players',
+                'Customer acquisition challenges in B2C education',
+                'Complex product requiring continuous updates',
+                'High operational costs for personalized services'
+            ];
+
+            const opportunities = [
+                'Expand to international markets',
+                'Enterprise B2B partnerships with universities',
+                'AI-powered skill verification credentials',
+                'Integration with job boards and recruitment platforms',
+                'Develop mobile-first experience'
+            ];
+
+            const advantages = [
+                'AI-powered personalization at scale',
+                'Integrated platform combining multiple services',
+                'Data network effects from user behavior',
+                'Platform for both candidates and employers'
+            ];
+
+            document.getElementById('strengths-container').innerHTML = strengths.map(s => 
+                `<div class="insight-item"><div class="insight-icon">✓</div><div class="insight-text">${s}</div></div>`
+            ).join('');
+
+            document.getElementById('weaknesses-container').innerHTML = weaknesses.map(w => 
+                `<div class="insight-item"><div class="insight-icon">⚠️</div><div class="insight-text">${w}</div></div>`
+            ).join('');
+
+            document.getElementById('opportunities-container').innerHTML = opportunities.map(o => 
+                `<div class="insight-item"><div class="insight-icon">→</div><div class="insight-text">${o}</div></div>`
+            ).join('');
+
+            document.getElementById('advantages-container').innerHTML = advantages.map(a => 
+                `<div class="insight-item"><div class="insight-icon">⭐</div><div class="insight-text">${a}</div></div>`
+            ).join('');
+        }
+
+        // Investment Decision Functions
+        function generateInvestmentDecision() {
+            const decisions = ['invest', 'later', 'acquire', 'reject'];
+            const weights = [0.5, 0.2, 0.15, 0.15];
+            const random = Math.random();
+            let cumulativeWeight = 0;
+            let decision = 'invest';
+
+            for (let i = 0; i < decisions.length; i++) {
+                cumulativeWeight += weights[i];
+                if (random < cumulativeWeight) {
+                    decision = decisions[i];
+                    break;
+                }
+            }
+
+            const baseValuation = parseInt(appState.startup.fundingAsk.match(/\$[\d,]+/)[0].replace(/[$,]/g, ''));
+            const baseEquity = parseFloat(appState.startup.fundingAsk.match(/[\d.]+%/)[0]);
+            const valuation = Math.round(baseValuation / (baseEquity / 100));
+
+            appState.investment = {
+                decision: decision,
+                valuation: valuation,
+                equity: baseEquity,
+                amount: baseValuation,
+                probability: Math.round(appState.overallScore * 0.8 + 15),
+                roi: decision === 'invest' ? Math.round(Math.random() * 15 + 20) : 0
+            };
+        }
+
+        function renderInvestmentDecision() {
+            const config = {
+                invest: { emoji: '🟢', title: 'Investment Offered', color: '#10b981' },
+                later: { emoji: '🟡', title: 'Come Back Later', color: '#f59e0b' },
+                acquire: { emoji: '🔵', title: 'Acquisition Offer', color: '#0ea5e9' },
+                reject: { emoji: '🔴', title: 'Not a Fit', color: '#ef4444' }
+            };
+
+            const cfg = config[appState.investment.decision];
+            document.getElementById('decision-emoji').textContent = cfg.emoji;
+            document.getElementById('decision-title').textContent = cfg.title;
+            document.getElementById('decision-title').style.color = cfg.color;
+
+            document.getElementById('decision-valuation').textContent = `$${(appState.investment.valuation / 1000000).toFixed(2)}M`;
+            document.getElementById('decision-equity').textContent = `${appState.investment.equity}%`;
+            document.getElementById('decision-amount').textContent = `$${(appState.investment.amount / 1000).toFixed(0)}k`;
+            document.getElementById('decision-probability').textContent = `${appState.investment.probability}%`;
+
+            const reasoning = {
+                invest: `Your AI Career Copilot addresses a massive market opportunity in education technology. The comprehensive solution, combined with multiple revenue streams, demonstrates strong business fundamentals. With an overall score of ${appState.overallScore}/100, we see significant potential for growth and market dominance. We recommend accepting this investment to accelerate product development and market expansion.`,
+                later: `While your concept has merit, we see some execution risks and market validation gaps. We'd like to see more customer traction, refined unit economics, and a stronger founding team composition. Come back with 12 months of revenue data and we'll reconsider.`,
+                acquire: `Rather than investing, we'd like to acquire your company. Your technology and team align well with our platform. We offer a strategic partnership opportunity with better immediate value for your shareholders.`,
+                reject: `While the problem space is interesting, we have concerns about market timing, competitive positioning, and unit economics. We don't see a clear path to defensibility in this crowded market at this time.`
+            };
+
+            document.getElementById('decision-reasoning').textContent = reasoning[appState.investment.decision];
+
+            if (appState.investment.decision === 'invest') {
+                createConfetti();
+            }
+        }
+
+        // Report Functions
+        function generateReport() {
+            const report = `
+                <div class="report-section">
+                    <div class="report-section-title">Executive Summary</div>
+                    <div class="report-content">
+                        ${appState.startup.name} received an overall investment score of <strong>${appState.overallScore}/100</strong> from our AI judge panel. The company presents a compelling opportunity in the education technology sector with a comprehensive solution addressing multiple pain points for students and job seekers.
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">Startup Overview</div>
+                    <div class="report-content">
+                        <strong>Company:</strong> ${appState.startup.name}<br>
+                        <strong>Funding Ask:</strong> ${appState.startup.fundingAsk}<br>
+                        <strong>Problem:</strong> ${appState.startup.problemStatement}<br>
+                        <strong>Solution:</strong> ${appState.startup.solution}
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">Evaluation Scores</div>
+                    <div class="report-content">
+                        <ul>
+                            <li><strong>Market Potential:</strong> ${appState.scores.marketPotential}/100</li>
+                            <li><strong>Innovation:</strong> ${appState.scores.innovation}/100</li>
+                            <li><strong>Business Model:</strong> ${appState.scores.businessModel}/100</li>
+                            <li><strong>Execution:</strong> ${appState.scores.execution}/100</li>
+                            <li><strong>Investment Worthiness:</strong> ${appState.scores.investmentWorthiness}/100</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">Investment Decision</div>
+                    <div class="report-content">
+                        <strong>Decision:</strong> ${appState.investment.decision.charAt(0).toUpperCase() + appState.investment.decision.slice(1)}<br>
+                        <strong>Suggested Valuation:</strong> $${(appState.investment.valuation / 1000000).toFixed(2)}M<br>
+                        <strong>Recommended Equity:</strong> ${appState.investment.equity}%<br>
+                        <strong>Investment Amount:</strong> $${(appState.investment.amount / 1000).toFixed(0)}k<br>
+                        <strong>Success Probability:</strong> ${appState.investment.probability}%
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">Strengths</div>
+                    <div class="report-content">
+                        <ul>
+                            <li>Strong market opportunity in the education/career development space</li>
+                            <li>Comprehensive solution addressing multiple pain points</li>
+                            <li>Viable revenue model with multiple income streams</li>
+                            <li>Clear target audience with significant market size</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">Areas for Improvement</div>
+                    <div class="report-content">
+                        <ul>
+                            <li>Differentiation in highly competitive market</li>
+                            <li>Customer acquisition strategy and CAC optimization</li>
+                            <li>Founding team experience in ed-tech</li>
+                            <li>Clear path to profitability and unit economics</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">Recommendations</div>
+                    <div class="report-content">
+                        <ul>
+                            <li>Focus on customer validation and retention metrics</li>
+                            <li>Develop strategic partnerships with educational institutions</li>
+                            <li>Expand internationally to tap into larger markets</li>
+                            <li>Build an enterprise version for B2B opportunities</li>
+                            <li>Invest in AI differentiation and proprietary technology</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-section-title">Next Steps</div>
+                    <div class="report-content">
+                        <ul>
+                            <li>Achieve $100k+ MRR to validate market traction</li>
+                            <li>Close initial strategic partnerships</li>
+                            <li>Hire experienced VP of Sales and VP of Product</li>
+                            <li>Expand team to 15-20 people within 12 months</li>
+                            <li>Plan Series A fundraising for 12-18 months out</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('report-content').innerHTML = report;
+        }
+
+        // Leaderboard Functions
+        function saveToLeaderboard() {
+            let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            leaderboard.push({
+                name: appState.startup.name,
+                score: appState.overallScore,
+                decision: appState.investment.decision,
+                valuation: appState.investment.valuation,
+                funding: appState.investment.amount,
+                date: new Date().toLocaleDateString()
+            });
+
+            leaderboard.sort((a, b) => b.score - a.score);
+            leaderboard = leaderboard.slice(0, 10);
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+        }
+
+        function renderLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            const tbody = document.getElementById('leaderboard-body');
+
+            if (leaderboard.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No startups yet. Be the first!</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = leaderboard.map((item, idx) => `
+                <tr>
+                    <td><div class="rank-badge">${idx + 1}</div></td>
+                    <td>${item.name}</td>
+                    <td><strong>${item.score}</strong></td>
+                    <td><span class="decision-badge badge-${item.decision === 'invest' ? 'invest' : item.decision === 'later' ? 'later' : item.decision === 'acquire' ? 'acquire' : 'reject'}">
+                        ${item.decision.charAt(0).toUpperCase() + item.decision.slice(1)}
+                    </span></td>
+                    <td>$${(item.valuation / 1000000).toFixed(2)}M</td>
+                    <td>${item.date}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Download PDF
+        function downloadPDF() {
+            const element = document.getElementById('report-content');
+            const opt = {
+                margin: 10,
+                filename: `${appState.startup.name}-Investment-Report.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function printReport() {
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write(document.getElementById('report-content').innerHTML);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Confetti Animation
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * window.innerWidth + 'px';
+                confetti.style.top = Math.random() * window.innerHeight + 'px';
+                confetti.textContent = ['🎉', '🎊', '⭐', '💰', '🚀'][Math.floor(Math.random() * 5)];
+                confetti.style.fontSize = Math.random() * 30 + 20 + 'px';
+                confetti.style.opacity = '1';
+                confetti.style.animation = `confettiFall ${Math.random() * 2 + 3}s ease-in forwards`;
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 5000);
+            }
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes confettiFall {
+                to {
+                    transform: translateY(${window.innerHeight}px) rotateZ(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize
+        populateStartupForm();
+    </script>
+</body>
+</html>
