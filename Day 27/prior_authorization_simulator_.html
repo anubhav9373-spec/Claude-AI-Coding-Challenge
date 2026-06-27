@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prior Authorization Story Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #001a4d 0%, #003d99 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-container {
+            display: block;
+            width: 100%;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            overflow-x: visible;
+            clear: both;
+        }
+        
+        .message {
+            display: block;
+            width: 100%;
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+            z-index: 1;
+            clear: both;
+            overflow: visible;
+            margin-bottom: 16px;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-8px);
+            }
+        }
+        
+        .choice-button {
+            transition: all 0.3s ease;
+        }
+        
+        .choice-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+        }
+        
+        .choice-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .debug-panel {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .narrator-text {
+            display: block;
+            width: 100%;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            clear: both;
+            overflow: visible;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .progress-fill {
+            height: 6px;
+            background: linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .character-left {
+            display: block;
+            width: 100%;
+            clear: both;
+            margin-bottom: 16px;
+            text-align: left;
+            overflow: visible;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .character-right {
+            display: block;
+            width: 100%;
+            clear: both;
+            margin-bottom: 16px;
+            text-align: right;
+            overflow: visible;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .bubble {
+            display: inline-block;
+            max-width: 90%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .bubble-left {
+            background: rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        .bubble-right {
+            background: rgba(16, 185, 129, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        .card {
+            display: block;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+            color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 2;
+            clear: both;
+            overflow: visible;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            color: rgba(59, 130, 246, 1);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .card-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .ending-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 12px 0;
+        }
+        
+        .ending-green {
+            background: rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.5);
+        }
+        
+        .ending-yellow {
+            background: rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.5);
+        }
+        
+        .ending-orange {
+            background: rgba(249, 115, 22, 0.3);
+            color: #fb923c;
+            border: 1px solid rgba(249, 115, 22, 0.5);
+        }
+        
+        .ending-red {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+        
+        /* Landing Page Styles */
+        .landing-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        
+        .hero-content {
+            text-align: center;
+            margin-bottom: 60px;
+            max-w-3xl;
+        }
+        
+        .hero-title {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa 0%, #06b6d4 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .hero-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #06b6d4 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+        
+        .start-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 16px 48px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+        }
+        
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.6);
+        }
+        
+        /* Two Column Layout */
+        .story-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            padding: 24px;
+            margin: 0 auto;
+            max-width: 1400px;
+        }
+        
+        .timeline-panel {
+            glass rounded-lg p-6 h-fit sticky top-24;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        
+        .chapter-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid rgba(59, 130, 246, 0.3);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .chapter-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: rgba(59, 130, 246, 0.6);
+        }
+        
+        .chapter-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-left-color: rgba(59, 130, 246, 1);
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 500;
+        }
+        
+        .chapter-item.completed {
+            border-left-color: rgba(16, 185, 129, 0.6);
+            opacity: 0.8;
+        }
+        
+        .chapter-number {
+            font-weight: 700;
+            display: inline-block;
+            width: 20px;
+            margin-right: 8px;
+        }
+        
+        .story-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .story-header {
+            glass rounded-lg p-6;
+            display: flex;
+            justify-between;
+            items-center;
+        }
+        
+        .header-info {
+            flex: 1;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .header-stat {
+            text-align: right;
+        }
+        
+        .header-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: rgba(59, 130, 246, 1);
+        }
+        
+        .header-stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .story-main {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .chat-wrapper {
+            glass rounded-lg p-6 display: block;
+            min-height: 70vh;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 3px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.5);
+        }
+        
+        @media (max-width: 1024px) {
+            .story-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline-panel {
+                sticky: unset;
+                max-height: unset;
+            }
+            
+            .hero-title {
+                font-size: 36px;
+            }
+            
+            .hero-subtitle {
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .story-layout {
+                padding: 16px;
+            }
+            
+            .bubble {
+                max-width: 95%;
+            }
+            
+            .hero-title {
+                font-size: 28px;
+            }
+            
+            .hero-subtitle {
+                font-size: 16px;
+            }
+            
+            .stat-number {
+                font-size: 24px;
+            }
+            
+            .chat-wrapper {
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="landingPage" class="landing-page">
+        <div class="hero-content">
+            <div class="hero-title">Prior Authorization Simulator</div>
+            <div class="hero-subtitle">Understand the healthcare authorization process through interactive storytelling</div>
+            <div class="hero-description">
+                Follow Rahul's journey as he navigates prior authorization for a prescribed biologic medication. Learn how insurance approvals work, why delays happen, and how the healthcare system measures efficiency.
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-4 gap-6 mb-12 max-w-4xl w-full">
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="stat-label">Interactive Chapters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Possible Outcomes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">15</div>
+                <div class="stat-label">Days Journey</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Learning Goals</div>
+            </div>
+        </div>
+        
+        <button class="start-button" onclick="startJourney()">
+            Start Your Journey →
+        </button>
+    </div>
+    
+    <div id="storyPage" class="hidden" style="min-height: 100vh;">
+        <div class="story-layout">
+            <!-- Left Sidebar: Timeline -->
+            <div class="timeline-panel glass rounded-lg p-6">
+                <div style="font-weight: 700; margin-bottom: 16px; color: rgba(59, 130, 246, 1); font-size: 14px;">
+                    📋 JOURNEY MAP
+                </div>
+                <div id="timelineContainer"></div>
+            </div>
+            
+            <!-- Right Content: Story -->
+            <div class="story-content">
+                <!-- Header with Progress -->
+                <div class="story-header glass rounded-lg p-6">
+                    <div class="header-info">
+                        <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 12px;">
+                            <span id="sceneTitle">Scene 1: Doctor Visit</span>
+                        </h1>
+                        <div style="height: 6px; background: gray-700 rounded-full overflow-hidden; margin-bottom: 8px;">
+                            <div id="progressBar" class="progress-fill" style="width: 12.5%; height: 100%;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
+                            <span id="progressPercent">12.5% Complete</span>
+                            <span id="timelineDisplay">Day 1</span>
+                        </div>
+                    </div>
+                    <div class="header-stats">
+                        <div class="header-stat">
+                            <div class="header-stat-value" id="sceneNumber">1/8</div>
+                            <div class="header-stat-label">Scene</div>
+                        </div>
+                        <div class="header-stat">
+                            <div class="header-stat-value" id="scoreDisplay">0</div>
+                            <div class="header-stat-label">Score</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Story Area -->
+                <div class="story-main">
+                    <!-- Chat -->
+                    <div class="chat-wrapper glass rounded-lg p-6">
+                        <div id="chatContainer" class="chat-container"></div>
+                    </div>
+                    
+                    <!-- Educational Card -->
+                    <div id="cardContainer"></div>
+                    
+                    <!-- Choices -->
+                    <div id="choicesContainer" class="grid grid-cols-2 gap-4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Debug Panel -->
+    <div id="debugPanel" class="hidden glass rounded-lg p-6 mb-6 debug-panel" style="margin: 24px; max-width: 400px;">
+        <div class="font-bold text-blue-400 mb-4">Debug Information</div>
+        <div id="debugContent" class="text-xs text-gray-300 whitespace-pre-wrap font-mono"></div>
+    </div>
+    
+    <script>
+        // Game State
+        const gameState = {
+            currentScene: 1,
+            choices: [],
+            knowledgeScore: 0,
+            dayCounter: 1,
+            endingType: '',
+            approvalPath: 'smooth',
+            sceneHistory: [],
+            storyStarted: false
+        };
+        
+        // Scene Definitions
+        const scenes = [
+            {
+                id: 1,
+                title: "Doctor Visit",
+                narrator: "Day 1: Rahul visits City Medical Center",
+                characters: [
+                    { speaker: "Doctor", type: "narrator", text: "After reviewing your symptoms and bloodwork, I believe you have Rheumatoid Arthritis. Let me prescribe Humira, which is an effective biologic medication for this condition." },
+                    { speaker: "Doctor", type: "narrator", text: "However, this medication requires prior authorization from your insurance. My office will submit the request immediately." },
+                    { speaker: "Rahul", type: "patient", text: "What does that mean? Will there be a delay in starting my treatment?" }
+                ],
+                choices: [
+                    { text: "Accept the plan and start the PA process", impact: "patient-engaged" },
+                    { text: "Ask about alternative medications without PA", impact: "alternative-seeking" }
+                ],
+                card: {
+                    what: "Rheumatoid Arthritis is diagnosed and Humira is prescribed. Prior authorization is required by the insurance company.",
+                    why: "Prior authorization (PA) is a requirement from insurance companies to verify that prescribed medications meet medical necessity and follow cost-effective treatment guidelines.",
+                    insight: "Biologic medications like Humira are highly effective but expensive, often costing $3,000-6,000 per month. Insurance companies use PA to ensure appropriate use.",
+                    takeaway: "The PA process begins immediately with the physician's office submitting the request to the insurance payer."
+                }
+            },
+            {
+                id: 2,
+                title: "Insurance Roadblock",
+                narrator: "Day 2: Dr. Patel's office submits the Prior Authorization request",
+                characters: [
+                    { speaker: "Doctor", type: "narrator", text: "My office has submitted your prior authorization request to StarCare Health. They have received all necessary clinical documentation." },
+                    { speaker: "Priya", type: "specialist", text: "Hello Rahul! I'm Priya, a healthcare operations specialist. The flow works like this: Your doctor's office sends the PA request to us (the payer), and we review it." },
+                    { speaker: "Priya", type: "specialist", text: "Once approved, your authorization remains on file. You won't need to request PA again for this medication at this dose level." }
+                ],
+                choices: [
+                    { text: "Trust the process and wait for approval", impact: "patient-trusting" },
+                    { text: "Request daily updates on the PA status", impact: "patient-proactive" }
+                ],
+                card: {
+                    what: "The PA request flows from the provider to the payer. The payer is the insurance company that makes approval decisions.",
+                    why: "This workflow ensures that insurers have clinical documentation before authorizing expensive treatments, reducing inappropriate prescribing.",
+                    insight: "Approved PAs are saved on file. Patients don't need new PA requests for the same medication and dose, reducing administrative burden over time.",
+                    takeaway: "The PA is submitted on Day 2, initiating the insurance review process."
+                }
+            },
+            {
+                id: 3,
+                title: "What is Prior Authorization?",
+                narrator: "Day 4: Prior Authorization Explained",
+                characters: [
+                    { speaker: "Rahul", type: "patient", text: "Priya, I'm anxious about this process. Can you explain what prior authorization actually is?" },
+                    { speaker: "Priya", type: "specialist", text: "Of course. Prior authorization is when an insurance company requires approval BEFORE a medication is dispensed. It's a gating mechanism." },
+                    { speaker: "Priya", type: "specialist", text: "It exists to ensure cost-effective care and prevent inappropriate use. For aggressive diagnoses like yours, delays can affect disease progression." },
+                    { speaker: "Priya", type: "specialist", text: "According to the AMA 2023 PA Survey, prior authorization causes treatment delays in the majority of cases. This is a real concern in healthcare." }
+                ],
+                choices: [
+                    { text: "Understand PA as a necessary safeguard", impact: "system-aware" },
+                    { text: "View PA as bureaucratic red tape", impact: "frustrated" }
+                ],
+                card: {
+                    what: "Prior authorization is a pre-approval requirement by insurance companies before dispensing medications.",
+                    why: "Insurance companies use PA to control costs, ensure appropriate prescribing, and verify that treatments meet clinical guidelines and medical necessity criteria.",
+                    insight: "Step therapy—trying cheaper medications first—is part of PA. For aggressive conditions, this delay can worsen patient outcomes and accelerate disease.",
+                    takeaway: "PA is both a cost-control tool AND a source of treatment delays that can harm patients. This is why many healthcare systems are reforming PA processes."
+                }
+            },
+            {
+                id: 4,
+                title: "Insurance Review",
+                narrator: "Day 5: Insurance Review Process",
+                characters: [
+                    { speaker: "Priya", type: "specialist", text: "Let me walk through what we're reviewing on our end. First, we check your eligibility—are you a current member?" },
+                    { speaker: "Priya", type: "specialist", text: "Second, we verify clinical documentation. Your doctor provided bloodwork, imaging, and symptom documentation. This is crucial." },
+                    { speaker: "Priya", type: "specialist", text: "Third, we match your ICD-10 diagnosis code (M06.9 - Rheumatoid Arthritis) to formulary guidelines. Fourth, we check step therapy history." },
+                    { speaker: "Priya", type: "specialist", text: "You haven't tried cheaper alternatives like methotrexate first. This is where issues sometimes arise." }
+                ],
+                choices: [
+                    { text: "Accept that step therapy guidelines exist for all patients", impact: "compliant-mindset" },
+                    { text: "Push for biologics as first-line therapy", impact: "aggressive-treatment" }
+                ],
+                card: {
+                    what: "Insurance companies review: (1) Eligibility, (2) Clinical Documentation, (3) ICD-10 Diagnosis Match, (4) Step Therapy History.",
+                    why: "Each element ensures appropriate use. Eligibility confirms coverage. Documentation justifies medical necessity. ICD-10 matching ensures the diagnosis supports the treatment. Step therapy saves costs by requiring cheaper options first.",
+                    insight: "Step therapy guidelines exist industry-wide. However, for rapidly progressive autoimmune diseases, delayed biologic therapy can lead to irreversible joint damage.",
+                    takeaway: "Understanding insurance review criteria helps patients and providers navigate PA requirements more effectively."
+                }
+            },
+            {
+                id: 5,
+                title: "Denial",
+                narrator: "Day 6: Prior Authorization Denied",
+                characters: [
+                    { speaker: "Priya", type: "specialist", text: "I'm calling with difficult news, Rahul. Your PA has been denied." },
+                    { speaker: "Rahul", type: "patient", text: "What? Why? My doctor said it was clinically appropriate!" },
+                    { speaker: "Priya", type: "specialist", text: "The denial is specifically about missing step therapy documentation. Your file shows no evidence of methotrexate trial." },
+                    { speaker: "Priya", type: "specialist", text: "Important: This denial does NOT mean permanent rejection. Denials often require physician offices to spend additional staff time resolving issues—this is a known administrative burden." },
+                    { speaker: "Priya", type: "specialist", text: "Your doctor can resubmit with additional documentation or request an appeal. This is very fixable." }
+                ],
+                choices: [
+                    { text: "Pursue an appeal immediately", impact: "appeal-ready" },
+                    { text: "Try methotrexate first to satisfy requirements", impact: "step-therapy-compliant" }
+                ],
+                card: {
+                    what: "The PA is denied due to missing step therapy documentation. The specific reason is absence of methotrexate trial in patient records.",
+                    why: "Insurance formularies typically require step therapy: cheaper, first-line treatments before biologics. Without documented methotrexate use, the insurer rejects the biologic request.",
+                    insight: "PA denials don't mean permanent rejection. They mean the request needs additional information or the patient needs to follow formulary guidelines. This is why clear documentation is critical.",
+                    takeaway: "Administrative staff burden increases significantly with PA denials, requiring re-submission and additional work. This is a documented healthcare inefficiency."
+                }
+            },
+            {
+                id: 6,
+                title: "Appeal",
+                narrator: "Day 8: Building the Appeal",
+                characters: [
+                    { speaker: "Rahul", type: "patient", text: "I want to appeal this. What do I need to do?" },
+                    { speaker: "Priya", type: "specialist", text: "Good decision. We'll need to gather supporting documents. Here's what helps:" },
+                    { speaker: "Priya", type: "specialist", text: "First: Clinical records showing disease severity and progression. Second: Supporting physician letter explaining why step therapy is contraindicated for your specific case." },
+                    { speaker: "Priya", type: "specialist", text: "Third: A letter of medical necessity from Dr. Patel. This letter is critical—it explains why Humira is medically necessary RIGHT NOW." },
+                    { speaker: "Priya", type: "specialist", text: "Once we receive these, we can escalate to our medical review team for a formal appeal decision." }
+                ],
+                choices: [
+                    { text: "Gather all documents and submit comprehensive appeal", impact: "thorough-appeal" },
+                    { text: "Submit basic appeal with just the physician letter", impact: "quick-appeal" }
+                ],
+                card: {
+                    what: "Building an appeal requires: clinical records, supporting physician letter, and letter of medical necessity explaining why step therapy is inappropriate.",
+                    why: "Detailed appeals demonstrate clinical urgency and medical necessity. A strong appeal can convince medical reviewers to override formulary restrictions.",
+                    insight: "Letters of Medical Necessity are powerful. They allow physicians to make clinical arguments that transcend algorithm-based denials.",
+                    takeaway: "Comprehensive appeals with strong clinical documentation significantly increase approval chances. This requires physician and patient collaboration."
+                }
+            },
+            {
+                id: 7,
+                title: "Approval",
+                narrator: "Day 12: Prior Authorization Approved",
+                characters: [
+                    { speaker: "Priya", type: "specialist", text: "Excellent news, Rahul! Your appeal has been approved!" },
+                    { speaker: "Priya", type: "specialist", text: "StarCare Health has issued authorization reference number PA-2024-87654. Keep this number." },
+                    { speaker: "Doctor", type: "narrator", text: "I've received the approval notification. Your authorization is now on file. You can start Humira immediately." },
+                    { speaker: "Priya", type: "specialist", text: "Important: This authorization remains valid for 12 months. You will NOT need another PA request for this medication at this dose during that period." },
+                    { speaker: "Rahul", type: "patient", text: "Thank you. This was more complex than I expected, but I'm glad it's resolved." }
+                ],
+                choices: [
+                    { text: "Reflect on what was learned", impact: "reflective" },
+                    { text: "Move forward with treatment immediately", impact: "action-oriented" }
+                ],
+                card: {
+                    what: "PA is approved with reference number. Authorization saved on file for 12 months. No repeat PA required during this period.",
+                    why: "Appeals with strong documentation can successfully overturn initial denials. The approval process protects both patient care and appropriate medication use.",
+                    insight: "The entire process took 11 days from initial request to approval. This delay represented a potential worsening of Rahul's condition due to disease progression.",
+                    takeaway: "Approved PAs remain on file, reducing future administrative burden. However, the 11-day delay highlights the real-world impact of PA processes on patient outcomes."
+                }
+            },
+            {
+                id: 8,
+                title: "Takeaways",
+                narrator: "Day 15: Takeaways and System Insights",
+                characters: [
+                    { speaker: "Priya", type: "specialist", text: "Let me summarize what you've learned about prior authorization from a patient perspective and a healthcare system perspective." },
+                    { speaker: "Rahul", type: "patient", text: "From my perspective, I learned that PA is complex, requires documentation, and delays can harm. But there's a process to challenge denials." },
+                    { speaker: "Priya", type: "specialist", text: "Exactly. Now here's how healthcare systems measure the impact. We track denial rates—percentage of PAs that are denied initially." },
+                    { speaker: "Priya", type: "specialist", text: "We track appeal rates—how many denials are appealed. We measure resolution time—how long from request to final decision. And workflow efficiency—how much staff time is consumed." },
+                    { speaker: "Priya", type: "specialist", text: "Your case represents a common pattern: initial denial, followed by successful appeal. This is inefficient for everyone." }
+                ],
+                choices: [
+                    { text: "Restart story to learn different outcomes", impact: "explore-paths" },
+                    { text: "Complete and view final statistics", impact: "review-complete" }
+                ],
+                card: {
+                    what: "Summary of patient journey: diagnosis → PA submission → denial → appeal → approval. Timeline: 11 days total.",
+                    why: "Understanding both patient and system perspectives reveals that PA creates burden for patients, physicians, and administrative staff.",
+                    insight: "Healthcare systems measure: denial rate (20-30% industry average), appeal rate (10-15%), resolution time (7-15 days), workflow efficiency (FTE impact).",
+                    takeaway: "Prior authorization serves important cost-control functions but creates significant healthcare inefficiency. Reform efforts focus on streamlining PA processes while maintaining medical appropriateness."
+                }
+            }
+        ];
+        
+        // Initialize
+        function init() {
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'd') {
+                    e.preventDefault();
+                    toggleDebug();
+                }
+            });
+        }
+        
+        // Start Journey
+        function startJourney() {
+            gameState.storyStarted = true;
+            document.getElementById('landingPage').classList.add('hidden');
+            document.getElementById('storyPage').classList.remove('hidden');
+            initializeTimeline();
+            loadScene(1);
+        }
+        
+        // Initialize Timeline
+        function initializeTimeline() {
+            const container = document.getElementById('timelineContainer');
+            container.innerHTML = '';
+            
+            scenes.forEach((scene, index) => {
+                const item = document.createElement('div');
+                item.className = `chapter-item ${index + 1 === gameState.currentScene ? 'active' : ''}`;
+                item.dataset.scene = index + 1;
+                
+                const number = document.createElement('span');
+                number.className = 'chapter-number';
+                number.textContent = (index + 1).toString().padStart(2, '0');
+                
+                const title = document.createTextNode(scene.title);
+                
+                item.appendChild(number);
+                item.appendChild(title);
+                
+                item.addEventListener('click', () => {
+                    // Allow clicking only on current or completed scenes (for visual reference)
+                    if (index + 1 <= gameState.currentScene) {
+                        updateTimelineHighlight(index + 1);
+                    }
+                });
+                
+                container.appendChild(item);
+            });
+        }
+        
+        // Update Timeline Highlight
+        function updateTimelineHighlight(sceneNum) {
+            document.querySelectorAll('.chapter-item').forEach((item, index) => {
+                item.classList.remove('active');
+                if (index < sceneNum) {
+                    item.classList.add('completed');
+                }
+                if (index + 1 === sceneNum) {
+                    item.classList.add('active');
+                }
+            });
+        }
+        
+        // Load Scene
+        function loadScene(sceneIndex) {
+            if (sceneIndex > 8) {
+                showCompletionDashboard();
+                return;
+            }
+            
+            gameState.currentScene = sceneIndex;
+            gameState.sceneHistory.push(sceneIndex);
+            
+            const scene = scenes[sceneIndex - 1];
+            updateProgress();
+            updateTimeline();
+            updateTimelineHighlight(sceneIndex);
+            clearChat();
+            displayScene(scene);
+        }
+        
+        // Display Scene
+        function displayScene(scene) {
+            // Update title
+            document.getElementById('sceneTitle').textContent = `Scene ${scene.id}: ${scene.title}`;
+            
+            // Narrator introduction
+            addNarratorMessage(scene.narrator);
+            
+            // Character messages with typing indicators
+            scene.characters.forEach((char, index) => {
+                setTimeout(() => {
+                    if (char.type === 'narrator') {
+                        addNarratorMessage(char.text);
+                    } else if (char.type === 'patient') {
+                        addMessage('left', 'Rahul', char.text);
+                    } else if (char.type === 'specialist') {
+                        addMessage('right', 'Priya', char.text);
+                    }
+                }, (index + 1) * 800);
+            });
+            
+            // Educational card
+            setTimeout(() => {
+                displayCard(scene.card);
+            }, (scene.characters.length + 2) * 800);
+            
+            // Choices
+            setTimeout(() => {
+                displayChoices(scene.choices, scene.id);
+            }, (scene.characters.length + 3) * 800);
+        }
+        
+        // Add Message to Chat
+        function addMessage(position, speaker, text) {
+            const container = document.getElementById('chatContainer');
+            
+            // Add typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = position === 'left' ? 'character-left' : 'character-right';
+            typingDiv.style.display = 'block';
+            typingDiv.style.width = '100%';
+            typingDiv.style.clear = 'both';
+            typingDiv.style.marginBottom = '16px';
+            
+            const typingContent = document.createElement('div');
+            typingContent.className = 'typing-indicator';
+            typingContent.style.display = 'inline-flex';
+            typingContent.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            typingDiv.appendChild(typingContent);
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+            
+            setTimeout(() => {
+                typingDiv.remove();
+                
+                const msgDiv = document.createElement('div');
+                msgDiv.className = position === 'left' ? 'character-left' : 'character-right';
+                msgDiv.style.display = 'block';
+                msgDiv.style.width = '100%';
+                msgDiv.style.clear = 'both';
+                msgDiv.style.marginBottom = '16px';
+                msgDiv.style.overflow = 'visible';
+                msgDiv.style.position = 'relative';
+                msgDiv.style.zIndex = '1';
+                
+                const bubble = document.createElement('div');
+                bubble.className = `bubble message ${position === 'left' ? 'bubble-left' : 'bubble-right'}`;
+                bubble.style.display = 'inline-block';
+                bubble.style.position = 'relative';
+                bubble.style.zIndex = '1';
+                
+                const nameSpan = document.createElement('div');
+                nameSpan.style.fontSize = '12px';
+                nameSpan.style.fontWeight = '600';
+                nameSpan.style.opacity = '0.8';
+                nameSpan.style.marginBottom = '4px';
+                nameSpan.textContent = speaker;
+                
+                const textSpan = document.createElement('div');
+                textSpan.textContent = text;
+                
+                bubble.appendChild(nameSpan);
+                bubble.appendChild(textSpan);
+                msgDiv.appendChild(bubble);
+                
+                container.appendChild(msgDiv);
+                container.scrollTop = container.scrollHeight;
+            }, 500);
+        }
+        
+        // Add Narrator Message
+        function addNarratorMessage(text) {
+            const container = document.getElementById('chatContainer');
+            
+            const narratorDiv = document.createElement('div');
+            narratorDiv.className = 'narrator-text message';
+            narratorDiv.style.display = 'block';
+            narratorDiv.style.width = '100%';
+            narratorDiv.style.marginBottom = '16px';
+            narratorDiv.style.clear = 'both';
+            narratorDiv.style.position = 'relative';
+            narratorDiv.style.zIndex = '1';
+            narratorDiv.textContent = text;
+            
+            container.appendChild(narratorDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Display Educational Card
+        function displayCard(cardData) {
+            const container = document.getElementById('cardContainer');
+            container.innerHTML = '';
+            container.style.display = 'block';
+            container.style.width = '100%';
+            container.style.clear = 'both';
+            container.style.marginBottom = '16px';
+            container.style.position = 'relative';
+            container.style.zIndex = '2';
+            
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card message';
+            cardDiv.style.display = 'block';
+            cardDiv.style.width = '100%';
+            cardDiv.style.position = 'relative';
+            cardDiv.style.zIndex = '2';
+            
+            const items = [
+                { title: '📋 What Happened', content: cardData.what },
+                { title: '❓ Why It Matters', content: cardData.why },
+                { title: '💡 Healthcare Insight', content: cardData.insight },
+                { title: '🎯 Key Takeaway', content: cardData.takeaway }
+            ];
+            
+            items.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.style.display = 'block';
+                itemDiv.style.marginBottom = '12px';
+                itemDiv.style.paddingBottom = '12px';
+                itemDiv.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+                
+                // Remove border from last item
+                if (index === items.length - 1) {
+                    itemDiv.style.borderBottom = 'none';
+                }
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'card-title';
+                titleDiv.textContent = item.title;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'card-content';
+                contentDiv.textContent = item.content;
+                
+                itemDiv.appendChild(titleDiv);
+                itemDiv.appendChild(contentDiv);
+                cardDiv.appendChild(itemDiv);
+            });
+            
+            container.appendChild(cardDiv);
+        }
+        
+        // Display Choices
+        function displayChoices(choices, sceneId) {
+            const container = document.getElementById('choicesContainer');
+            container.innerHTML = '';
+            container.style.display = 'grid';
+            container.style.gridTemplateColumns = '1fr 1fr';
+            container.style.gap = '16px';
+            container.style.marginTop = '16px';
+            container.style.clear = 'both';
+            container.style.position = 'relative';
+            container.style.zIndex = '1';
+            
+            choices.forEach((choice, index) => {
+                const button = document.createElement('button');
+                button.className = 'choice-button glass px-4 py-3 rounded-lg text-sm font-medium w-full hover:bg-white hover:bg-opacity-10';
+                button.style.display = 'block';
+                button.style.position = 'relative';
+                button.style.zIndex = '1';
+                button.textContent = choice.text;
+                
+                button.addEventListener('click', () => {
+                    gameState.choices.push({
+                        scene: sceneId,
+                        choice: choice.text,
+                        impact: choice.impact
+                    });
+                    
+                    updateKnowledgeScore(choice.impact);
+                    updateEndingPath(choice.impact);
+                    
+                    // Disable all choice buttons
+                    document.querySelectorAll('.choice-button').forEach(btn => {
+                        btn.disabled = true;
+                    });
+                    
+                    // Progress to next scene
+                    setTimeout(() => {
+                        nextScene();
+                    }, 500);
+                });
+                
+                container.appendChild(button);
+            });
+        }
+        
+        // Next Scene
+        function nextScene() {
+            gameState.currentScene++;
+            gameState.dayCounter += Math.floor(Math.random() * 2) + 1;
+            
+            if (gameState.currentScene > 8) {
+                showCompletionDashboard();
+            } else {
+                loadScene(gameState.currentScene);
+            }
+        }
+        
+        // Update Progress Bar
+        function updateProgress() {
+            const percent = (gameState.currentScene / 8) * 100;
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = Math.round(percent) + '% Complete';
+            document.getElementById('sceneNumber').textContent = `${gameState.currentScene}/8`;
+            document.getElementById('scoreDisplay').textContent = gameState.knowledgeScore;
+        }
+        
+        // Update Timeline
+        function updateTimeline() {
+            document.getElementById('timelineDisplay').textContent = `Day ${gameState.dayCounter}`;
+        }
+        
+        // Clear Chat
+        function clearChat() {
+            document.getElementById('chatContainer').innerHTML = '';
+            document.getElementById('cardContainer').innerHTML = '';
+            document.getElementById('choicesContainer').innerHTML = '';
+        }
+        
+        // Update Knowledge Score
+        function updateKnowledgeScore(impact) {
+            const scores = {
+                'patient-engaged': 2,
+                'alternative-seeking': 1,
+                'patient-trusting': 2,
+                'patient-proactive': 3,
+                'system-aware': 3,
+                'frustrated': 1,
+                'compliant-mindset': 2,
+                'aggressive-treatment': 1,
+                'appeal-ready': 3,
+                'step-therapy-compliant': 2,
+                'thorough-appeal': 3,
+                'quick-appeal': 2,
+                'reflective': 3,
+                'action-oriented': 1,
+                'explore-paths': 2,
+                'review-complete': 2
+            };
+            
+            gameState.knowledgeScore += scores[impact] || 0;
+        }
+        
+        // Update Ending Path
+        function updateEndingPath(impact) {
+            const pathWeights = {
+                'patient-engaged': 'smooth',
+                'alternative-seeking': 'delayed',
+                'patient-trusting': 'smooth',
+                'patient-proactive': 'smooth',
+                'system-aware': 'smooth',
+                'frustrated': 'denial',
+                'compliant-mindset': 'smooth',
+                'aggressive-treatment': 'delayed',
+                'appeal-ready': 'appeal',
+                'step-therapy-compliant': 'smooth',
+                'thorough-appeal': 'appeal',
+                'quick-appeal': 'delayed',
+                'reflective': 'smooth',
+                'action-oriented': 'smooth',
+                'explore-paths': 'smooth',
+                'review-complete': 'smooth'
+            };
+            
+            const newPath = pathWeights[impact] || 'smooth';
+            
+            if (newPath === 'denial' || gameState.approvalPath === 'denial') {
+                gameState.approvalPath = 'denial';
+            } else if (newPath === 'appeal' || gameState.approvalPath === 'appeal') {
+                gameState.approvalPath = 'appeal';
+            } else if (newPath === 'delayed') {
+                gameState.approvalPath = 'delayed';
+            }
+        }
+        
+        // Show Completion Dashboard
+        function showCompletionDashboard() {
+            clearChat();
+            
+            const dashDiv = document.createElement('div');
+            dashDiv.className = 'message';
+            dashDiv.style.display = 'block';
+            dashDiv.style.width = '100%';
+            dashDiv.style.marginBottom = '16px';
+            dashDiv.style.clear = 'both';
+            dashDiv.style.position = 'relative';
+            dashDiv.style.zIndex = '1';
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.style.fontSize = '20px';
+            titleDiv.style.fontWeight = 'bold';
+            titleDiv.style.marginBottom = '24px';
+            titleDiv.style.textAlign = 'center';
+            titleDiv.style.color = 'rgba(59, 130, 246, 1)';
+            titleDiv.textContent = '📊 Your Story Completion';
+            
+            dashDiv.appendChild(titleDiv);
+            
+            // Determine Ending
+            let endingType, endingBadge, endingDescription;
+            
+            if (gameState.approvalPath === 'denial') {
+                endingType = '🔴 Final Denial';
+                endingBadge = 'ending-red';
+                endingDescription = 'The PA was never approved. Treatment was delayed significantly.';
+            } else if (gameState.approvalPath === 'appeal') {
+                endingType = '🟠 Appeal Success';
+                endingBadge = 'ending-orange';
+                endingDescription = 'After successful appeal, the PA was approved.';
+            } else if (gameState.approvalPath === 'delayed') {
+                endingType = '🟡 Delayed Approval';
+                endingBadge = 'ending-yellow';
+                endingDescription = 'The PA was approved after additional time and documentation.';
+            } else {
+                endingType = '🟢 Smooth Approval';
+                endingBadge = 'ending-green';
+                endingDescription = 'The PA was approved efficiently with minimal delays.';
+            }
+            
+            gameState.endingType = endingType;
+            
+            const endingDiv = document.createElement('div');
+            endingDiv.className = `ending-badge ${endingBadge}`;
+            endingDiv.style.display = 'block';
+            endingDiv.style.marginBottom = '16px';
+            endingDiv.textContent = endingType;
+            dashDiv.appendChild(endingDiv);
+            
+            const endingDescDiv = document.createElement('div');
+            endingDescDiv.style.marginBottom = '24px';
+            endingDescDiv.style.fontSize = '14px';
+            endingDescDiv.style.lineHeight = '1.6';
+            endingDescDiv.style.display = 'block';
+            endingDescDiv.textContent = endingDescription;
+            dashDiv.appendChild(endingDescDiv);
+            
+            // Story Path
+            const pathDiv = document.createElement('div');
+            pathDiv.className = 'card' ;
+            pathDiv.style.marginBottom = '16px';
+            pathDiv.style.display = 'block';
+            pathDiv.style.clear = 'both';
+            
+            const pathTitle = document.createElement('div');
+            pathTitle.className = 'card-title';
+            pathTitle.textContent = '📖 Your Story Path';
+            pathDiv.appendChild(pathTitle);
+            
+            const pathContent = document.createElement('div');
+            pathContent.className = 'card-content';
+            pathContent.style.fontSize = '12px';
+            pathContent.textContent = `Scenes visited: ${gameState.sceneHistory.join(' → ')}`;
+            pathDiv.appendChild(pathContent);
+            dashDiv.appendChild(pathDiv);
+            
+            // Timeline Summary
+            const timelineDiv = document.createElement('div');
+            timelineDiv.className = 'card';
+            timelineDiv.style.marginBottom = '16px';
+            timelineDiv.style.display = 'block';
+            timelineDiv.style.clear = 'both';
+            
+            const timeTitle = document.createElement('div');
+            timeTitle.className = 'card-title';
+            timeTitle.textContent = '⏱️ Timeline Summary';
+            timelineDiv.appendChild(timeTitle);
+            
+            const timeContent = document.createElement('div');
+            timeContent.className = 'card-content';
+            timeContent.textContent = `Total Days: ${gameState.dayCounter} | Story Begun: Day 1 | Story Completed: Day ${gameState.dayCounter}`;
+            timelineDiv.appendChild(timeContent);
+            dashDiv.appendChild(timelineDiv);
+            
+            // Knowledge Score
+            const scoreDiv = document.createElement('div');
+            scoreDiv.className = 'card';
+            scoreDiv.style.marginBottom = '16px';
+            scoreDiv.style.display = 'block';
+            scoreDiv.style.clear = 'both';
+            
+            const scoreTitle = document.createElement('div');
+            scoreTitle.className = 'card-title';
+            scoreTitle.textContent = '📚 Knowledge Score';
+            scoreDiv.appendChild(scoreTitle);
+            
+            const maxScore = 48;
+            const scorePercent = Math.round((gameState.knowledgeScore / maxScore) * 100);
+            const scoreContent = document.createElement('div');
+            scoreContent.className = 'card-content';
+            scoreContent.textContent = `${gameState.knowledgeScore} / ${maxScore} points (${scorePercent}%)`;
+            scoreDiv.appendChild(scoreContent);
+            dashDiv.appendChild(scoreDiv);
+            
+            // System Metrics
+            const metricsDiv = document.createElement('div');
+            metricsDiv.className = 'card';
+            metricsDiv.style.marginBottom = '16px';
+            metricsDiv.style.display = 'block';
+            metricsDiv.style.clear = 'both';
+            
+            const metricsTitle = document.createElement('div');
+            metricsTitle.className = 'card-title';
+            metricsTitle.textContent = '🏥 System Metrics';
+            metricsDiv.appendChild(metricsTitle);
+            
+            const denialRateDiv = document.createElement('div');
+            denialRateDiv.style.fontSize = '12px';
+            denialRateDiv.style.marginBottom = '8px';
+            denialRateDiv.className = 'card-content';
+            denialRateDiv.innerHTML = '<strong>Denial Rate:</strong> Industry average is 20-30% initially denied. Appeal rates recover 60-70% of these.';
+            metricsDiv.appendChild(denialRateDiv);
+            
+            const appealRateDiv = document.createElement('div');
+            appealRateDiv.style.fontSize = '12px';
+            appealRateDiv.style.marginBottom = '8px';
+            appealRateDiv.className = 'card-content';
+            appealRateDiv.innerHTML = '<strong>Appeal Rate:</strong> 10-15% of patients file formal appeals. Success rate on appeal: 60-70%.';
+            metricsDiv.appendChild(appealRateDiv);
+            
+            const resolutionDiv = document.createElement('div');
+            resolutionDiv.style.fontSize = '12px';
+            resolutionDiv.style.marginBottom = '8px';
+            resolutionDiv.className = 'card-content';
+            resolutionDiv.innerHTML = '<strong>Resolution Time:</strong> Average 7-15 days for initial decision. Appeals add 5-10 additional days.';
+            metricsDiv.appendChild(resolutionDiv);
+            
+            const efficiencyDiv = document.createElement('div');
+            efficiencyDiv.style.fontSize = '12px';
+            efficiencyDiv.className = 'card-content';
+            efficiencyDiv.innerHTML = '<strong>Workflow Efficiency:</strong> Physician offices spend 14 hours/week on PA-related work. Each denial requires 2-4 additional hours.';
+            metricsDiv.appendChild(efficiencyDiv);
+            
+            dashDiv.appendChild(metricsDiv);
+            
+            // Key Learnings
+            const learningDiv = document.createElement('div');
+            learningDiv.className = 'card';
+            learningDiv.style.display = 'block';
+            learningDiv.style.clear = 'both';
+            
+            const learningTitle = document.createElement('div');
+            learningTitle.className = 'card-title';
+            learningTitle.textContent = '🎓 Key Learnings';
+            learningDiv.appendChild(learningTitle);
+            
+            const learnings = [
+                'Prior authorization exists as a cost-control mechanism, but creates treatment delays.',
+                'Initial PA denials do NOT mean permanent rejection—they often require additional documentation.',
+                'Strong appeals with clinical justification can successfully override initial denials.',
+                'Both patients and healthcare systems bear burden of the PA process.',
+                'Reform efforts focus on streamlining PA while maintaining medical appropriateness.',
+                'Healthcare IT integration could significantly reduce PA resolution times.'
+            ];
+            
+            learnings.forEach(learning => {
+                const li = document.createElement('div');
+                li.style.fontSize = '12px';
+                li.style.marginBottom = '8px';
+                li.style.color = 'rgba(255, 255, 255, 0.85)';
+                li.style.display = 'block';
+                li.textContent = '• ' + learning;
+                learningDiv.appendChild(li);
+            });
+            
+            dashDiv.appendChild(learningDiv);
+            
+            document.getElementById('chatContainer').appendChild(dashDiv);
+            
+            // Display restart button
+            const choicesContainer = document.getElementById('choicesContainer');
+            choicesContainer.innerHTML = '';
+            choicesContainer.style.display = 'block';
+            choicesContainer.style.gridTemplateColumns = 'auto';
+            choicesContainer.style.clear = 'both';
+            choicesContainer.style.marginTop = '16px';
+            
+            const restartBtn = document.createElement('button');
+            restartBtn.className = 'choice-button glass px-4 py-3 rounded-lg text-sm font-medium w-full col-span-2 hover:bg-white hover:bg-opacity-10';
+            restartBtn.style.display = 'block';
+            restartBtn.textContent = '🔄 Restart Story';
+            restartBtn.addEventListener('click', () => {
+                restartStory();
+            });
+            
+            choicesContainer.appendChild(restartBtn);
+            
+            updateProgress();
+        }
+        
+        // Restart Story
+        function restartStory() {
+            gameState.currentScene = 1;
+            gameState.choices = [];
+            gameState.knowledgeScore = 0;
+            gameState.dayCounter = 1;
+            gameState.endingType = '';
+            gameState.approvalPath = 'smooth';
+            gameState.sceneHistory = [];
+            
+            loadScene(1);
+        }
+        
+        // Toggle Debug Panel
+        function toggleDebug() {
+            const panel = document.getElementById('debugPanel');
+            panel.classList.toggle('hidden');
+            
+            if (!panel.classList.contains('hidden')) {
+                updateDebugContent();
+            }
+        }
+        
+        // Update Debug Content
+        function updateDebugContent() {
+            const content = document.getElementById('debugContent');
+            const info = `
+Current Scene: ${gameState.currentScene}
+Day Counter: ${gameState.dayCounter}
+Knowledge Score: ${gameState.knowledgeScore}
+Ending Type: ${gameState.endingType || 'Not yet determined'}
+Approval Path: ${gameState.approvalPath}
+
+Selected Choices:
+${gameState.choices.map(c => `  Scene ${c.scene}: ${c.choice} (${c.impact})`).join('\n') || '  None yet'}
+
+Scene History:
+${gameState.sceneHistory.join(' → ') || 'None yet'}
+            `.trim();
+            
+            content.textContent = info;
+        }
+        
+        // Initialize application
+        init();
+    </script>
+</body>
+</html>
