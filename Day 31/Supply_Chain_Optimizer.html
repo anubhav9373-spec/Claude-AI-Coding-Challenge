@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supply Chain Optimizer — Simulation</title>
+<style>
+:root{
+  --bg:#080d16;
+  --bg-panel:#0d1524;
+  --bg-panel-2:#111b2e;
+  --bg-raised:#141f34;
+  --bg-raised-hover:#182643;
+  --line:#1d2942;
+  --line-soft:#161f34;
+  --text-hi:#eef2fa;
+  --text-mid:#a7b3c9;
+  --text-low:#66748f;
+  --blue:#3b82f6;
+  --blue-soft:#1f3d73;
+  --cyan:#22d3ee;
+  --green:#22c55e;
+  --green-soft:#123626;
+  --red:#f0505f;
+  --red-soft:#3a1620;
+  --amber:#f5a524;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,Courier,monospace;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:
+    radial-gradient(ellipse 1100px 650px at 20% -10%, #0f1c33 0%, transparent 60%),
+    radial-gradient(ellipse 900px 700px at 100% 0%, #0d1a2c 0%, transparent 55%),
+    var(--bg);
+  color:var(--text-hi);
+  font-family:var(--font);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+.bg-grid{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(59,130,246,0.035) 1px,transparent 1px),
+                    linear-gradient(90deg,rgba(59,130,246,0.035) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse 90% 60% at 50% 0%, black 0%, transparent 75%);
+}
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+button:focus-visible,.clickable:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+
+/* ============ SHELL ============ */
+#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 30px;border-bottom:1px solid var(--line-soft);
+  background:linear-gradient(180deg, rgba(13,21,36,0.92), rgba(8,13,22,0.6));
+  backdrop-filter:blur(8px);position:sticky;top:0;z-index:30;
+}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-mark{
+  width:36px;height:36px;border-radius:10px;
+  background:conic-gradient(from 210deg,var(--blue),var(--cyan),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-weight:800;color:#03101d;font-size:14px;
+  box-shadow:0 0 22px rgba(34,211,238,.35);
+}
+.brand-text h1{font-size:15px;font-weight:800;letter-spacing:.2px;}
+.brand-text span{display:block;font-size:10.5px;color:var(--text-low);letter-spacing:1.6px;text-transform:uppercase;margin-top:2px;}
+.progress-chip{
+  font-family:var(--mono);font-size:13px;color:var(--text-mid);
+  background:var(--bg-panel);border:1px solid var(--line);
+  padding:6px 14px;border-radius:20px;
+}
+.progress-chip b{color:var(--cyan);}
+
+/* ============ METRICS STRIP ============ */
+.metrics-strip{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:12px;
+  padding:16px 30px;
+}
+.metric-card{
+  background:linear-gradient(160deg,var(--bg-panel),var(--bg-panel-2));
+  border:1px solid var(--line);border-radius:12px;padding:13px 15px;
+  transition:border-color .2s;
+}
+.metric-card .l{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--text-low);font-weight:700;}
+.metric-card .v{font-family:var(--mono);font-size:20px;font-weight:800;margin-top:6px;transition:color .3s;}
+.metric-card .v.flash-good{color:var(--green);}
+.metric-card .v.flash-bad{color:var(--red);}
+
+/* ============ MAIN VIEWS ============ */
+.view{display:none;flex:1;}
+.view.active{display:flex;flex-direction:column;}
+
+/* ---- Start screen ---- */
+.start-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:30px;}
+.start-card{
+  max-width:760px;width:100%;text-align:center;
+  background:linear-gradient(160deg,var(--bg-panel),var(--bg-panel-2));
+  border:1px solid var(--line);border-radius:20px;padding:50px 46px;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;
+  letter-spacing:1.4px;text-transform:uppercase;color:var(--cyan);
+  background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);
+  padding:6px 14px;border-radius:20px;
+}
+.start-card h2{
+  font-size:38px;font-weight:800;line-height:1.15;margin-top:20px;
+  background:linear-gradient(135deg,#fff,var(--cyan) 90%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.start-card p.lead{color:var(--text-mid);margin-top:16px;font-size:15px;line-height:1.7;max-width:600px;margin-left:auto;margin-right:auto;}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:30px;}
+.stat-box{background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.stat-box .v{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--blue);}
+.stat-box.cyan .v{color:var(--cyan);}
+.stat-box .l{font-size:11px;color:var(--text-low);text-transform:uppercase;letter-spacing:.6px;margin-top:4px;}
+.howitworks{
+  margin-top:22px;text-align:left;background:rgba(245,165,36,.06);
+  border:1px solid rgba(245,165,36,.25);border-radius:12px;padding:14px 18px;
+  font-size:13px;color:var(--text-mid);line-height:1.6;
+}
+.howitworks b{color:var(--amber);}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 26px;border-radius:11px;font-weight:700;font-size:14.5px;transition:.15s ease;
+}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#03101d;box-shadow:0 10px 26px rgba(34,211,238,.28);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(34,211,238,.4);}
+.btn-secondary{background:var(--bg-raised);border:1px solid var(--line);color:var(--text-hi);}
+.btn-secondary:hover{border-color:var(--cyan);}
+.start-card .btn-primary{margin-top:28px;}
+
+/* ---- Challenge screen ---- */
+.challenge-grid{
+  flex:1;display:grid;grid-template-columns:1fr 340px;gap:18px;
+  padding:6px 30px 30px;align-items:start;
+}
+.challenge-panel{
+  background:linear-gradient(160deg,var(--bg-panel),var(--bg-panel-2));
+  border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px 28px;
+}
+.challenge-tag{
+  font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--cyan);display:flex;align-items:center;gap:6px;
+}
+.challenge-title{font-size:23px;font-weight:800;margin-top:8px;}
+.challenge-context{
+  margin-top:16px;background:rgba(59,130,246,.06);border-left:3px solid var(--blue);
+  border-radius:0 10px 10px 0;padding:14px 16px;font-size:13.5px;color:var(--text-mid);line-height:1.65;
+}
+.challenge-context b{color:var(--text-hi);}
+.section-label{
+  display:flex;align-items:center;gap:8px;margin-top:22px;margin-bottom:12px;
+  font-size:13px;font-weight:700;color:var(--text-hi);
+}
+.section-label .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);}
+
+.option-list{display:flex;flex-direction:column;gap:11px;}
+.option-card{
+  background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;display:flex;gap:14px;transition:.15s ease;position:relative;
+}
+.option-card:hover{border-color:var(--blue-soft);background:var(--bg-raised-hover);}
+.option-card.selected{border-color:var(--blue);background:rgba(59,130,246,.08);box-shadow:0 0 0 1px var(--blue) inset;}
+.option-card.disabled{opacity:.55;pointer-events:none;}
+.option-icon{font-size:20px;line-height:1.3;flex-shrink:0;}
+.option-body{flex:1;}
+.option-name-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.option-name{font-size:14.5px;font-weight:700;color:var(--text-hi);}
+.option-check{
+  width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;flex-shrink:0;
+  transition:.15s ease;
+}
+.option-card.selected .option-check{background:var(--blue);border-color:var(--blue);color:#03101d;}
+.option-desc{font-size:12.5px;color:var(--text-mid);margin-top:4px;line-height:1.55;}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.tag{
+  font-family:var(--mono);font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;
+  border:1px solid; letter-spacing:.2px;
+}
+.tag.pos{color:#7ce8ab;background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.35);}
+.tag.neg{color:#ff9aa4;background:rgba(240,80,95,.08);border-color:rgba(240,80,95,.35);}
+.tag.neu{color:#f5c983;background:rgba(245,165,36,.08);border-color:rgba(245,165,36,.35);}
+
+.confirm-row{display:flex;justify-content:flex-end;margin-top:22px;}
+.confirm-row .btn-primary:disabled{opacity:.4;pointer-events:none;box-shadow:none;}
+
+/* ---- Advisor sidebar ---- */
+.advisor-panel{
+  background:linear-gradient(160deg,var(--bg-panel),var(--bg-panel-2));
+  border:1px solid var(--line);border-radius:var(--radius);padding:20px;
+  position:sticky;top:96px;
+}
+.advisor-head{display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--line-soft);}
+.advisor-avatar{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:conic-gradient(from 200deg,#6d5efc,#22d3ee,#6d5efc);
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+}
+.advisor-name{font-size:13.5px;font-weight:700;}
+.advisor-sub{font-size:10px;color:var(--text-low);text-transform:uppercase;letter-spacing:.8px;margin-top:1px;}
+.advisor-body{padding-top:16px;min-height:60px;}
+.advisor-placeholder{font-size:13px;color:var(--text-low);line-height:1.6;}
+.advisor-analysis{font-size:13px;color:var(--text-mid);line-height:1.65;animation:fadeUp .3s ease;}
+.advisor-analysis b{color:var(--text-hi);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+.impact-block{margin-top:16px;animation:fadeUp .35s ease;}
+.impact-title{
+  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-low);
+  margin-bottom:8px;
+}
+.impact-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:12.5px;border-bottom:1px solid var(--line-soft);}
+.impact-row:last-child{border-bottom:none;}
+.impact-row .k{color:var(--text-mid);}
+.impact-row .v{font-family:var(--mono);font-weight:700;}
+.impact-row .v.good{color:var(--green);}
+.impact-row .v.bad{color:var(--red);}
+.impact-row .v.flat{color:var(--text-low);}
+
+.decision-log{margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft);}
+.decision-log .title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-low);margin-bottom:10px;}
+.log-entry{font-size:12px;color:var(--text-mid);padding:6px 0;display:flex;gap:8px;}
+.log-entry .bullet{color:var(--cyan);flex-shrink:0;}
+.log-entry b{color:var(--text-hi);}
+
+/* ---- Results screen ---- */
+.results-wrap{flex:1;padding:20px 30px 40px;display:flex;justify-content:center;}
+.results-card{max-width:920px;width:100%;}
+.score-hero{
+  background:linear-gradient(160deg,var(--bg-panel),var(--bg-panel-2));
+  border:1px solid var(--line);border-radius:20px;padding:40px;text-align:center;
+}
+.score-num{font-family:var(--mono);font-size:72px;font-weight:800;line-height:1;}
+.score-num span{font-size:28px;color:var(--text-low);font-weight:700;}
+.grade-line{font-size:22px;font-weight:800;margin-top:10px;}
+.grade-sub{font-size:13px;color:var(--text-mid);margin-top:6px;}
+.grade-sub b{color:var(--text-hi);}
+
+.compare-section{margin-top:22px;}
+.compare-heading{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:12px;}
+.compare-heading .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.compare-box{background:var(--bg-panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;}
+.compare-box .htitle{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-low);margin-bottom:12px;}
+.compare-box.after .htitle{color:var(--cyan);}
+.compare-line{display:flex;justify-content:space-between;padding:7px 0;font-size:13.5px;border-bottom:1px solid var(--line-soft);}
+.compare-line:last-child{border-bottom:none;}
+.compare-line .k{color:var(--text-mid);}
+.compare-line .v{font-family:var(--mono);font-weight:700;}
+.compare-line .v.good{color:var(--green);}
+.compare-line .v.bad{color:var(--red);}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+.outcomes-box, .weak-box{background:var(--bg-panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;}
+.outcomes-box .htitle, .weak-box .htitle{
+  display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-low);margin-bottom:12px;
+}
+.weak-box{border-color:rgba(245,165,36,.3);background:rgba(245,165,36,.04);}
+.weak-box .htitle{color:var(--amber);}
+.oc-line{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;}
+.oc-line .k{color:var(--text-mid);}
+.oc-line .v{font-family:var(--mono);font-weight:700;}
+.oc-line .v.good{color:var(--green);}
+.oc-line .v.bad{color:var(--red);}
+.weak-text{font-size:13px;color:var(--text-mid);line-height:1.6;}
+
+.replay-row{display:flex;justify-content:center;margin-top:28px;}
+
+@media (max-width:1000px){
+  .metrics-strip{grid-template-columns:repeat(3,1fr);}
+  .challenge-grid{grid-template-columns:1fr;}
+  .compare-grid,.two-col{grid-template-columns:1fr;}
+  .advisor-panel{position:static;}
+}
+@media (max-width:560px){
+  .metrics-strip{grid-template-columns:repeat(2,1fr);padding:12px;}
+  .topbar{padding:12px 16px;}
+  .challenge-grid{padding:6px 14px 20px;}
+  .start-card{padding:32px 22px;}
+  .start-card h2{font-size:28px;}
+  .stat-row{grid-template-columns:1fr;}
+  .score-num{font-size:52px;}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s !important;transition-duration:.001s !important;}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">SC</div>
+      <div class="brand-text">
+        <h1>Supply Chain Optimizer</h1>
+        <span>Simulation</span>
+      </div>
+    </div>
+    <div class="progress-chip" id="progressChip">Overview</div>
+  </header>
+
+  <section class="metrics-strip" id="metricsStrip"></section>
+
+  <!-- START VIEW -->
+  <div class="view active" id="view-start">
+    <div class="start-wrap">
+      <div class="start-card">
+        <span class="eyebrow">⚡ Interactive Simulation</span>
+        <h2>Optimize a Real Supply Chain</h2>
+        <p class="lead">You've just been appointed Supply Chain Director at a struggling company. Make 6 real decisions — from supplier strategy to technology investments — and see how your choices reshape the business. No prior knowledge needed.</p>
+        <div class="stat-row">
+          <div class="stat-box"><div class="v">6</div><div class="l">Strategic Decisions</div></div>
+          <div class="stat-box"><div class="v">100%</div><div class="l">Randomized Scenarios</div></div>
+          <div class="stat-box cyan"><div class="v">AI</div><div class="l">Advisor Guidance</div></div>
+        </div>
+        <div class="howitworks">
+          <b>How it works:</b> Every challenge explains the business context first, then presents 4 options. Each choice updates your company's live metrics — profit, cost, delivery speed, risk, satisfaction, and resilience. Your AI Advisor explains what each decision means in plain English.
+        </div>
+        <button class="btn btn-primary" id="startBtn">Start Optimization →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHALLENGE VIEW -->
+  <div class="view" id="view-challenge">
+    <div class="challenge-grid">
+      <div class="challenge-panel">
+        <div class="challenge-tag" id="challengeTag"></div>
+        <h2 class="challenge-title" id="challengeTitle"></h2>
+        <div class="challenge-context" id="challengeContext"></div>
+        <div class="section-label"><span class="dot"></span>Choose Your Strategy</div>
+        <div class="option-list" id="optionList"></div>
+        <div class="confirm-row">
+          <button class="btn btn-primary" id="confirmBtn" disabled>Confirm Decision →</button>
+        </div>
+      </div>
+
+      <aside class="advisor-panel">
+        <div class="advisor-head">
+          <div class="advisor-avatar">🤖</div>
+          <div>
+            <div class="advisor-name">AI Supply Advisor</div>
+            <div class="advisor-sub">Strategic Intelligence</div>
+          </div>
+        </div>
+        <div class="advisor-body" id="advisorBody">
+          <div class="advisor-placeholder">Select an option to receive strategic analysis from your AI advisor…</div>
+        </div>
+        <div class="decision-log" id="decisionLog" style="display:none;">
+          <div class="title">Decision Log</div>
+          <div id="decisionLogList"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- RESULTS VIEW -->
+  <div class="view" id="view-results">
+    <div class="results-wrap">
+      <div class="results-card">
+        <div class="score-hero">
+          <div class="score-num" id="scoreNum">0<span>/100</span></div>
+          <div class="grade-line" id="gradeLine"></div>
+          <div class="grade-sub">Based on 6 strategic decisions for <b>PeakBuild Materials</b></div>
+        </div>
+
+        <div class="compare-section">
+          <div class="compare-heading"><span class="dot"></span>Before &amp; After Comparison</div>
+          <div class="compare-grid">
+            <div class="compare-box before">
+              <div class="htitle">Before Optimization</div>
+              <div id="beforeBox"></div>
+            </div>
+            <div class="compare-box after">
+              <div class="htitle">After Optimization</div>
+              <div id="afterBox"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="outcomes-box">
+            <div class="htitle">📊 Key Outcomes</div>
+            <div id="outcomesBox"></div>
+          </div>
+          <div class="weak-box">
+            <div class="htitle">⚠ Remaining Weaknesses</div>
+            <div class="weak-text" id="weakText"></div>
+          </div>
+        </div>
+
+        <div class="replay-row">
+          <button class="btn btn-primary" id="playAgainBtn">↺ Run New Simulation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= METRICS ================= */
+const START_METRICS = {
+  cost: 7820,        // $K/month
+  profit: 2940,       // $K/month
+  delivery: 4,         // days
+  risk: 63,             // /100 (lower better)
+  resilience: 35,     // /100 (higher better)
+  satisfaction: 54    // /100 (higher better)
+};
+const METRIC_META = [
+  {key:'cost', label:'Monthly Cost', fmt:v=>'$'+(v/1000).toFixed(2)+'M', good:'low'},
+  {key:'profit', label:'Monthly Profit', fmt:v=>'$'+(v/1000).toFixed(2)+'M', good:'high'},
+  {key:'delivery', label:'Delivery Days', fmt:v=>v.toFixed(1)+'d', good:'low'},
+  {key:'risk', label:'Risk Level', fmt:v=>Math.round(v)+'/100', good:'low'},
+  {key:'resilience', label:'Resilience', fmt:v=>Math.round(v)+'/100', good:'high'},
+  {key:'satisfaction', label:'Satisfaction', fmt:v=>Math.round(v)+'/100', good:'high'}
+];
+
+let metrics = Object.assign({}, START_METRICS);
+const beforeSnapshot = Object.assign({}, START_METRICS);
+
+/* ================= CHALLENGE DATA ================= */
+const CHALLENGES = [
+  {
+    tag:'Challenge 1 — 🛡️ Supply Chain Risk Mitigation',
+    title:'How should you handle supply chain risk mitigation?',
+    context:'The 2011 Japan earthquake halted 700 factories across 50 countries. COVID shut down global shipping for months. <b>Supply chain disruptions now cost companies an average of $228M per event.</b> Risk management means identifying where your chain is fragile and building redundancy before disaster strikes.',
+    options:[
+      { icon:'📁', name:'Business continuity planning',
+        desc:'Document detailed contingency plans for every critical disruption scenario. Train teams quarterly.',
+        tags:[{t:'Response time -60%',c:'pos'},{t:'Low cost',c:'pos'},{t:'Resilience +30',c:'pos'}],
+        analysis:'A documented playbook cuts decision time to hours instead of days when disruption hits. It is the cheapest resilience investment on this list, though it does not protect against sudden financial shocks.',
+        fx:{cost:20, profit:60, delivery:0, risk:-25, resilience:30, satisfaction:5} },
+      { icon:'🏦', name:'Supply chain insurance',
+        desc:'Purchase parametric supply chain insurance covering disruptions from natural disasters, geopolitical events, and pandemics.',
+        tags:[{t:'Financial protection +100%',c:'pos'},{t:'Premium cost -$$$',c:'neg'},{t:'Resilience +15',c:'pos'}],
+        analysis:'Parametric insurance pays out automatically when a defined trigger occurs — no long claims process. More costly than traditional insurance, but covers supply chain-specific risks. Particularly valuable for businesses with revenue concentrated in a single market or season.',
+        fx:{cost:60, profit:200, delivery:0, risk:-15, resilience:20, satisfaction:3} },
+      { icon:'🌐', name:'Geopolitical risk monitoring',
+        desc:'Subscribe to a real-time geopolitical risk intelligence service. Get early warning of tariff changes, sanctions, and instability.',
+        tags:[{t:'Early warning +50%',c:'pos'},{t:'Decision lead time +3 weeks',c:'pos'},{t:'Annual fee',c:'neg'}],
+        analysis:'Advance warning turns reactive scrambling into planned rerouting. The extra lead time is most valuable for companies sourcing from politically volatile regions, but the fee recurs whether or not an event occurs.',
+        fx:{cost:40, profit:80, delivery:-0.2, risk:-20, resilience:18, satisfaction:2} },
+      { icon:'🔒', name:'Strategic stockpile for critical items',
+        desc:'Maintain a 90-day strategic reserve of the top 10 highest-risk components. Expensive but eliminates their disruption impact.',
+        tags:[{t:'Critical stockout risk -95%',c:'pos'},{t:'Inventory cost +40%',c:'neg'},{t:'Operational continuity +100%',c:'pos'}],
+        analysis:'A 90-day buffer on your highest-risk inputs essentially removes them as a failure point. The tradeoff is real: carrying cost rises sharply, and capital gets tied up in inventory instead of growth.',
+        fx:{cost:150, profit:120, delivery:0, risk:-35, resilience:25, satisfaction:8} }
+    ]
+  },
+  {
+    tag:'Challenge 2 — 📦 Inventory Policy Redesign',
+    title:'How should you handle inventory policy redesign?',
+    context:"Holding inventory costs money — warehousing, insurance, obsolescence risk, and tied-up capital. But too little inventory means stockouts and lost sales. This tradeoff between <b>'holding cost' and 'shortage cost'</b> is one of the oldest problems in business. Companies use statistical models to find the sweet spot.",
+    options:[
+      { icon:'⏱️', name:'Just-in-Time (JIT) model',
+        desc:'Receive inventory only when needed. Minimal warehouse footprint, maximum supplier dependency.',
+        tags:[{t:'Inventory cost -40%',c:'pos'},{t:'Stockout risk +25%',c:'neg'},{t:'Cash freed +$$',c:'pos'}],
+        analysis:'JIT frees up significant working capital by minimizing stock on hand. It performs best with reliable suppliers and predictable demand — any upstream disruption now hits your shelves almost immediately.',
+        fx:{cost:-200, profit:90, delivery:0.3, risk:10, resilience:-5, satisfaction:-3} },
+      { icon:'🛡️', name:'Safety stock buffer',
+        desc:'Hold 30 extra days of inventory as a buffer. Never stockout — at the cost of higher carrying charges.',
+        tags:[{t:'Stockout risk -80%',c:'pos'},{t:'Inventory cost +35%',c:'neg'},{t:'Satisfaction +15',c:'pos'}],
+        analysis:'A buffer is the simplest way to protect customer promises: demand spikes and minor delays get absorbed automatically. The cost is straightforward too — more warehouse space and more capital sitting idle.',
+        fx:{cost:180, profit:60, delivery:0, risk:-15, resilience:10, satisfaction:15} },
+      { icon:'🔢', name:'ABC segmentation',
+        desc:'Classify items by value and velocity. Hold lots of fast-moving A items, less of slow-moving C items.',
+        tags:[{t:'Efficiency +28%',c:'pos'},{t:'Cost -12%',c:'pos'},{t:'Complexity +15%',c:'neg'}],
+        analysis:'ABC segmentation puts capital where it earns the most — high-velocity items get priority stock while slow movers are trimmed. It requires ongoing analysis to keep the classification accurate as demand shifts.',
+        fx:{cost:-90, profit:150, delivery:0, risk:-5, resilience:8, satisfaction:5} },
+      { icon:'🔁', name:'Vendor-managed inventory (VMI)',
+        desc:'Let your supplier monitor your stock levels and replenish automatically. They own the problem; you free up management attention.',
+        tags:[{t:'Admin cost -25%',c:'pos'},{t:'Supplier dependency +20%',c:'neg'},{t:'Stockouts -30%',c:'pos'}],
+        analysis:'VMI shifts replenishment planning onto suppliers who often have better demand visibility across their whole customer base. The risk is concentration — your inventory health now depends on one partner\'s systems working well.',
+        fx:{cost:-70, profit:70, delivery:-0.3, risk:-10, resilience:12, satisfaction:6} }
+    ]
+  },
+  {
+    tag:'Challenge 3 — 🌱 Sustainability & Risk Management',
+    title:'How should you handle sustainability & risk management?',
+    context:'ESG (Environmental, Social, Governance) requirements are increasingly mandatory — not optional. Customers, investors, and regulators all now scrutinize your carbon footprint and labor practices. Beyond compliance, <b>sustainable supply chains are often more resilient</b> because they reduce dependency on volatile fossil fuels and build deeper supplier relationships.',
+    options:[
+      { icon:'🌍', name:'Carbon offset program',
+        desc:'Purchase verified carbon credits to offset supply chain emissions. Meet net-zero targets on paper with minimal operational change.',
+        tags:[{t:'ESG score +20',c:'pos'},{t:'Actual emissions neutral',c:'neu'},{t:'Cost -$',c:'neg'}],
+        analysis:'Offsets are the fastest route to a net-zero claim but don\'t change how your chain actually operates. Regulators and customers increasingly want to see operational reduction, not just credits, so treat this as a bridge, not a destination.',
+        fx:{cost:30, profit:10, delivery:0, risk:0, resilience:2, satisfaction:2} },
+      { icon:'♻️', name:'Circular supply chain design',
+        desc:'Build reverse logistics for returns, refurbishment, and material recovery. Reduce waste and create a secondary revenue stream.',
+        tags:[{t:'Waste -45%',c:'pos'},{t:'Revenue +5%',c:'pos'},{t:'Complexity +30%',c:'neg'}],
+        analysis:'Circular design turns waste reduction into an actual revenue line through refurbished and recovered materials, while cutting real operational impact. It requires new logistics capability, which adds coordination overhead.',
+        fx:{cost:50, profit:180, delivery:0, risk:-8, resilience:15, satisfaction:10} },
+      { icon:'📋', name:'Supplier ESG audit program',
+        desc:'Audit all Tier-1 and Tier-2 suppliers for labor, environmental, and governance standards. Delist non-compliant vendors.',
+        tags:[{t:'Brand risk -40%',c:'pos'},{t:'Supplier count -15%',c:'neg'},{t:'ESG score +35',c:'pos'}],
+        analysis:'Auditing deep into your supplier tiers is where most brand-damaging ESG failures actually originate, so this option directly reduces reputational risk. Expect to lose some suppliers who won\'t meet the bar, tightening your sourcing options short-term.',
+        fx:{cost:70, profit:40, delivery:0, risk:-20, resilience:18, satisfaction:8} },
+      { icon:'☀️', name:'Renewable energy for facilities',
+        desc:'Install solar panels and procure renewable energy contracts for all warehouses. Reduces energy cost and carbon footprint.',
+        tags:[{t:'Energy cost -35%',c:'pos'},{t:'CO2 -60%',c:'pos'},{t:'15-year payback',c:'neu'}],
+        analysis:'Renewable energy delivers a real, durable operational cost cut alongside genuine emissions reduction — not just an offset. The payback period is long, so this is a strategic bet on facilities you plan to keep for years.',
+        fx:{cost:-120, profit:90, delivery:0, risk:-5, resilience:10, satisfaction:6} }
+    ]
+  },
+  {
+    tag:'Challenge 4 — 🏭 Supplier Diversification',
+    title:'How should you handle supplier diversification?',
+    context:"Right now, most of your product comes from a <b>single primary supplier</b>. If that supplier faces a natural disaster, labor strike, or financial trouble — your entire operation stops. This is called 'supplier concentration risk.' Businesses evaluate tradeoffs between cost savings from bulk ordering vs. resilience from spreading orders across multiple suppliers.",
+    options:[
+      { icon:'🔀', name:'Dual-source strategy',
+        desc:'Split orders between two vetted suppliers in different regions. Slightly higher unit cost, much lower risk.',
+        tags:[{t:'Risk -30%',c:'pos'},{t:'Cost +5%',c:'neg'},{t:'Resilience +25',c:'pos'}],
+        analysis:'Two qualified suppliers in different regions means a single regional disruption no longer stops production entirely. The unit cost increase is modest since you retain meaningful volume with each partner.',
+        fx:{cost:120, profit:60, delivery:0, risk:-30, resilience:25, satisfaction:5} },
+      { icon:'🌐', name:'Multi-source marketplace',
+        desc:'Use a digital supplier exchange to source from 5+ qualified vendors. Maximum flexibility but complex to manage.',
+        tags:[{t:'Risk -50%',c:'pos'},{t:'Cost +12%',c:'neg'},{t:'Flexibility +40%',c:'pos'}],
+        analysis:'Spreading across five or more vendors gives you the strongest resilience on this list — no single failure can meaningfully disrupt supply. Managing quality and coordination across that many relationships is a real operational burden.',
+        fx:{cost:280, profit:40, delivery:0, risk:-50, resilience:40, satisfaction:8} },
+      { icon:'📍', name:'Nearshore single supplier',
+        desc:'Switch to a geographically closer supplier. Shorter lead times, simpler communication, but still one source.',
+        tags:[{t:'Delivery -3 days',c:'pos'},{t:'Risk -10%',c:'neg'},{t:'Cost -2%',c:'pos'}],
+        analysis:'Nearshoring meaningfully improves delivery speed and simplifies communication, and it usually costs less than offshore alternatives once logistics are counted. It doesn\'t solve concentration risk though — you still depend entirely on one supplier.',
+        fx:{cost:-40, profit:30, delivery:-3, risk:-10, resilience:10, satisfaction:10} },
+      { icon:'🏗️', name:'Vertical integration',
+        desc:'Acquire or build your own production capability for key inputs. Maximum control, huge upfront capital required.',
+        tags:[{t:'Risk -60%',c:'pos'},{t:'Capital -$$$$',c:'neg'},{t:'Long-term savings',c:'pos'}],
+        analysis:'Owning production of your key inputs removes supplier risk almost entirely and can be the cheapest option over a long horizon. The upfront capital requirement is the largest of any option here, and it locks you into a fixed capability.',
+        fx:{cost:400, profit:250, delivery:-1, risk:-60, resilience:50, satisfaction:12} }
+    ]
+  },
+  {
+    tag:'Challenge 5 — 🏬 Warehouse Network Redesign',
+    title:'How should you handle warehouse network redesign?',
+    context:"Your warehouses were placed years ago based on old demand patterns. As your customer base shifts — especially toward urban e-commerce buyers — the <b>distance between stock and customer drives up delivery cost and time</b>. Companies use 'center-of-gravity' analysis and delivery time mapping to find optimal warehouse locations.",
+    options:[
+      { icon:'🏢', name:'Consolidate to fewer mega-hubs',
+        desc:'Merge 8 warehouses into 3 large regional DCs. Lower overhead, better automation potential, but longer last-mile.',
+        tags:[{t:'Cost -18%',c:'pos'},{t:'Delivery +1.5 days',c:'neg'},{t:'Efficiency +30%',c:'pos'}],
+        analysis:'Consolidation captures real economies of scale — fewer facilities to run means lower fixed overhead and room to automate. The tradeoff lands directly on customers as slower last-mile delivery for anyone far from a hub.',
+        fx:{cost:-260, profit:140, delivery:1.5, risk:0, resilience:10, satisfaction:-5} },
+      { icon:'🏙️', name:'Urban micro-fulfillment network',
+        desc:'Open 15 small city-center warehouses near high-density customers. Fast last-mile, higher rent, complex inventory management.',
+        tags:[{t:'Delivery -2 days',c:'pos'},{t:'Cost +22%',c:'neg'},{t:'Satisfaction +20',c:'pos'}],
+        analysis:'Micro-fulfillment gets stock dramatically closer to where most of your customers actually are, which shows up immediately in satisfaction scores. Urban real estate is expensive, and keeping 15 small sites stocked correctly is a harder inventory problem than a handful of large ones.',
+        fx:{cost:320, profit:90, delivery:-2, risk:0, resilience:5, satisfaction:20} },
+      { icon:'🌀', name:'Hybrid hub-and-spoke',
+        desc:'2 national hubs + 6 regional spokes. Balance between cost efficiency and delivery reach.',
+        tags:[{t:'Cost -10%',c:'pos'},{t:'Delivery neutral',c:'neu'},{t:'Resilience +15',c:'pos'}],
+        analysis:'Hub-and-spoke is the balanced middle path — you keep most of the cost efficiency of consolidation while regional spokes prevent delivery times from blowing out. It rarely wins outright on any single metric, but it doesn\'t lose badly on any of them either.',
+        fx:{cost:-150, profit:110, delivery:0, risk:-5, resilience:15, satisfaction:8} },
+      { icon:'🚚', name:'3PL outsourcing',
+        desc:'Contract a third-party logistics provider to manage all warehousing. Pay per unit stored/shipped, no fixed costs.',
+        tags:[{t:'Capital freed',c:'pos'},{t:'Flexibility +35%',c:'pos'},{t:'Control -25%',c:'neg'}],
+        analysis:'3PL outsourcing converts fixed warehouse costs into variable per-unit fees, which is attractive if demand is unpredictable or seasonal. You give up direct operational control, so service quality now depends on your contract terms and the provider\'s performance.',
+        fx:{cost:-190, profit:50, delivery:0, risk:5, resilience:-5, satisfaction:0} }
+    ]
+  },
+  {
+    tag:'Challenge 6 — 💻 Supply Chain Technology Adoption',
+    title:'How should you handle supply chain technology adoption?',
+    context:"Technology transforms data into decisions — but only if the right systems are in place. Many supply chains run on spreadsheets and emails, creating <b>visibility gaps that cost 10-15% of revenue in inefficiencies</b>. The question isn't whether to invest in technology, but which technology gives the fastest return.",
+    options:[
+      { icon:'👁️', name:'End-to-end visibility platform',
+        desc:'Deploy real-time tracking across all shipments and inventory locations. Know exactly where everything is, always.',
+        tags:[{t:'Visibility +100%',c:'pos'},{t:'Exception management +50%',c:'pos'},{t:'Cost -8%',c:'pos'}],
+        analysis:'Full visibility is usually the highest-leverage tech investment because every other decision in this simulation gets better with accurate real-time data. It typically pays for itself quickly through fewer expediting emergencies and better exception handling.',
+        fx:{cost:-100, profit:200, delivery:-0.5, risk:-15, resilience:20, satisfaction:10} },
+      { icon:'🤖', name:'Robotic warehouse automation',
+        desc:'Install pick-and-pack robots in your main distribution center. 3x faster order processing, lower labor cost.',
+        tags:[{t:'Throughput +200%',c:'pos'},{t:'Labor cost -40%',c:'pos'},{t:'CAPEX -$$$$',c:'neg'}],
+        analysis:'Automation delivers the largest single throughput jump on this list and meaningfully lowers ongoing labor cost. The capital outlay is steep and locks you into a specific facility layout, so it makes most sense once you know your network design is stable.',
+        fx:{cost:450, profit:300, delivery:-1, risk:-5, resilience:15, satisfaction:5} },
+      { icon:'🔗', name:'Blockchain traceability',
+        desc:'Implement blockchain to create an immutable record of product provenance. Reduces fraud and enables instant recalls.',
+        tags:[{t:'Trust +40%',c:'pos'},{t:'Recall speed +80%',c:'pos'},{t:'Implementation complex',c:'neg'}],
+        analysis:'An immutable provenance record is especially valuable in regulated or high-fraud-risk categories, and it cuts recall response from weeks to hours. Implementation requires supplier participation across the chain, which is often the hardest part to coordinate.',
+        fx:{cost:130, profit:60, delivery:0, risk:-10, resilience:10, satisfaction:8} },
+      { icon:'🖥️', name:'ERP system upgrade',
+        desc:'Replace legacy systems with a modern cloud ERP integrating finance, inventory, orders, and procurement.',
+        tags:[{t:'Data accuracy +60%',c:'pos'},{t:'Decision speed +40%',c:'neg'},{t:'18-month project',c:'neu'}],
+        analysis:'A modern ERP is the foundation everything else in this list eventually depends on — unified data means faster, more accurate decisions across finance and operations. It is a long project with real disruption risk during migration, so timing it right matters.',
+        fx:{cost:220, profit:220, delivery:0, risk:-15, resilience:18, satisfaction:10} }
+    ]
+  }
+];
+
+/* ================= STATE ================= */
+let currentChallenge = 0;
+let selectedOption = null;
+const decisions = []; // {challengeTag, optionName}
+
+/* ================= DOM ================= */
+const $ = id=>document.getElementById(id);
+const metricsStrip = $('metricsStrip');
+const progressChip = $('progressChip');
+
+function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+
+/* ================= METRICS RENDER ================= */
+function buildMetricsStrip(){
+  metricsStrip.innerHTML = '';
+  METRIC_META.forEach(m=>{
+    const card = document.createElement('div');
+    card.className='metric-card';
+    card.id='mc-'+m.key;
+    card.innerHTML = `<div class="l">${m.label}</div><div class="v" id="mv-${m.key}">--</div>`;
+    metricsStrip.appendChild(card);
+  });
+}
+function renderMetrics(prev){
+  METRIC_META.forEach(m=>{
+    const el = $('mv-'+m.key);
+    el.textContent = m.fmt(metrics[m.key]);
+    if(prev){
+      const delta = metrics[m.key]-prev[m.key];
+      el.classList.remove('flash-good','flash-bad');
+      if(Math.abs(delta) > 0.001){
+        const isGoodDir = m.good==='high' ? delta>0 : delta<0;
+        el.classList.add(isGoodDir?'flash-good':'flash-bad');
+        setTimeout(()=>el.classList.remove('flash-good','flash-bad'),900);
+      }
+    }
+  });
+}
+
+/* ================= VIEW SWITCHING ================= */
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+/* ================= START ================= */
+$('startBtn').addEventListener('click', ()=>{
+  currentChallenge = 0;
+  decisions.length = 0;
+  metrics = Object.assign({}, START_METRICS);
+  Object.assign(beforeSnapshot, START_METRICS);
+  renderMetrics();
+  showView('view-challenge');
+  renderChallenge();
+});
+
+/* ================= CHALLENGE RENDER ================= */
+function renderChallenge(){
+  const ch = CHALLENGES[currentChallenge];
+  selectedOption = null;
+  progressChip.innerHTML = `<b>${currentChallenge+1}</b> / ${CHALLENGES.length} Challenges`;
+  $('challengeTag').textContent = ch.tag;
+  $('challengeTitle').textContent = ch.title;
+  $('challengeContext').innerHTML = ch.context;
+
+  const list = $('optionList');
+  list.innerHTML = '';
+  ch.options.forEach((opt, idx)=>{
+    const card = document.createElement('div');
+    card.className='option-card';
+    card.dataset.idx = idx;
+    const tagsHtml = opt.tags.map(t=>`<span class="tag ${t.c==='pos'?'pos':t.c==='neg'?'neg':'neu'}">${t.t}</span>`).join('');
+    card.innerHTML = `
+      <div class="option-icon">${opt.icon}</div>
+      <div class="option-body">
+        <div class="option-name-row">
+          <div class="option-name">${opt.name}</div>
+          <div class="option-check">✓</div>
+        </div>
+        <div class="option-desc">${opt.desc}</div>
+        <div class="tag-row">${tagsHtml}</div>
+      </div>
+    `;
+    card.addEventListener('click', ()=>selectOption(idx));
+    list.appendChild(card);
+  });
+
+  // reset advisor panel
+  $('advisorBody').innerHTML = `<div class="advisor-placeholder">Select an option to receive strategic analysis from your AI advisor…</div>`;
+  $('confirmBtn').disabled = true;
+
+  renderDecisionLog();
+}
+
+function selectOption(idx){
+  selectedOption = idx;
+  document.querySelectorAll('.option-card').forEach(c=>{
+    c.classList.toggle('selected', parseInt(c.dataset.idx,10)===idx);
+  });
+  const ch = CHALLENGES[currentChallenge];
+  const opt = ch.options[idx];
+
+  const impactRows = [
+    {label:'Monthly Cost', delta:opt.fx.cost, fmt:v=>(v>=0?'+':'')+'$'+Math.abs(Math.round(v))+'K', good:'low'},
+    {label:'Monthly Profit', delta:opt.fx.profit, fmt:v=>(v>=0?'+':'')+'$'+Math.abs(Math.round(v))+'K', good:'high'},
+    {label:'Delivery Days', delta:opt.fx.delivery, fmt:v=> (Math.abs(v)<0.05?'0d':((v>=0?'+':'')+v.toFixed(1)+'d')), good:'low'},
+    {label:'Risk Level', delta:opt.fx.risk, fmt:v=>(v>=0?'+':'')+Math.round(v), good:'low'},
+    {label:'Resilience', delta:opt.fx.resilience, fmt:v=>(v>=0?'+':'')+Math.round(v), good:'high'},
+    {label:'Customer Satisfaction', delta:opt.fx.satisfaction, fmt:v=>(v>=0?'+':'')+Math.round(v), good:'high'}
+  ];
+
+  const impactHtml = impactRows.map(r=>{
+    let cls='flat';
+    if(Math.abs(r.delta) > 0.001){
+      const goodDir = r.good==='high' ? r.delta>0 : r.delta<0;
+      cls = goodDir ? 'good' : 'bad';
+    }
+    return `<div class="impact-row"><span class="k">${r.label}</span><span class="v ${cls}">${r.fmt(r.delta)}</span></div>`;
+  }).join('');
+
+  $('advisorBody').innerHTML = `
+    <div class="advisor-analysis">${opt.analysis}</div>
+    <div class="impact-block">
+      <div class="impact-title">Projected Impact</div>
+      ${impactHtml}
+    </div>
+  `;
+  $('confirmBtn').disabled = false;
+}
+
+$('confirmBtn').addEventListener('click', ()=>{
+  if(selectedOption===null) return;
+  const ch = CHALLENGES[currentChallenge];
+  const opt = ch.options[selectedOption];
+  const prev = Object.assign({}, metrics);
+
+  metrics.cost += opt.fx.cost;
+  metrics.profit += opt.fx.profit;
+  metrics.delivery = clamp(metrics.delivery + opt.fx.delivery, 0.5, 20);
+  metrics.risk = clamp(metrics.risk + opt.fx.risk, 0, 100);
+  metrics.resilience = clamp(metrics.resilience + opt.fx.resilience, 0, 100);
+  metrics.satisfaction = clamp(metrics.satisfaction + opt.fx.satisfaction, 0, 100);
+
+  renderMetrics(prev);
+
+  const shortLabel = ch.tag.replace(/^Challenge \d+ — ?[^\s]*\s*/, '').trim();
+  decisions.push({ challenge: shortLabel || ch.title, option: opt.name });
+
+  currentChallenge++;
+  if(currentChallenge < CHALLENGES.length){
+    renderChallenge();
+  } else {
+    showResults();
+  }
+});
+
+function renderDecisionLog(){
+  const wrap = $('decisionLog');
+  const list = $('decisionLogList');
+  if(decisions.length===0){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  list.innerHTML = decisions.slice().reverse().map(d=>`
+    <div class="log-entry"><span class="bullet">•</span><span><b>${d.challenge}:</b> ${d.option}</span></div>
+  `).join('');
+}
+
+/* ================= RESULTS ================= */
+function computeScore(){
+  const riskScore = 100-metrics.risk;
+  const resilienceScore = metrics.resilience;
+  const satisfactionScore = metrics.satisfaction;
+  const profitGrowth = metrics.profit - beforeSnapshot.profit;
+  const profitScore = clamp((profitGrowth/9500)*100, 0, 100); // ~9.5M growth = full marks
+  const raw = riskScore*0.3 + resilienceScore*0.3 + satisfactionScore*0.3 + profitScore*0.1;
+  return clamp(Math.round(raw), 0, 100);
+}
+
+function gradeFor(score){
+  if(score>=90) return {letter:'A', label:'World-Class', color:'var(--green)'};
+  if(score>=75) return {letter:'B', label:'Strong Performance', color:'var(--cyan)'};
+  if(score>=60) return {letter:'C', label:'Room to Improve', color:'var(--amber)'};
+  return {letter:'D', label:'High Risk Exposure', color:'var(--red)'};
+}
+
+function showResults(){
+  const score = computeScore();
+  const grade = gradeFor(score);
+
+  $('scoreNum').innerHTML = `${score}<span>/100</span>`;
+  $('scoreNum').style.color = grade.color;
+  $('gradeLine').textContent = `Grade ${grade.letter} — ${grade.label}`;
+  $('gradeLine').style.color = grade.color;
+
+  // before/after boxes
+  const beforeBox = $('beforeBox');
+  const afterBox = $('afterBox');
+  beforeBox.innerHTML = METRIC_META.map(m=>`
+    <div class="compare-line"><span class="k">${m.label}</span><span class="v">${m.fmt(beforeSnapshot[m.key])}</span></div>
+  `).join('');
+  afterBox.innerHTML = METRIC_META.map(m=>{
+    const delta = metrics[m.key]-beforeSnapshot[m.key];
+    let cls='';
+    if(Math.abs(delta)>0.001){
+      const goodDir = m.good==='high' ? delta>0 : delta<0;
+      cls = goodDir?'good':'bad';
+    }
+    return `<div class="compare-line"><span class="k">${m.label}</span><span class="v ${cls}">${m.fmt(metrics[m.key])}</span></div>`;
+  }).join('');
+
+  // key outcomes
+  const deltas = METRIC_META.map(m=>{
+    const delta = metrics[m.key]-beforeSnapshot[m.key];
+    const goodDir = m.good==='high' ? delta>0 : delta<0;
+    const normalized = m.key==='cost' ? -delta/beforeSnapshot.cost :
+                        m.key==='profit' ? delta/Math.max(1,beforeSnapshot.profit) :
+                        m.key==='delivery' ? -delta/Math.max(1,beforeSnapshot.delivery) :
+                        m.key==='risk' ? -delta/100 :
+                        delta/100;
+    return {key:m.key, label:m.label, delta, goodDir, normalized};
+  });
+  const biggest = deltas.slice().sort((a,b)=>b.normalized-a.normalized)[0];
+  const costChange = metrics.cost-beforeSnapshot.cost;
+  const profitChange = metrics.profit-beforeSnapshot.profit;
+  const satChange = metrics.satisfaction-beforeSnapshot.satisfaction;
+
+  $('outcomesBox').innerHTML = `
+    <div class="oc-line"><span class="k">Biggest Improvement</span><span class="v good">${biggest.label}</span></div>
+    <div class="oc-line"><span class="k">Monthly Cost Change</span><span class="v ${costChange<=0?'good':'bad'}">${costChange<=0?'-':'+'}$${Math.abs(costChange/1000).toFixed(2)}M</span></div>
+    <div class="oc-line"><span class="k">Profit Change</span><span class="v ${profitChange>=0?'good':'bad'}">${profitChange>=0?'+':'-'}$${Math.abs(profitChange/1000).toFixed(2)}M/mo</span></div>
+    <div class="oc-line"><span class="k">Customer Satisfaction</span><span class="v ${satChange>=0?'good':'bad'}">${satChange>=0?'+':''}${Math.round(satChange)} pts</span></div>
+  `;
+
+  // weaknesses
+  const weak = [];
+  if(metrics.risk > 25) weak.push('Risk level remains elevated — consider further diversification or contingency planning.');
+  if(metrics.resilience < 70) weak.push('Resilience has room to grow; a single major disruption could still cause meaningful damage.');
+  if(metrics.satisfaction < 70) weak.push('Customer satisfaction is below target — delivery speed or reliability may still be lagging.');
+  if(metrics.delivery > 3) weak.push('Delivery times are still slower than best-in-class networks.');
+  if(metrics.profit - metrics.cost < (beforeSnapshot.profit-beforeSnapshot.cost)) weak.push('Net margin has not improved relative to the starting position — cost increases are outpacing profit gains.');
+
+  $('weakText').textContent = weak.length
+    ? weak.join(' ')
+    : 'All core metrics are performing well. Focus now on continuous improvement and monitoring.';
+
+  showView('view-results');
+  progressChip.textContent = 'Results';
+}
+
+$('playAgainBtn').addEventListener('click', ()=>{
+  progressChip.textContent = 'Overview';
+  showView('view-start');
+});
+
+/* ================= INIT ================= */
+buildMetricsStrip();
+renderMetrics();
+
+})();
+</script>
+</body>
+</html>
