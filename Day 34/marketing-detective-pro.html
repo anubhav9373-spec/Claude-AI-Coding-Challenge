@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Marketing Detective Pro</title>
+<style>
+/* ============================================================
+   MARKETING DETECTIVE PRO — CORE STYLES
+   ============================================================ */
+:root{
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-body: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-soft: 0 10px 30px rgba(0,0,0,0.35);
+  --shadow-deep: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* ---- THEME: Claude Orange ---- */
+[data-theme="orange"]{
+  --bg-0:#1a1410; --bg-1:#241a13; --bg-2:#2e2119;
+  --paper:#f4ead9; --paper-2:#ece0cb;
+  --ink:#2a1d12; --ink-soft:#5a4a3a;
+  --accent:#d97757; --accent-2:#e8a679; --accent-dark:#b85c3f;
+  --line:rgba(217,119,87,0.35);
+  --text-hi:#fbe9dc; --text-lo:#c9b8a8;
+  --good:#7fbf6a; --bad:#e0574f; --warn:#e2b23d;
+  --board-felt:#3a2a1d;
+}
+/* ---- THEME: Cyber Blue ---- */
+[data-theme="cyber"]{
+  --bg-0:#060a14; --bg-1:#0a1224; --bg-2:#0f1c33;
+  --paper:#dfeeff; --paper-2:#cfe4fb;
+  --ink:#0a1830; --ink-soft:#33506e;
+  --accent:#3fc8ff; --accent-2:#7fe0ff; --accent-dark:#1a8fc7;
+  --line:rgba(63,200,255,0.35);
+  --text-hi:#e6f6ff; --text-lo:#9fc6df;
+  --good:#4be08a; --bad:#ff5d6c; --warn:#ffd166;
+  --board-felt:#0c1830;
+}
+/* ---- THEME: Emerald Intelligence ---- */
+[data-theme="emerald"]{
+  --bg-0:#07160f; --bg-1:#0c2018; --bg-2:#123024;
+  --paper:#e8f3ea; --paper-2:#d9ecdc;
+  --ink:#0e2a1c; --ink-soft:#3d6650;
+  --accent:#33c98a; --accent-2:#78e6b3; --accent-dark:#1f9e6a;
+  --line:rgba(51,201,138,0.35);
+  --text-hi:#e8fbf0; --text-lo:#a4d6bd;
+  --good:#5fe090; --bad:#ff6b6b; --warn:#f0c661;
+  --board-felt:#0e2a1e;
+}
+/* ---- THEME: Purple Analyst ---- */
+[data-theme="purple"]{
+  --bg-0:#120a1c; --bg-1:#1b1029; --bg-2:#251638;
+  --paper:#f0e8f7; --paper-2:#e4d5f0;
+  --ink:#241533; --ink-soft:#5a4770;
+  --accent:#a970e0; --accent-2:#c79cf0; --accent-dark:#8250bd;
+  --line:rgba(169,112,224,0.35);
+  --text-hi:#f4ecfc; --text-lo:#c3aede;
+  --good:#71d999; --bad:#ff6f8f; --warn:#f0c25f;
+  --board-felt:#20132e;
+}
+/* ---- THEME: Crimson Investigation ---- */
+[data-theme="crimson"]{
+  --bg-0:#160707; --bg-1:#240b0b; --bg-2:#301010;
+  --paper:#f5e9e4; --paper-2:#ecd7d0;
+  --ink:#2c0f0d; --ink-soft:#6b3a33;
+  --accent:#e0473f; --accent-2:#f08079; --accent-dark:#b8332b;
+  --line:rgba(224,71,63,0.35);
+  --text-hi:#fbe8e5; --text-lo:#dcaba3;
+  --good:#6fce7c; --bad:#ff5c4d; --warn:#eab54a;
+  --board-felt:#2c0f0d;
+}
+/* ---- THEME: Midnight Noir ---- */
+[data-theme="noir"]{
+  --bg-0:#08090b; --bg-1:#0f1113; --bg-2:#171a1d;
+  --paper:#e9e6df; --paper-2:#dcd8cf;
+  --ink:#1a1a1a; --ink-soft:#54524c;
+  --accent:#c9a24a; --accent-2:#e0c179; --accent-dark:#a17f33;
+  --line:rgba(201,162,74,0.35);
+  --text-hi:#f2efe7; --text-lo:#a8a49a;
+  --good:#7fbf6a; --bad:#d9564f; --warn:#c9a24a;
+  --board-felt:#141414;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse at 20% -10%, var(--bg-2), transparent 60%),
+    radial-gradient(ellipse at 100% 110%, var(--bg-2), transparent 60%),
+    var(--bg-0);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;}
+button{font-family:inherit;}
+::selection{background:var(--accent); color:var(--bg-0);}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+}
+
+/* Focus visibility */
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible, textarea:focus-visible, input:focus-visible{
+  outline:3px solid var(--accent-2);
+  outline-offset:2px;
+  border-radius:4px;
+}
+
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* ============================================================
+   LAYOUT SHELL
+   ============================================================ */
+#app{ min-height:100vh; display:flex; flex-direction:column; }
+
+.screen{
+  display:none;
+  flex:1;
+  width:100%;
+  animation: fadeIn 0.5s ease;
+}
+.screen.active{ display:flex; flex-direction:column; }
+
+@keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+.container{ width:100%; max-width:1200px; margin:0 auto; padding:24px; }
+
+/* ============================================================
+   TOPBAR / NAV
+   ============================================================ */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 24px;
+  background:linear-gradient(180deg, var(--bg-1), transparent);
+  border-bottom:1px solid var(--line);
+  position:sticky; top:0; z-index:40;
+  backdrop-filter: blur(10px);
+}
+.brand{ display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; letter-spacing:0.5px; }
+.brand .badge-mini{
+  width:34px; height:34px; border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, var(--accent-2), var(--accent-dark));
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; box-shadow:0 0 0 3px rgba(255,255,255,0.08), var(--shadow-soft);
+}
+.brand-title{ font-size:18px; color:var(--text-hi); }
+.brand-title small{ display:block; font-family:var(--font-body); font-weight:400; font-size:11px; color:var(--text-lo); letter-spacing:2px; text-transform:uppercase; }
+
+.nav-actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.pill{
+  display:flex; align-items:center; gap:6px;
+  background:var(--bg-2); border:1px solid var(--line);
+  padding:6px 12px; border-radius:999px; font-size:12px; color:var(--text-lo);
+}
+.pill strong{ color:var(--accent-2); }
+
+.icon-btn{
+  background:var(--bg-2); border:1px solid var(--line); color:var(--text-hi);
+  padding:8px 14px; border-radius:999px; cursor:pointer; font-size:13px;
+  transition:all 0.2s ease; display:inline-flex; align-items:center; gap:6px;
+}
+.icon-btn:hover{ background:var(--accent); color:var(--bg-0); border-color:var(--accent); transform:translateY(-1px); }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn{
+  border:none; cursor:pointer; font-weight:600; letter-spacing:0.3px;
+  border-radius:999px; padding:14px 30px; font-size:15px;
+  background:linear-gradient(135deg, var(--accent-2), var(--accent-dark));
+  color:var(--bg-0); box-shadow:0 8px 24px -6px var(--accent-dark);
+  transition:transform 0.18s ease, box-shadow 0.18s ease;
+}
+.btn:hover{ transform:translateY(-2px) scale(1.01); box-shadow:0 14px 30px -6px var(--accent-dark); }
+.btn:active{ transform:translateY(0px) scale(0.99); }
+.btn.secondary{
+  background:transparent; color:var(--text-hi); border:1.5px solid var(--line);
+  box-shadow:none;
+}
+.btn.secondary:hover{ border-color:var(--accent); color:var(--accent-2); }
+.btn.block{ width:100%; display:block; text-align:center; }
+.btn:disabled{ opacity:0.45; cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* ============================================================
+   THEME SELECT SCREEN
+   ============================================================ */
+#screen-theme{
+  align-items:center; justify-content:center; text-align:center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.05), transparent 60%),
+    var(--bg-0);
+  position:relative;
+}
+.theme-hero{ padding:60px 20px 30px; }
+.theme-hero h1{
+  font-family:var(--font-display); font-size:clamp(32px,6vw,56px); margin:0 0 8px;
+  background:linear-gradient(135deg,var(--text-hi),var(--accent-2));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.theme-hero p{ color:var(--text-lo); font-size:16px; max-width:520px; margin:0 auto; }
+.theme-hero .eyebrow{
+  font-size:12px; letter-spacing:4px; text-transform:uppercase; color:var(--text-lo);
+  margin-bottom:14px; display:block;
+}
+
+.theme-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:18px; padding:20px; max-width:980px; margin:0 auto 30px;
+}
+.theme-card{
+  --tc-a: #999; --tc-b:#555; --tc-bg:#111; --tc-paper:#eee;
+  border-radius:var(--radius-md); padding:0; overflow:hidden; cursor:pointer;
+  border:2px solid transparent; background:var(--bg-1);
+  transition:transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  text-align:left;
+}
+.theme-card:hover{ transform:translateY(-6px); box-shadow:var(--shadow-soft); }
+.theme-card.selected{ border-color:var(--tc-a); box-shadow:0 0 0 4px color-mix(in srgb, var(--tc-a) 25%, transparent); }
+.theme-card .swatch{
+  height:90px;
+  background:linear-gradient(135deg, var(--tc-bg), var(--tc-b));
+  position:relative;
+  display:flex; align-items:flex-end; padding:10px;
+}
+.theme-card .swatch::after{
+  content:''; position:absolute; top:12px; right:12px; width:16px; height:16px; border-radius:50%;
+  background:var(--tc-a); box-shadow:0 0 12px var(--tc-a);
+}
+.theme-card .swatch .chip{
+  width:26px; height:26px; border-radius:6px; background:var(--tc-paper); border:2px solid var(--tc-a);
+}
+.theme-card .meta{ padding:12px 14px; }
+.theme-card .meta h3{ margin:0 0 2px; font-size:15px; color:#fff; }
+.theme-card .meta span{ font-size:11px; color:#aaa; }
+
+/* ============================================================
+   DETECTIVE BRIEFING
+   ============================================================ */
+#screen-briefing{ align-items:center; justify-content:center; }
+.briefing-card{
+  max-width:640px; margin:40px auto; padding:44px 40px; text-align:center;
+  background:linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  border:1px solid var(--line); border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-deep); position:relative;
+}
+.detective-badge{
+  width:110px; height:110px; margin:0 auto 20px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent-dark) 70%);
+  display:flex; align-items:center; justify-content:center; font-size:50px;
+  box-shadow:0 0 0 6px rgba(255,255,255,0.06), 0 0 40px -5px var(--accent);
+  animation: badgePulse 2.6s ease-in-out infinite;
+}
+@keyframes badgePulse{ 0%,100%{ box-shadow:0 0 0 6px rgba(255,255,255,0.06), 0 0 30px -8px var(--accent);} 50%{ box-shadow:0 0 0 10px rgba(255,255,255,0.1), 0 0 55px -5px var(--accent);} }
+.briefing-card h1{ font-family:var(--font-display); font-size:28px; margin:0 0 6px; }
+.briefing-card .type-line{
+  font-family:var(--font-mono); color:var(--text-lo); font-size:14px; min-height:70px; margin:18px 0 26px; line-height:1.6;
+  border-top:1px dashed var(--line); border-bottom:1px dashed var(--line); padding:16px 4px; text-align:left;
+}
+.type-line .cursor{ display:inline-block; width:8px; background:var(--accent); animation:blink 0.9s steps(1) infinite; }
+@keyframes blink{ 50%{ opacity:0; } }
+.stat-row{ display:flex; gap:16px; justify-content:center; margin-bottom:24px; flex-wrap:wrap; }
+.stat-chip{ background:var(--bg-2); border:1px solid var(--line); padding:8px 16px; border-radius:10px; font-size:13px; }
+.stat-chip b{ display:block; color:var(--accent-2); font-size:18px; }
+
+/* ============================================================
+   CASE ASSIGNMENT
+   ============================================================ */
+#screen-assign{ align-items:center; justify-content:center; }
+.file-folder{
+  max-width:680px; margin:30px auto; position:relative;
+  background:var(--paper); color:var(--ink); border-radius:6px 6px 14px 14px;
+  box-shadow:var(--shadow-deep); padding:0; overflow:hidden;
+  animation: folderOpen 0.6s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes folderOpen{ from{ transform:scale(0.9) rotate(-2deg); opacity:0;} to{ transform:scale(1) rotate(0); opacity:1;} }
+.file-folder .tab{
+  background:var(--accent-dark); color:#fff; font-family:var(--font-mono);
+  font-size:12px; letter-spacing:2px; padding:8px 20px; display:inline-block;
+  border-radius:0 0 8px 0;
+}
+.file-folder .content{ padding:30px 34px 34px; }
+.stamp{
+  position:absolute; top:20px; right:26px; border:3px solid var(--bad); color:var(--bad);
+  padding:6px 14px; border-radius:8px; font-weight:800; letter-spacing:2px; font-size:13px;
+  transform:rotate(8deg); opacity:0.85; font-family:var(--font-mono);
+}
+.file-folder h2{ font-family:var(--font-display); font-size:26px; margin:6px 0 2px; }
+.file-folder .sub{ color:var(--ink-soft); font-size:13px; margin-bottom:18px; }
+.assign-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:20px; }
+.assign-grid .field{ background:var(--paper-2); border-radius:8px; padding:10px 12px; }
+.assign-grid .field label{ display:block; font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-soft); margin-bottom:4px; }
+.assign-grid .field span{ font-weight:700; font-size:14px; }
+.assign-note{ font-style:italic; color:var(--ink-soft); font-size:14px; border-left:3px solid var(--accent); padding-left:12px; margin-bottom:22px; }
+
+/* ============================================================
+   INVESTIGATION BOARD
+   ============================================================ */
+#screen-board{ align-items:stretch; }
+.board-layout{ display:grid; grid-template-columns:1fr 340px; gap:18px; padding:18px; max-width:1400px; margin:0 auto; width:100%; }
+@media (max-width:980px){ .board-layout{ grid-template-columns:1fr; } }
+
+.corkboard{
+  position:relative; border-radius:var(--radius-lg); padding:22px;
+  background-color:var(--board-felt);
+  background-image:
+    radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size:14px 14px;
+  border:10px solid #1c140d;
+  box-shadow:inset 0 0 60px rgba(0,0,0,0.6), var(--shadow-deep);
+  min-height:640px;
+}
+[data-theme="cyber"] .corkboard, [data-theme="noir"] .corkboard{ border-color:#05070a; }
+.corkboard-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
+.corkboard-header h2{ font-family:var(--font-display); margin:0; font-size:20px; color:var(--text-hi); }
+.corkboard-header .hint{ font-size:12px; color:var(--text-lo); }
+
+.evidence-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; position:relative;
+}
+.evidence-card{
+  background:var(--paper); color:var(--ink); border-radius:4px; padding:14px 14px 16px;
+  box-shadow:0 8px 18px rgba(0,0,0,0.4), 0 2px 0 rgba(255,255,255,0.4) inset;
+  cursor:grab; position:relative; transform:rotate(var(--rot,0deg));
+  transition:transform 0.2s ease, box-shadow 0.2s ease;
+  border-top:22px solid transparent;
+  user-select:none;
+}
+.evidence-card:hover{ transform:rotate(0deg) translateY(-4px) scale(1.02); box-shadow:0 16px 26px rgba(0,0,0,0.5); z-index:5; }
+.evidence-card.dragging{ opacity:0.4; }
+.evidence-card.important{ outline:3px solid var(--warn); }
+.evidence-card .pin{
+  position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+  width:16px; height:16px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #fff, var(--bad) 60%);
+  box-shadow:0 3px 5px rgba(0,0,0,0.5);
+}
+.evidence-card .etype{
+  font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:1px;
+  color:var(--accent-dark); font-weight:700; margin-bottom:4px; display:flex; align-items:center; justify-content:space-between;
+}
+.evidence-card h4{ margin:0 0 6px; font-size:14px; font-family:var(--font-display); }
+.evidence-card p{ margin:0; font-size:12px; line-height:1.5; color:var(--ink-soft); }
+.evidence-card .card-actions{ display:flex; gap:6px; margin-top:10px; }
+.evidence-card .mini-btn{
+  border:1px solid var(--ink-soft); background:transparent; color:var(--ink);
+  font-size:10px; padding:4px 8px; border-radius:6px; cursor:pointer;
+}
+.evidence-card .mini-btn:hover{ background:var(--ink); color:var(--paper); }
+.evidence-card .mini-btn.on{ background:var(--warn); border-color:var(--warn); color:#402c00; }
+
+.side-panel{ display:flex; flex-direction:column; gap:16px; }
+.panel-box{
+  background:var(--bg-1); border:1px solid var(--line); border-radius:var(--radius-md);
+  padding:16px; box-shadow:var(--shadow-soft);
+}
+.panel-box h3{ margin:0 0 10px; font-size:14px; text-transform:uppercase; letter-spacing:1px; color:var(--accent-2); display:flex; align-items:center; gap:8px; }
+.notebook textarea{
+  width:100%; min-height:150px; resize:vertical; background:var(--paper); color:var(--ink);
+  border:none; border-radius:8px; padding:12px; font-family:var(--font-mono); font-size:13px; line-height:1.5;
+  box-shadow:inset 0 0 0 1px var(--line);
+}
+.notebook .save-hint{ font-size:11px; color:var(--text-lo); margin-top:6px; }
+
+.metric-list{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.metric-list li{ background:var(--bg-2); border-radius:8px; padding:8px 10px; }
+.metric-list li b{ display:block; font-size:15px; color:var(--accent-2); }
+.metric-list li span{ font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-lo); }
+
+.comment-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; max-height:180px; overflow-y:auto; }
+.comment-list li{ background:var(--bg-2); border-left:3px solid var(--accent); border-radius:6px; padding:8px 10px; font-size:12.5px; font-style:italic; color:var(--text-lo); }
+
+.solve-btn-wrap{ position:sticky; bottom:16px; margin-top:10px; text-align:center; }
+
+/* ============================================================
+   CLUE MODAL
+   ============================================================ */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,0.72); z-index:100; display:none;
+  align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px);
+}
+.modal-overlay.active{ display:flex; animation:fadeIn 0.25s ease; }
+.modal-card{
+  background:var(--paper); color:var(--ink); max-width:520px; width:100%; border-radius:var(--radius-md);
+  padding:26px 26px 22px; box-shadow:var(--shadow-deep); position:relative; max-height:85vh; overflow-y:auto;
+}
+.modal-card h3{ font-family:var(--font-display); margin:0 0 10px; font-size:20px; }
+.modal-card .insight{
+  margin-top:14px; padding:12px 14px; background:var(--paper-2); border-left:4px solid var(--accent);
+  border-radius:6px; font-size:13.5px;
+}
+.modal-close{
+  position:absolute; top:12px; right:14px; background:transparent; border:none; font-size:20px; cursor:pointer; color:var(--ink-soft);
+}
+
+/* ============================================================
+   SOLVE PANEL
+   ============================================================ */
+.solve-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:110; display:none; align-items:center; justify-content:center; padding:16px; }
+.solve-overlay.active{ display:flex; animation:fadeIn 0.3s ease; }
+.solve-card{
+  background:var(--bg-1); border:1px solid var(--line); border-radius:var(--radius-lg); max-width:640px; width:100%;
+  padding:30px; max-height:88vh; overflow-y:auto; box-shadow:var(--shadow-deep);
+}
+.solve-card h2{ font-family:var(--font-display); margin-top:0; }
+.option-list{ display:flex; flex-direction:column; gap:10px; margin:18px 0; }
+.option-item{
+  display:flex; align-items:flex-start; gap:10px; padding:14px; border-radius:10px; border:1.5px solid var(--line);
+  cursor:pointer; background:var(--bg-2); transition:all 0.15s ease;
+}
+.option-item:hover{ border-color:var(--accent); }
+.option-item.selected{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 14%, var(--bg-2)); }
+.option-item input{ margin-top:3px; accent-color:var(--accent); }
+.option-item .letter{
+  width:24px; height:24px; border-radius:50%; background:var(--bg-1); display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; flex-shrink:0; border:1px solid var(--line);
+}
+
+/* ============================================================
+   CASE CLOSED
+   ============================================================ */
+#screen-closed{ align-items:center; justify-content:center; text-align:center; }
+.stamp-reveal{
+  font-family:var(--font-display); font-weight:900; font-size:clamp(38px,8vw,72px);
+  color:var(--bad); border:6px solid var(--bad); padding:6px 26px; border-radius:10px;
+  transform:rotate(-6deg) scale(0); display:inline-block; margin:30px auto; letter-spacing:4px;
+  animation: stampIn 0.5s cubic-bezier(.34,1.56,.64,1) forwards; animation-delay:0.15s;
+}
+@keyframes stampIn{ to{ transform:rotate(-6deg) scale(1); } }
+.verdict-box{
+  max-width:640px; margin:10px auto 24px; background:var(--bg-1); border:1px solid var(--line);
+  border-radius:var(--radius-md); padding:24px; text-align:left;
+}
+.verdict-box.correct{ border-color:var(--good); }
+.verdict-box.wrong{ border-color:var(--bad); }
+.verdict-tag{ font-weight:700; letter-spacing:1px; text-transform:uppercase; font-size:12px; }
+.verdict-tag.correct{ color:var(--good); }
+.verdict-tag.wrong{ color:var(--bad); }
+.xp-pop{ font-family:var(--font-mono); font-size:22px; color:var(--accent-2); margin-top:8px; }
+
+/* ============================================================
+   LEARNING REPORT
+   ============================================================ */
+#screen-report{ align-items:center; justify-content:flex-start; }
+.report-card{ max-width:760px; margin:20px auto; width:100%; }
+.report-section{
+  background:var(--bg-1); border:1px solid var(--line); border-radius:var(--radius-md);
+  padding:18px 20px; margin-bottom:14px;
+}
+.report-section h4{ margin:0 0 8px; color:var(--accent-2); font-size:14px; text-transform:uppercase; letter-spacing:1px; }
+.report-section p, .report-section li{ font-size:14.5px; line-height:1.65; color:var(--text-hi); }
+.report-section ul{ margin:6px 0 0; padding-left:20px; }
+
+/* ============================================================
+   ACHIEVEMENT TOAST
+   ============================================================ */
+#toast-wrap{ position:fixed; top:80px; right:20px; z-index:200; display:flex; flex-direction:column; gap:10px; }
+.toast{
+  background:linear-gradient(135deg, var(--accent-2), var(--accent-dark)); color:var(--bg-0);
+  padding:14px 18px; border-radius:12px; box-shadow:var(--shadow-deep); min-width:240px;
+  animation: toastIn 0.4s ease, toastOut 0.4s ease 3.6s forwards;
+  font-size:13px;
+}
+.toast b{ display:block; font-size:14px; margin-bottom:2px; }
+@keyframes toastIn{ from{ transform:translateX(120%); opacity:0;} to{ transform:translateX(0); opacity:1;} }
+@keyframes toastOut{ to{ transform:translateX(120%); opacity:0;} }
+
+/* ============================================================
+   KNOWLEDGE / STATS DRAWERS
+   ============================================================ */
+.drawer-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:120; display:none; }
+.drawer-overlay.active{ display:block; animation:fadeIn 0.2s ease; }
+.drawer{
+  position:fixed; top:0; right:0; height:100%; width:min(440px,92vw); background:var(--bg-1);
+  border-left:1px solid var(--line); z-index:121; transform:translateX(100%); transition:transform 0.3s ease;
+  overflow-y:auto; padding:22px;
+}
+.drawer.active{ transform:translateX(0); }
+.drawer h2{ font-family:var(--font-display); margin-top:0; }
+.glossary-item{ border-bottom:1px solid var(--line); padding:12px 0; }
+.glossary-item h4{ margin:0 0 4px; color:var(--accent-2); font-size:14px; }
+.glossary-item p{ margin:0; font-size:13px; color:var(--text-lo); line-height:1.5; }
+
+.rank-track{ display:flex; flex-direction:column; gap:6px; margin:14px 0 20px; }
+.rank-step{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; background:var(--bg-2); font-size:13px; opacity:0.5; }
+.rank-step.done{ opacity:1; }
+.rank-step.current{ opacity:1; border:1px solid var(--accent); background:color-mix(in srgb, var(--accent) 12%, var(--bg-2)); }
+.rank-step .dot{ width:10px; height:10px; border-radius:50%; background:var(--text-lo); flex-shrink:0; }
+.rank-step.done .dot, .rank-step.current .dot{ background:var(--accent); }
+
+.badge-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:12px; margin-top:10px; }
+.badge-item{ background:var(--bg-2); border-radius:10px; padding:12px 8px; text-align:center; border:1px solid var(--line); opacity:0.35; }
+.badge-item.unlocked{ opacity:1; border-color:var(--accent); }
+.badge-item .bicon{ font-size:26px; margin-bottom:6px; }
+.badge-item .bname{ font-size:11px; font-weight:600; }
+
+.chart-bars{ display:flex; align-items:flex-end; gap:6px; height:120px; margin-top:10px; }
+.chart-bars .bar{ flex:1; background:linear-gradient(180deg,var(--accent-2),var(--accent-dark)); border-radius:4px 4px 0 0; min-height:4px; position:relative; }
+.chart-bars .bar span{ position:absolute; bottom:-18px; left:0; right:0; text-align:center; font-size:9px; color:var(--text-lo); }
+
+.cat-bar-row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; }
+.cat-bar-row .label{ width:110px; flex-shrink:0; color:var(--text-lo); }
+.cat-bar-track{ flex:1; background:var(--bg-2); border-radius:6px; height:10px; overflow:hidden; }
+.cat-bar-fill{ height:100%; background:linear-gradient(90deg,var(--accent-dark),var(--accent-2)); }
+
+footer.foot-note{ text-align:center; padding:18px; color:var(--text-lo); font-size:11px; }
+
+@media (max-width:640px){
+  .assign-grid{ grid-template-columns:1fr 1fr; }
+  .metric-list{ grid-template-columns:1fr 1fr; }
+  .stamp{ position:static; display:inline-block; margin-bottom:10px; transform:rotate(-3deg); }
+}
+</style>
+</head>
+<body data-theme="orange">
+<div id="app">
+
+  <!-- ============================================================
+       SCREEN 1: THEME SELECTION
+  ============================================================ -->
+  <section id="screen-theme" class="screen active" aria-label="Theme selection">
+    <div class="theme-hero">
+      <span class="eyebrow">Marketing Investigation Bureau</span>
+      <h1>Marketing Detective Pro</h1>
+      <p>Choose your investigation aesthetic. Every detective works differently — pick the look that fits your style.</p>
+    </div>
+    <div class="theme-grid" id="theme-grid" role="radiogroup" aria-label="Choose a visual theme"></div>
+    <div style="padding-bottom:50px;">
+      <button class="btn" id="btn-continue-theme">Continue to Briefing →</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 2: DETECTIVE BRIEFING
+  ============================================================ -->
+  <section id="screen-briefing" class="screen" aria-label="Detective briefing">
+    <div class="briefing-card">
+      <div class="detective-badge" aria-hidden="true">🕵️</div>
+      <h1>Welcome, Detective.</h1>
+      <div class="type-line" id="type-line" aria-live="polite"></div>
+      <div class="stat-row">
+        <div class="stat-chip"><b id="brief-rank">Intern Investigator</b>Current Rank</div>
+        <div class="stat-chip"><b id="brief-cases">0</b>Cases Closed</div>
+        <div class="stat-chip"><b id="brief-xp">0</b>Total XP</div>
+      </div>
+      <button class="btn" id="btn-start-investigation">Start Investigation →</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 3: CASE ASSIGNMENT
+  ============================================================ -->
+  <section id="screen-assign" class="screen" aria-label="Case assignment">
+    <div class="container">
+      <div class="file-folder">
+        <div class="tab">CASE FILE — CONFIDENTIAL</div>
+        <div class="content" style="position:relative;">
+          <div class="stamp">URGENT</div>
+          <h2 id="assign-company">Company Name</h2>
+          <div class="sub" id="assign-industry">Industry</div>
+          <div class="assign-grid" id="assign-grid"></div>
+          <div class="assign-note" id="assign-objective"></div>
+          <button class="btn block" id="btn-open-board">Open Investigation Board →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 4: INVESTIGATION BOARD
+  ============================================================ -->
+  <section id="screen-board" class="screen" aria-label="Investigation board">
+    <div class="topbar">
+      <div class="brand">
+        <div class="badge-mini">🔍</div>
+        <div class="brand-title">Case #<span id="board-case-num">1</span><small id="board-case-name">Company</small></div>
+      </div>
+      <div class="nav-actions">
+        <span class="pill">🏅 <strong id="hud-rank">Intern Investigator</strong></span>
+        <span class="pill">⚡ <strong id="hud-xp">0</strong> XP</span>
+        <span class="pill">🔥 <strong id="hud-streak">0</strong> streak</span>
+        <button class="icon-btn" id="btn-open-knowledge">📚 Knowledge Center</button>
+        <button class="icon-btn" id="btn-open-stats">📊 Stats</button>
+      </div>
+    </div>
+
+    <div class="board-layout">
+      <div class="corkboard">
+        <div class="corkboard-header">
+          <h2>Evidence Board</h2>
+          <span class="hint">Drag cards to rearrange · Click a card to examine it closely · Pin what matters</span>
+        </div>
+        <div class="evidence-grid" id="evidence-grid"></div>
+      </div>
+
+      <div class="side-panel">
+        <div class="panel-box notebook">
+          <h3>📓 Detective Notebook</h3>
+          <textarea id="notebook-text" placeholder="Jot down your theory... What pattern connects the evidence?" aria-label="Detective notebook"></textarea>
+          <div class="save-hint" id="notebook-save-hint">Notes autosave for this case.</div>
+        </div>
+
+        <div class="panel-box">
+          <h3>📈 Campaign Metrics</h3>
+          <ul class="metric-list" id="metric-list"></ul>
+        </div>
+
+        <div class="panel-box">
+          <h3>💬 Customer Comments</h3>
+          <ul class="comment-list" id="comment-list"></ul>
+        </div>
+
+        <div class="panel-box">
+          <h3>🕵️ Competitor Intel</h3>
+          <p id="competitor-note" style="font-size:13px;color:var(--text-lo);margin:0;"></p>
+        </div>
+
+        <div class="solve-btn-wrap">
+          <button class="btn block" id="btn-open-solve">🧩 Solve the Case</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 5: CASE CLOSED
+  ============================================================ -->
+  <section id="screen-closed" class="screen" aria-label="Case closed">
+    <div class="container">
+      <div class="stamp-reveal" id="closed-tag">CASE CLOSED</div>
+      <div class="verdict-box" id="verdict-box">
+        <div class="verdict-tag" id="verdict-tag">CORRECT</div>
+        <h2 id="verdict-headline" style="font-family:var(--font-display);margin:6px 0 12px;"></h2>
+        <p id="verdict-explanation" style="line-height:1.6;"></p>
+        <div style="margin-top:12px;">
+          <strong style="color:var(--accent-2);font-size:13px;text-transform:uppercase;letter-spacing:1px;">Supporting Evidence</strong>
+          <ul id="verdict-evidence" style="margin:8px 0 0;padding-left:20px;line-height:1.6;"></ul>
+        </div>
+        <div class="xp-pop" id="xp-pop"></div>
+      </div>
+      <button class="btn" id="btn-view-report">View Learning Report →</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 6: LEARNING REPORT
+  ============================================================ -->
+  <section id="screen-report" class="screen" aria-label="Learning report">
+    <div class="container report-card">
+      <h1 style="font-family:var(--font-display);">📘 Marketing Learning Report</h1>
+      <div class="report-section">
+        <h4>What Happened</h4>
+        <p id="rep-what"></p>
+      </div>
+      <div class="report-section">
+        <h4>Root Cause</h4>
+        <p id="rep-root"></p>
+      </div>
+      <div class="report-section">
+        <h4>Marketing Lesson</h4>
+        <p id="rep-lesson"></p>
+      </div>
+      <div class="report-section">
+        <h4>KPI Interpretation</h4>
+        <p id="rep-kpi"></p>
+      </div>
+      <div class="report-section">
+        <h4>Industry Best Practice</h4>
+        <p id="rep-practice"></p>
+      </div>
+      <div class="report-section">
+        <h4>Suggested Improvements</h4>
+        <ul id="rep-improvements"></ul>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; padding-bottom:50px;">
+        <button class="btn" id="btn-next-case">Next Case →</button>
+        <button class="btn secondary" id="btn-view-stats-report">View Statistics</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot-note">Marketing Detective Pro — an offline investigative learning game. No data leaves your browser.</footer>
+</div>
+
+<!-- ================= CLUE MODAL ================= -->
+<div class="modal-overlay" id="clue-modal" role="dialog" aria-modal="true" aria-labelledby="clue-modal-title">
+  <div class="modal-card">
+    <button class="modal-close" id="clue-modal-close" aria-label="Close">✕</button>
+    <div class="etype" id="clue-modal-type" style="color:var(--accent-dark);font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;"></div>
+    <h3 id="clue-modal-title">Evidence Title</h3>
+    <p id="clue-modal-body"></p>
+    <div class="insight" id="clue-modal-insight"></div>
+  </div>
+</div>
+
+<!-- ================= SOLVE OVERLAY ================= -->
+<div class="solve-overlay" id="solve-overlay" role="dialog" aria-modal="true" aria-labelledby="solve-title">
+  <div class="solve-card">
+    <h2 id="solve-title">What really caused this campaign to fail?</h2>
+    <p style="color:var(--text-lo);font-size:13px;">Select the root cause best supported by the evidence.</p>
+    <div class="option-list" id="solve-options"></div>
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button class="btn secondary" id="btn-cancel-solve">Back to Board</button>
+      <button class="btn" id="btn-submit-verdict" disabled>Submit Verdict</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= KNOWLEDGE DRAWER ================= -->
+<div class="drawer-overlay" id="knowledge-overlay"></div>
+<div class="drawer" id="knowledge-drawer" aria-label="Marketing knowledge center">
+  <button class="modal-close" id="knowledge-close" aria-label="Close knowledge center">✕</button>
+  <h2>📚 Marketing Knowledge Center</h2>
+  <p style="color:var(--text-lo);font-size:13px;">Quick reference for the metrics you'll investigate.</p>
+  <div id="glossary-list"></div>
+</div>
+
+<!-- ================= STATS DRAWER ================= -->
+<div class="drawer-overlay" id="stats-overlay"></div>
+<div class="drawer" id="stats-drawer" aria-label="Detective statistics">
+  <button class="modal-close" id="stats-close" aria-label="Close statistics">✕</button>
+  <h2>📊 Detective Statistics</h2>
+
+  <h4 style="color:var(--accent-2);margin-bottom:4px;">Rank Progress</h4>
+  <div class="rank-track" id="rank-track"></div>
+
+  <h4 style="color:var(--accent-2);margin-bottom:4px;">Accuracy Trend (last 10)</h4>
+  <div class="chart-bars" id="accuracy-chart" style="margin-bottom:26px;"></div>
+
+  <h4 style="color:var(--accent-2);margin-bottom:4px;">XP Growth</h4>
+  <div class="chart-bars" id="xp-chart" style="margin-bottom:26px;"></div>
+
+  <h4 style="color:var(--accent-2);margin-bottom:8px;">Category Performance</h4>
+  <div id="category-bars" style="margin-bottom:20px;"></div>
+
+  <h4 style="color:var(--accent-2);margin-bottom:8px;">Achievements</h4>
+  <div class="badge-grid" id="badge-grid"></div>
+</div>
+
+<div id="toast-wrap" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   THEME DEFINITIONS
+============================================================ */
+const THEMES = [
+  {id:'orange', name:'Claude Orange', desc:'Warm & focused', a:'#d97757', b:'#b85c3f', bg:'#241a13', paper:'#f4ead9'},
+  {id:'cyber', name:'Cyber Blue', desc:'Digital & sharp', a:'#3fc8ff', b:'#1a8fc7', bg:'#0a1224', paper:'#dfeeff'},
+  {id:'emerald', name:'Emerald Intelligence', desc:'Calm & clear', a:'#33c98a', b:'#1f9e6a', bg:'#0c2018', paper:'#e8f3ea'},
+  {id:'purple', name:'Purple Analyst', desc:'Curious & sharp', a:'#a970e0', b:'#8250bd', bg:'#1b1029', paper:'#f0e8f7'},
+  {id:'crimson', name:'Crimson Investigation', desc:'Urgent & bold', a:'#e0473f', b:'#b8332b', bg:'#240b0b', paper:'#f5e9e4'},
+  {id:'noir', name:'Midnight Noir', desc:'Classic detective', a:'#c9a24a', b:'#a17f33', bg:'#0f1113', paper:'#e9e6df'}
+];
+
+/* ============================================================
+   GLOSSARY
+============================================================ */
+const GLOSSARY = [
+  {term:'Reach', def:'The total number of unique people who saw your campaign at least once.'},
+  {term:'CTR (Click-Through Rate)', def:'The percentage of people who saw your ad and clicked it. Low CTR often signals weak creative or wrong audience targeting.'},
+  {term:'CPC (Cost Per Click)', def:'How much you pay, on average, each time someone clicks your ad.'},
+  {term:'CPM (Cost Per Mille)', def:'The cost to show your ad 1,000 times, regardless of clicks. Used to compare raw visibility costs.'},
+  {term:'CPA (Cost Per Acquisition)', def:'The average cost to acquire one paying customer or lead through a campaign.'},
+  {term:'ROAS (Return on Ad Spend)', def:'Revenue generated for every dollar spent on advertising. A ROAS of 4x means $4 earned per $1 spent.'},
+  {term:'Conversion Rate', def:'The percentage of visitors who complete a desired action, like purchasing or signing up.'},
+  {term:'Bounce Rate', def:'The percentage of visitors who leave a page without interacting further. High bounce often points to a landing page mismatch.'},
+  {term:'Retention Rate', def:'The percentage of customers who continue engaging or purchasing over time, rather than churning.'},
+  {term:'CAC (Customer Acquisition Cost)', def:'The total sales and marketing cost divided by the number of new customers gained.'},
+  {term:'Customer Lifetime Value (LTV)', def:'The total revenue a business can expect from a single customer over the entire relationship.'}
+];
+
+/* ============================================================
+   RANKS
+============================================================ */
+const RANKS = [
+  {name:'Intern Investigator', minXP:0},
+  {name:'Junior Analyst', minXP:150},
+  {name:'Marketing Detective', minXP:400},
+  {name:'Senior Strategist', minXP:800},
+  {name:'Growth Specialist', minXP:1400},
+  {name:'Marketing Master', minXP:2200}
+];
+
+/* ============================================================
+   ACHIEVEMENTS
+============================================================ */
+const ACHIEVEMENTS = [
+  {id:'first_case', name:'First Case Closed', icon:'🥇', check:s=>s.casesSolved>=1},
+  {id:'five_cases', name:'5 Cases Solved', icon:'🎖️', check:s=>s.casesSolved>=5},
+  {id:'ten_cases', name:'10 Cases Solved', icon:'🏆', check:s=>s.casesSolved>=10},
+  {id:'perfect_accuracy', name:'Perfect Accuracy', icon:'🎯', check:s=>s.casesSolved>=5 && s.correctAnswers===s.casesSolved},
+  {id:'speed_solver', name:'Speed Solver', icon:'⚡', check:s=>s.fastSolves>=3},
+  {id:'marketing_expert', name:'Marketing Expert', icon:'🧠', check:s=>s.correctAnswers>=8},
+  {id:'master_detective', name:'Master Detective', icon:'🕵️‍♂️', check:s=>s.casesSolved>=15}
+];
+
+/* ============================================================
+   CASE DATABASE (16 cases)
+============================================================ */
+const CASES = [
+{
+  id:'c1', category:'Low CTR', company:'Lumen & Co.', industry:'Home Décor E-commerce',
+  objective:'Drive traffic to new spring furniture collection', audience:'Homeowners aged 28-45, mid-to-high income',
+  channels:['Facebook Ads','Instagram Ads','Google Display'], budget:'$18,000', reach:'1,240,000', ctr:'0.31%',
+  engagement:'2,100 likes/comments', conversionRate:'0.4%', leads:'890', sales:'112',
+  comments:["The ad barely stood out in my feed, I almost scrolled past it three times.","I couldn't tell what was actually being sold from the thumbnail.","Looked like every other furniture ad I've seen this year."],
+  socialPerformance:'Impressions high, but engagement rate sits far below account average (0.17% vs 1.9% typical).',
+  competitorObservation:'A rival brand running nearly identical targeting sees 1.8% CTR with bold, high-contrast product shots.',
+  primaryMistake:'Weak, generic ad creative failed to capture attention in a crowded feed.',
+  clues:[
+    {title:'Creative Review', body:'The hero image uses a muted beige palette that blends into typical feed backgrounds, with small text overlay that is unreadable on mobile.', insight:'Low visual contrast and unreadable text are classic causes of scroll-past behavior — this is a creative problem, not a targeting problem.'},
+    {title:'Audience Match Report', body:'Audience demographics closely match actual buyers of similar furniture brands; overlap score is 82%, well above the 60% benchmark.', insight:'Because targeting overlap is strong, the audience itself is not the likely culprit — this clue rules out wrong-audience theories.'},
+    {title:'Competitor Creative Snapshot', body:'The best-performing competitor ad uses bold color blocking, a single clear product hero shot, and large readable text — the opposite of Lumen\'s approach.', insight:'When targeting is comparable but performance differs sharply, creative execution is usually the deciding factor.'}
+  ],
+  correctExplanation:'The audience was well-matched, but the ad creative itself was visually forgettable and hard to read on mobile, so people scrolled past without ever registering what was being offered.',
+  improvements:['Redesign creative with high-contrast imagery and a single clear focal product.','Use bold, mobile-legible text overlays under 6 words.','A/B test 3-4 creative variants before scaling spend.'],
+  options:[
+    'The target audience was completely wrong for this product',
+    'The ad creative was visually weak and failed to grab attention',
+    'The budget was too small to generate meaningful reach',
+    'The landing page had broken checkout functionality',
+    'The offer itself was not compelling enough'
+  ], correctIndex:1,
+  lesson:'CTR problems are not always audience problems. When targeting overlap is strong but CTR is weak, investigate the creative first — contrast, clarity, and a single focal message matter more than audience precision in a crowded feed.',
+  kpiNote:'CTR of 0.31% is well below the 0.9%-1.5% typical range for retail display/social ads, while reach and impressions were healthy — indicating a message/creative issue rather than a delivery issue.',
+  bestPractice:'Test creative variations before scaling media spend; a strong creative can outperform a mediocre one by 3-5x at identical targeting and budget.'
+},
+{
+  id:'c2', category:'Wrong Audience Targeting', company:'FitPulse', industry:'Fitness Subscription App',
+  objective:'Acquire new premium subscribers', audience:'Broad targeting: all adults 18-65 interested in "fitness"',
+  channels:['Instagram Ads','TikTok Ads'], budget:'$25,000', reach:'2,900,000', ctr:'1.4%',
+  engagement:'High: 40,000 interactions', conversionRate:'0.6%', leads:'3,100 trial signups', sales:'180 paid conversions',
+  comments:["Downloaded it because the ad looked fun, but it's way too intense for my level.","I thought this was a casual step-tracker, not a hardcore training app.","Cancelled after the trial, not what I expected at all."],
+  socialPerformance:'Massive engagement and shares, but trial-to-paid conversion sits at 5.8% versus a 22% company average.',
+  competitorObservation:'Competitor apps segment ads by fitness level (beginner/intermediate/advanced) and see 3x higher trial-to-paid rates.',
+  primaryMistake:'Broad, undifferentiated targeting attracted high volume but the wrong-fit users who churned immediately after trial.',
+  clues:[
+    {title:'Trial Cohort Survey', body:'68% of trial users who churned said the app content did not match their fitness level or expectations set by the ad.', insight:'High churn tied directly to expectation mismatch points to a targeting/positioning issue rather than a product bug.'},
+    {title:'Ad Targeting Settings', body:'Campaign targeting was set to "Interest: Fitness" with no segmentation by experience level, age-appropriate intensity, or goal (weight loss vs performance).', insight:'Extremely broad interest targeting maximizes reach but dilutes relevance — a wide net catches people who were never a real fit.'},
+    {title:'Engagement vs Conversion Gap', body:'Engagement metrics (likes, shares, saves) are far above account average, but paid conversion is far below average.', insight:'High top-of-funnel engagement with weak bottom-of-funnel conversion is a signature of an attention-grabbing but poorly-targeted campaign.'}
+  ],
+  correctExplanation:'The ad drew huge attention from a broad audience, but without segmentation by fitness level or goals, most people who signed up were never a genuine fit for the intense program — so they churned almost immediately.',
+  improvements:['Segment campaigns by fitness level and goal (beginner/intermediate/advanced).','Set audience expectations accurately in creative to reduce mismatch.','Track trial-to-paid by segment to reallocate budget toward best-fit audiences.'],
+  options:[
+    'The creative was too boring to generate engagement',
+    'The pricing was set too high for the target market',
+    'Broad, unsegmented targeting attracted users who were a poor fit for the product',
+    'The app had major technical bugs during onboarding',
+    'The competitor undercut pricing during the campaign'
+  ], correctIndex:2,
+  lesson:'High engagement is not the same as high-quality leads. When conversion lags far behind engagement, check whether targeting is broad enough to be attracting the wrong people.',
+  kpiNote:'A 5.8% trial-to-paid rate against a 22% baseline signals a segment mismatch, not a pricing or product defect, especially paired with strong top-funnel engagement.',
+  bestPractice:'Segment campaigns by user intent and experience level rather than optimizing purely for reach or engagement volume.'
+},
+{
+  id:'c3', category:'Bad Landing Page', company:'Northgate Insurance', industry:'Insurance',
+  objective:'Generate quote requests for auto insurance', audience:'Drivers aged 25-55 shopping for cheaper premiums',
+  channels:['Google Search Ads'], budget:'$40,000', reach:'510,000 impressions', ctr:'4.8%',
+  engagement:'N/A (search)', conversionRate:'0.9%', leads:'220', sales:'95',
+  comments:["The page took forever to load on my phone, I gave up.","I clicked 'Get Quote' and it just refreshed the page with no form.","Too many fields before I even see a price estimate."],
+  socialPerformance:'N/A — search campaign',
+  competitorObservation:'Top competitor landing pages show an instant price estimate after just 3 form fields; Northgate requires 11 fields before any estimate appears.',
+  primaryMistake:'The landing page had a long, frustrating form and slow mobile load time that caused visitors to abandon before converting.',
+  clues:[
+    {title:'Landing Page Load Test', body:'Mobile page load time measured at 7.2 seconds, more than double the 3-second threshold where bounce rates spike sharply.', insight:'Every additional second of load time beyond ~3s is strongly correlated with dramatic increases in bounce, especially on mobile search traffic.'},
+    {title:'Form Analytics', body:'Heatmap data shows 74% of visitors abandon the quote form after field 4, well before reaching the submit button at field 11.', insight:'A long form front-loaded before any value is shown creates friction fatigue — visitors leave before feeling rewarded.'},
+    {title:'CTR vs Conversion Comparison', body:'CTR of 4.8% is strong and above search benchmarks, meaning the ad copy and offer resonate — but on-page conversion is far below benchmark.', insight:'Strong CTR paired with weak conversion isolates the problem to the landing page experience itself, not the ad or targeting.'}
+  ],
+  correctExplanation:'The ad successfully attracted highly relevant clicks (CTR was strong), but a slow-loading, overly long quote form caused the majority of visitors to abandon before ever seeing a price, tanking conversions.',
+  improvements:['Reduce the form to 3-4 fields before showing an instant estimate.','Optimize mobile page speed to under 3 seconds.','Add progress indicators to reduce perceived form length.'],
+  options:[
+    'The ad copy failed to attract relevant searchers',
+    'The audience targeting excluded likely buyers',
+    'A slow, overly long landing page form caused abandonment',
+    'The budget was spread across too many keywords',
+    'Competitors were bidding up the cost per click'
+  ], correctIndex:2,
+  lesson:'When CTR is strong but conversion is weak, the landing page — not the ad — is usually the bottleneck. Page speed and form length are two of the highest-leverage fixes.',
+  kpiNote:'A 4.8% search CTR is healthy, but a 0.9% conversion rate against an 11-field form and 7.2s load time points squarely at on-page friction.',
+  bestPractice:'Keep lead-gen forms to the minimum viable fields and show value (like a price estimate) as early as possible in the flow.'
+},
+{
+  id:'c4', category:'Poor Offer Positioning', company:'Brewhouse Roasters', industry:'Specialty Coffee Subscription',
+  objective:'Convert free samples into paid subscriptions', audience:'Coffee enthusiasts, 25-50',
+  channels:['Email','Instagram'], budget:'$9,500', reach:'85,000', ctr:'2.1%',
+  engagement:'Moderate', conversionRate:'1.1%', leads:'640 sample requests', sales:'71',
+  comments:["I loved the free sample but $34/month felt steep compared to my grocery store beans.","The email never explained why this coffee was worth more than what I already buy.","No mention of what makes the beans special versus cheaper options."],
+  socialPerformance:'Sample requests were strong, but only 11% converted to paid, versus a 30% industry benchmark for sample-to-paid coffee subscriptions.',
+  competitorObservation:'Leading competitor subscriptions lead with origin story, farmer partnerships, and roast freshness guarantees directly in their conversion emails.',
+  primaryMistake:'The value proposition for the premium price point was never clearly communicated, leaving price as the dominant (negative) factor in the decision.',
+  clues:[
+    {title:'Post-Sample Survey', body:'62% of non-converting sample recipients cited "not sure what makes it different" as their top reason for not subscribing.', insight:'When customers cannot articulate the value difference, price becomes the only comparison point — and price alone rarely wins against cheaper alternatives.'},
+    {title:'Email Content Audit', body:'The conversion email focuses entirely on discount urgency ("Subscribe now and save 10%") with no mention of sourcing, roast quality, or freshness.', insight:'Leading with discount messaging instead of value differentiation reinforces a price-only comparison in the customer\'s mind.'},
+    {title:'Sample Feedback Ratings', body:'Sample product itself received a 4.6/5 average taste rating — customers liked the coffee, they just didn\'t understand why it cost more.', insight:'High product satisfaction paired with low conversion strongly suggests a messaging/positioning gap rather than a product quality issue.'}
+  ],
+  correctExplanation:'Customers genuinely liked the coffee, but marketing never explained why it justified a premium price, so the offer was evaluated on price alone against cheaper alternatives and lost.',
+  improvements:['Rebuild conversion emails around sourcing story, roast freshness, and farmer partnerships.','Add a side-by-side value comparison versus grocery store coffee.','Test a "why we cost more" explainer directly in the checkout flow.'],
+  options:[
+    'The coffee itself received poor taste ratings from samples',
+    'The premium value proposition was never clearly communicated, so price dominated the decision',
+    'The email open rates were too low to matter',
+    'The sample request form was too complicated',
+    'The subscription page had a broken payment processor'
+  ], correctIndex:1,
+  lesson:'A premium price only works when the premium value is made explicit. Without clear differentiation, customers default to comparing on price alone.',
+  kpiNote:'An 11% sample-to-paid rate against a 30% benchmark, combined with high taste satisfaction, isolates the issue to positioning rather than product.',
+  bestPractice:'Always pair a premium price point with an explicit, repeated explanation of the unique value driving that price.'
+},
+{
+  id:'c5', category:'Weak Creative', company:'Solstice Skincare', industry:'Beauty & Personal Care',
+  objective:'Launch new anti-aging serum', audience:'Women 35-55 interested in skincare',
+  channels:['Instagram Ads','YouTube Pre-roll'], budget:'$60,000', reach:'3,400,000', ctr:'0.22%',
+  engagement:'Low: 0.3% engagement rate', conversionRate:'0.3%', leads:'1,050', sales:'62',
+  comments:["The video felt like a generic stock-footage ad, nothing about it felt premium.","I couldn't even tell it was a skincare brand until the very end.","Looked exactly like ten other serum ads I've scrolled past."],
+  socialPerformance:'Engagement rate of 0.3% is roughly one-sixth of the brand\'s historical average of 1.8%.',
+  competitorObservation:'A competing premium serum brand uses close-up texture shots and founder testimonials, generating 2.4% CTR with a similar budget.',
+  primaryMistake:'Generic, low-production-value creative failed to convey premium positioning or capture attention against better-produced competitor ads.',
+  clues:[
+    {title:'Creative Production Notes', body:'The video ad was assembled largely from stock footage with a voiceover script that never shows the actual product texture or application.', insight:'For beauty products, texture and application visuals are critical trust signals — their absence weakens perceived product quality.'},
+    {title:'Brand Recall Survey', body:'Only 14% of viewers who saw the full ad could correctly identify the brand or product category afterward.', insight:'Extremely low brand recall after full ad exposure indicates the creative failed at its most basic job: making an impression.'},
+    {title:'Placement Performance Breakdown', body:'CTR and engagement are uniformly low across every placement and audience segment tested, not just one demographic.', insight:'When poor performance is consistent across all audiences and placements, the common denominator — the creative itself — is the likely cause.'}
+  ],
+  correctExplanation:'The ad used generic stock footage that never showcased the actual product, resulting in extremely low brand recall and engagement across every audience segment tested — the creative itself was the failure point.',
+  improvements:['Reshoot with real product texture, application, and before/after visuals.','Feature a recognizable spokesperson or founder for trust and recall.','Test creative concepts in small batches before committing to a full media budget.'],
+  options:[
+    'The audience targeting was mismatched with typical serum buyers',
+    'The budget was too small to reach a meaningful audience',
+    'Generic, low-quality creative failed to showcase the product or build brand recall',
+    'The product price was too high for the target demographic',
+    'The landing page had a broken add-to-cart button'
+  ], correctIndex:2,
+  lesson:'Uniformly poor performance across every audience and placement points to the creative itself, not targeting — a broken creative fails everywhere equally.',
+  kpiNote:'A 0.22% CTR and 0.3% engagement rate, consistent across all segments, rules out audience-specific issues and isolates the creative as the root cause.',
+  bestPractice:'For considered-purchase beauty products, show real product texture and results — generic stock footage undermines premium positioning.'
+},
+{
+  id:'c6', category:'Mobile UX Problems', company:'QuickCart Grocery', industry:'Grocery Delivery',
+  objective:'Increase mobile app order completions', audience:'Urban professionals, 22-45',
+  channels:['Push Notifications','App Store Ads'], budget:'$15,000', reach:'400,000 app opens', ctr:'N/A',
+  engagement:'High app opens', conversionRate:'2.3% (checkout completion)', leads:'N/A', sales:'9,200 completed orders out of 400,000 opens',
+  comments:["Every time I tried to check out on my phone, the payment button was cut off the screen.","App crashed twice when I tried to apply a promo code.","Had to switch to desktop just to finish my order."],
+  socialPerformance:'App store reviews show a 2.1-star average this month, down from 4.3 stars pre-redesign.',
+  competitorObservation:'Competitor delivery apps maintain sub-1% crash rates and single-thumb-reachable checkout buttons.',
+  primaryMistake:'A recent app redesign introduced mobile UI bugs, including an unreachable checkout button and crashes during promo code entry.',
+  clues:[
+    {title:'Crash Report Log', body:'Crash analytics show a 340% spike in checkout-flow crashes beginning the exact day the new app redesign was pushed live.', insight:'A crash spike that aligns precisely with a release date strongly implicates that release as the direct cause.'},
+    {title:'App Store Review Timeline', body:'One-star reviews mentioning "checkout," "button," or "crash" jumped from near-zero to 68% of all new reviews after the redesign date.', insight:'A sudden concentrated spike in specific complaint keywords right after a change is strong evidence pointing to that change.'},
+    {title:'Session Recording Sample', body:'Screen recordings show the primary checkout button rendering partially off-screen on several popular device sizes.', insight:'Direct visual evidence of a broken UI element on common devices confirms a technical implementation defect, not a marketing or targeting issue.'}
+  ],
+  correctExplanation:'A recent app redesign introduced a broken checkout button layout and crash bugs on common device sizes, causing a massive spike in abandoned orders that coincided exactly with the release date.',
+  improvements:['Roll back or hotfix the checkout button layout across common device sizes.','Add automated device-size testing to the release QA process.','Push an in-app apology and discount to affected users to rebuild trust.'],
+  options:[
+    'The push notification copy was not compelling enough',
+    'A broken mobile checkout UI introduced by a recent redesign caused abandonment',
+    'The target audience does not prefer mobile shopping',
+    'The app store listing had poor screenshots',
+    'Delivery times were too slow compared to competitors'
+  ], correctIndex:1,
+  lesson:'Technical UX regressions can silently destroy conversion even when marketing drives strong top-of-funnel traffic. Always correlate performance drops with recent product releases.',
+  kpiNote:'400,000 app opens with only a 2.3% checkout completion rate, alongside a review-score collapse timed to a release, points to a technical defect rather than a demand or targeting problem.',
+  bestPractice:'Monitor crash rates and review sentiment immediately after every app release, and be ready to roll back quickly if metrics regress.'
+},
+{
+  id:'c7', category:'Funnel Drop-off', company:'CloudDesk SaaS', industry:'B2B Software',
+  objective:'Convert free trial users to paid plans', audience:'Small business owners and team leads',
+  channels:['LinkedIn Ads','Email Nurture'], budget:'$30,000', reach:'220,000', ctr:'1.9%',
+  engagement:'Trial signups strong', conversionRate:'4% trial-to-paid', leads:'2,400 trials started', sales:'96 paid conversions',
+  comments:["I never got a single onboarding email after signing up, just silence for two weeks.","I forgot I even had a trial until it expired.","No one reached out to help me set things up."],
+  socialPerformance:'N/A — B2B email/LinkedIn funnel',
+  competitorObservation:'Competitor SaaS tools send a structured 7-email onboarding sequence achieving 15-18% trial-to-paid conversion.',
+  primaryMistake:'A broken or missing onboarding email sequence left trial users without guidance, causing them to disengage before experiencing product value.',
+  clues:[
+    {title:'Email Automation Audit', body:'Investigation reveals the onboarding email automation was accidentally disabled during a marketing platform migration three weeks before this cohort started.', insight:'A disabled automation exactly aligned with the affected cohort strongly explains why users received no nurture communication.'},
+    {title:'Trial Activity Logs', body:'78% of trial users who churned never used the product beyond the first login session.', insight:'Extremely low product engagement post-signup usually means users never learned how to unlock value — a classic onboarding failure signature.'},
+    {title:'Support Ticket Sample', body:'A handful of trial users submitted tickets asking "how do I get started" — questions that a working onboarding sequence would have already answered.', insight:'Direct user confusion about basic setup indicates the self-serve onboarding path was insufficient or absent.'}
+  ],
+  correctExplanation:'A platform migration accidentally disabled the onboarding email sequence for this exact cohort, leaving trial users with no guidance, so most never returned after their first session and the trial silently expired.',
+  improvements:['Restore and QA-test the onboarding automation after every platform migration.','Add an in-app checklist to guide first-session activation regardless of email deliverability.','Set up automated alerts for email automation failures.'],
+  options:[
+    'LinkedIn targeting reached the wrong job titles',
+    'The pricing page listed incorrect prices',
+    'A disabled onboarding email sequence left trial users without guidance, causing disengagement',
+    'The product had a critical security vulnerability',
+    'Ad frequency was too high, causing banner blindness'
+  ], correctIndex:2,
+  lesson:'Funnel drop-off is often invisible until you check operational systems, not just campaign settings. Always verify that lifecycle automations are actually running.',
+  kpiNote:'A 4% trial-to-paid rate against a 15-18% benchmark, combined with 78% single-session churn, points to an activation/onboarding failure rather than an acquisition problem.',
+  bestPractice:'Treat onboarding automations as critical infrastructure — monitor them the same way you would monitor site uptime.'
+},
+{
+  id:'c8', category:'Budget Misallocation', company:'PawPrint Pet Foods', industry:'Pet Food E-commerce',
+  objective:'Maximize sales during a 30-day launch window', audience:'Dog and cat owners nationwide',
+  channels:['Facebook Ads','Google Search','TV Spot'], budget:'$120,000 (70% TV, 20% Facebook, 10% Search)', reach:'8,200,000',
+  ctr:'Search: 6.1%, Facebook: 0.9%', engagement:'Moderate', conversionRate:'Search: 5.2%, Facebook: 0.7%',
+  leads:'N/A', sales:'1,340 total, 78% attributed to Search despite receiving only 10% of budget',
+  comments:["I searched for 'grain free dog food' and found them immediately, great experience.","Saw the TV ad but forgot the brand name by the time I wanted to buy.","Facebook ad felt intrusive and I never clicked it."],
+  socialPerformance:'Facebook ROAS measured at 1.1x; Search ROAS measured at 9.4x.',
+  competitorObservation:'Competitor pet brands allocate the majority of digital budget toward high-intent search and retargeting rather than broad awareness channels.',
+  primaryMistake:'The majority of budget was allocated to a low-ROAS TV/broad-awareness strategy while the highest-performing channel (Search) was underfunded.',
+  clues:[
+    {title:'Channel ROAS Report', body:'Search delivered a 9.4x return on ad spend while consuming only 10% of the budget; TV\'s attributed ROAS could not be reliably measured but Facebook returned just 1.1x.', insight:'A massive ROAS gap between channels, especially with the best performer starved of budget, is a clear sign of budget misallocation.'},
+    {title:'Sales Attribution Breakdown', body:'78% of total sales are attributed to Search traffic, despite Search receiving only 10% of total budget.', insight:'When a small budget allocation drives the majority of results, that channel is under-invested relative to its actual performance.'},
+    {title:'Post-Purchase Survey', body:'When asked "how did you hear about us," most buyers cited actively searching for the product, not recalling the TV spot.', insight:'Direct customer testimony confirming high-intent discovery over broad awareness supports reallocating budget toward intent-based channels.'}
+  ],
+  correctExplanation:'The campaign poured the majority of its budget into a low-return TV/awareness strategy, while Search — which delivered the highest ROAS by a wide margin — was starved of funding, leaving significant revenue on the table.',
+  improvements:['Reallocate a larger share of budget toward high-intent Search, informed by ROAS data.','Set up mid-flight budget reallocation checkpoints during future launches.','Use TV/awareness primarily to support brand recall, not as the primary conversion driver.'],
+  options:[
+    'The product itself was not appealing to pet owners',
+    'Budget was misallocated toward a low-return channel while the highest-performing channel was underfunded',
+    'The Facebook creative had a rendering bug',
+    'The 30-day launch window was too short to gather data',
+    'Search keywords were too broad and untargeted'
+  ], correctIndex:1,
+  lesson:'Total reach and total budget size mean little without channel-level ROAS visibility. Always be ready to shift budget mid-campaign toward what is actually converting.',
+  kpiNote:'A 9.4x ROAS on Search versus 1.1x on Facebook, with Search receiving only 10% of budget, is a textbook misallocation signature.',
+  bestPractice:'Build in mid-flight budget review checkpoints so spend can shift toward proven high-ROAS channels before the campaign ends.'
+},
+{
+  id:'c9', category:'Brand Confusion', company:'Verve Energy Drinks', industry:'Beverage',
+  objective:'Build awareness for new flavor line', audience:'Young adults 18-30',
+  channels:['TikTok Ads','Influencer Partnerships'], budget:'$45,000', reach:'5,600,000', ctr:'1.6%',
+  engagement:'High: 210,000 interactions', conversionRate:'0.5%', leads:'N/A', sales:'410 units (in-store redemption codes)',
+  comments:["I thought this was a new brand, not Verve, the logo looked totally different.","The influencer never actually said the brand name clearly in the video.","Cool video but I have no idea what to ask for at the store."],
+  socialPerformance:'Extremely high views and shares, but branded search volume for "Verve" barely moved during the campaign.',
+  competitorObservation:'Competitor flavor launches keep consistent brand logo placement and repeat the brand name verbally at least twice per influencer video.',
+  primaryMistake:'Influencer content and creative used an inconsistent, redesigned visual identity that failed to connect back to the parent brand, confusing viewers about who was behind the product.',
+  clues:[
+    {title:'Creative Brand Consistency Audit', body:'The new flavor line used a completely redesigned logo and color scheme with no visual link to Verve\'s existing brand identity.', insight:'A drastic, unexplained visual departure from established brand identity can prevent audiences from connecting new content to the parent brand.'},
+    {title:'Branded Search Volume', body:'Despite 5.6 million reach and high engagement, searches for "Verve" increased by less than 2% during the campaign period.', insight:'High content engagement without a corresponding lift in brand search suggests viewers engaged with the content but did not register or retain the brand behind it.'},
+    {title:'Influencer Script Review', body:'Across sampled influencer videos, the brand name was mentioned on average only once, often buried in fast speech near the end.', insight:'Minimal, buried brand mentions in high-engagement content make it easy for viewers to enjoy the video without ever registering the brand.'}
+  ],
+  correctExplanation:'A redesigned visual identity with minimal, buried brand mentions meant that even highly engaged viewers could not connect the exciting content back to Verve, so awareness and purchase intent for the actual brand never materialized.',
+  improvements:['Maintain consistent brand identity elements across all new product line creative.','Require influencers to state the brand name clearly at least twice, including in captions.','Track branded search lift as a required KPI for future awareness campaigns.'],
+  options:[
+    'The influencers had low follower counts and little reach',
+    'TikTok was the wrong platform for this audience',
+    'Inconsistent branding and minimal brand mentions left viewers unable to connect content to the company',
+    'The new flavor received negative taste reviews',
+    'The redemption code system was too complicated to use'
+  ], correctIndex:2,
+  lesson:'High reach and engagement are vanity metrics if audiences cannot identify or recall the brand behind the content. Brand consistency and clear naming are essential, especially in fast-moving short-form video.',
+  kpiNote:'A near-flat branded search lift despite 5.6M reach and strong engagement reveals a brand attribution failure, not a reach or interest problem.',
+  bestPractice:'Track branded search volume alongside engagement metrics to confirm awareness campaigns are actually building recall of the correct brand.'
+},
+{
+  id:'c10', category:'Email Failure', company:'Meridian Travel Co.', industry:'Travel & Tourism',
+  objective:'Sell last-minute holiday travel packages', audience:'Existing customer email list, 140,000 subscribers',
+  channels:['Email Marketing'], budget:'$4,000', reach:'140,000 sent', ctr:'0.4%',
+  engagement:'Low opens', conversionRate:'0.1%', leads:'560 clicks', sales:'14',
+  comments:["This went straight to my spam folder, I only found it by accident.","I get so many emails from them every single day, I just stopped opening any.","The subject line looked like clickbait so I ignored it."],
+  socialPerformance:'N/A — email campaign',
+  competitorObservation:'Competitor travel brands send at most 2-3 emails per week and maintain inbox placement rates above 95%.',
+  primaryMistake:'Severe list fatigue from excessive email frequency combined with declining sender reputation caused most emails to land in spam or be ignored.',
+  clues:[
+    {title:'Send Frequency Log', body:'This customer list received an average of 1.4 emails per day over the prior two months, far above typical engagement thresholds.', insight:'Extremely high send frequency is one of the leading causes of both list fatigue and declining sender reputation with mailbox providers.'},
+    {title:'Deliverability Report', body:'Inbox placement rate has fallen to 61% over the past month, with a growing share landing in spam folders.', insight:'A declining inbox placement rate, especially trending downward over time, indicates a sender reputation problem tied to prior sending behavior.'},
+    {title:'Open Rate Trend', body:'Open rates have steadily declined from 28% six months ago to 6% today, a gradual downward trend rather than a single bad email.', insight:'A slow, steady decline (rather than a single-campaign anomaly) points to cumulative list fatigue rather than one bad send.'}
+  ],
+  correctExplanation:'Months of excessive email frequency caused both list fatigue and a declining sender reputation, pushing an increasing share of emails into spam folders and driving opens down to a fraction of their former level — this single campaign was a symptom of a much longer pattern.',
+  improvements:['Reduce sending frequency and implement list segmentation based on engagement.','Run a sender reputation recovery plan with email service provider support.','Suppress or re-engage inactive subscribers rather than continuing to email them daily.'],
+  options:[
+    'The subject line contained a typo that confused readers',
+    'The travel packages were priced too high for the audience',
+    'Excessive send frequency caused list fatigue and declining deliverability over time',
+    'The email was sent at the wrong time of day',
+    'The email list was purchased from a third party'
+  ], correctIndex:2,
+  lesson:'Email performance problems are often cumulative, not isolated to one send. A sudden-looking failure may actually be the result of months of overuse eroding trust with both subscribers and mailbox providers.',
+  kpiNote:'A steady six-month open rate decline from 28% to 6%, paired with falling inbox placement, points to systemic list fatigue rather than a one-off content issue.',
+  bestPractice:'Monitor send frequency and inbox placement rate continuously, and proactively segment or suppress disengaged subscribers before reputation damage compounds.'
+},
+{
+  id:'c11', category:'Retention Problems', company:'Nourish Meal Kits', industry:'Subscription Meal Delivery',
+  objective:'Reduce subscriber churn after month one', audience:'Busy professionals and families',
+  channels:['Onboarding Email','SMS'], budget:'$12,000 (retention-focused)', reach:'6,200 new subscribers/month',
+  ctr:'N/A', engagement:'N/A', conversionRate:'N/A', leads:'N/A', sales:'Month-2 retention rate: 34% (industry avg ~58%)',
+  comments:["The recipes in week 3 were nearly identical to week 1, got boring fast.","I never got a reminder before my card was charged again, felt sneaky.","No one ever asked me what I actually liked eating."],
+  socialPerformance:'N/A — retention-focused metric set',
+  competitorObservation:'Competitor meal kits send a preference survey in week one and rotate at least 70% new recipes weekly.',
+  primaryMistake:'Lack of recipe personalization and menu repetition caused early boredom, compounded by unclear billing communication that eroded trust.',
+  clues:[
+    {title:'Recipe Rotation Analysis', body:'Analysis shows 60% of recipes sent in week 3 overlapped significantly with week 1, far above the 15% overlap competitors allow.', insight:'High menu repetition this early in the subscription lifecycle is a direct driver of perceived lack of value and boredom-driven churn.'},
+    {title:'Churn Exit Survey', body:'The top two reasons cited for cancelling were "same meals every week" and "surprised by a charge I didn\'t expect."', insight:'When customers explicitly name both a content issue and a trust/billing issue, both should be treated as compounding causes.'},
+    {title:'Onboarding Flow Audit', body:'New subscribers are never asked about dietary preferences or dislikes during signup, and no billing reminder is sent before renewal charges.', insight:'Missing personalization intake and missing renewal transparency are structural onboarding gaps that directly explain the survey feedback.'}
+  ],
+  correctExplanation:'New subscribers never had their preferences captured, leading to repetitive, poorly personalized menus, while a lack of renewal reminders created a feeling of being charged without warning — together these structural onboarding gaps drove churn well below industry norms.',
+  improvements:['Add a preference and allergy survey during signup to personalize menus from day one.','Send a billing reminder 48 hours before every renewal charge.','Guarantee low recipe overlap within the first 4-6 weeks.'],
+  options:[
+    'The meal kit prices increased without notice',
+    'Delivery delays caused spoiled ingredients',
+    'Lack of menu personalization and unclear billing communication drove early churn',
+    'A competitor launched an aggressive discount campaign',
+    'The mobile app had login issues for existing subscribers'
+  ], correctIndex:2,
+  lesson:'Retention problems often trace back to onboarding gaps, not just ongoing product quality. Capturing preferences early and communicating billing clearly are foundational trust-builders.',
+  kpiNote:'A month-2 retention rate of 34% against a 58% industry average, paired with explicit exit-survey feedback, points to structural onboarding failures rather than random churn.',
+  bestPractice:'Treat the first 30 days as a critical trust-building window: personalize early, and always communicate billing changes proactively.'
+},
+{
+  id:'c12', category:'Seasonal Mistiming', company:'Frostline Outerwear', industry:'Apparel',
+  objective:'Sell winter coat inventory', audience:'Cold-climate shoppers nationwide',
+  channels:['Facebook Ads','Email'], budget:'$22,000', reach:'1,100,000', ctr:'1.1%',
+  engagement:'Moderate', conversionRate:'0.6%', leads:'N/A', sales:'240 units, mostly in clearance-priced sizes only',
+  comments:["Cute coats but it's already March, I don't need this until next winter.","Feels a little late, I already bought a coat back in November.","Why am I seeing winter coat ads right before spring?"],
+  socialPerformance:'CTR reasonable but conversion far below the brand\'s typical November-December performance of 2.4%.',
+  competitorObservation:'Competitor outerwear brands finish their major push by early January and shift to spring lines by February.',
+  primaryMistake:'The campaign launched in early March, well past peak winter purchase intent, so demand had already collapsed before the ads even ran.',
+  clues:[
+    {title:'Seasonal Search Trend Data', body:'Search interest for "winter coats" typically peaks in November and declines over 70% by March.', insight:'Launching a seasonal campaign well after the historical demand peak all but guarantees weak performance regardless of creative or targeting quality.'},
+    {title:'Sales Timing Breakdown', body:'The vast majority of units sold were heavily discounted clearance sizes, suggesting price-driven bargain hunters rather than genuine seasonal need.', insight:'Sales concentrated in clearance items rather than full-price inventory indicates the audience was buying out of discount appeal, not seasonal necessity.'},
+    {title:'Internal Campaign Calendar', body:'The campaign was originally scheduled for November but was delayed ten weeks due to internal creative approval bottlenecks.', insight:'A documented internal delay lines up precisely with the mistimed launch, confirming a scheduling/process failure rather than a market or creative flaw.'}
+  ],
+  correctExplanation:'An internal approval delay pushed the campaign\'s launch from November to March, ten weeks past peak winter coat demand, so most of the audience had already purchased coats elsewhere and only bargain hunters responded to clearance pricing.',
+  improvements:['Build campaign approval buffers into the seasonal calendar, especially for time-sensitive categories.','Shift unsold winter inventory to a "next season" pre-order campaign instead of a same-season push.','Set hard internal deadlines tied to seasonal demand curves, not just creative readiness.'],
+  options:[
+    'The coats were priced too high for the target market',
+    'The campaign launched ten weeks late, well past peak seasonal demand',
+    'The ad creative failed to showcase the product clearly',
+    'The audience targeting excluded cold-climate regions',
+    'Facebook\'s algorithm deprioritized the ad set'
+  ], correctIndex:1,
+  lesson:'Timing can override almost every other marketing variable for seasonal products. A great campaign launched at the wrong time will still underperform.',
+  kpiNote:'Conversion far below the brand\'s typical November-December rate, combined with sales concentrated only in clearance sizes, confirms a demand-timing mismatch rather than a creative or targeting flaw.',
+  bestPractice:'Map campaign launch dates against historical seasonal demand curves, and build approval-process buffers to protect critical launch windows.'
+},
+{
+  id:'c13', category:'Social Media Failure', company:'Vantage Bikes', industry:'Cycling & Outdoor Gear',
+  objective:'Grow social following and drive pre-orders for new e-bike', audience:'Outdoor enthusiasts, commuters 25-45',
+  channels:['Instagram','Twitter/X'], budget:'$14,000', reach:'900,000 impressions', ctr:'N/A',
+  engagement:'Extremely negative sentiment spike', conversionRate:'N/A', leads:'N/A', sales:'Pre-orders paused after 48 hours',
+  comments:["Replying to every single comment with the same copy-pasted response feels so fake.","They ignored a legitimate safety question about the brakes for three days.","Customer service bot responses everywhere, zero real human engagement."],
+  socialPerformance:'Negative sentiment mentions rose from a baseline of 3% to 41% within 72 hours of launch.',
+  competitorObservation:'Competitor e-bike brands respond to safety-related questions within 2 hours with a named team member, not automated replies.',
+  primaryMistake:'An unmoderated, over-automated social response strategy failed to address a legitimate safety concern quickly, triggering a public trust crisis.',
+  clues:[
+    {title:'Sentiment Timeline', body:'Negative sentiment mentions spiked from 3% to 41% within 72 hours, correlating precisely with an unanswered public safety question about brake reliability.', insight:'A sharp, dated sentiment spike tied to a specific unresolved public complaint usually identifies the triggering event directly.'},
+    {title:'Response Time Audit', body:'The average response time to comments was under 5 minutes using templated auto-replies, but the flagged safety question went unanswered by a real person for 3 days.', insight:'Fast automated responses to easy comments combined with silence on a hard question suggests a broken escalation process, not a lack of effort overall.'},
+    {title:'Comment Screenshot Evidence', body:'Screenshots circulating online show the identical templated reply posted under dozens of different, unrelated comments, including the safety question.', insight:'Visible evidence of copy-pasted responses to serious concerns damages perceived authenticity and can accelerate a trust crisis once shared publicly.'}
+  ],
+  correctExplanation:'A legitimate public safety question about the brakes went unanswered for three days while unrelated comments received instant templated replies, and screenshots of the mismatch went viral, triggering a rapid, public trust crisis that forced a pre-order pause.',
+  improvements:['Build an escalation path so safety or trust-related questions are flagged for immediate human response.','Avoid identical templated replies on visibly different comment types.','Prepare a crisis communication plan for rapid, transparent public responses.'],
+  options:[
+    'The e-bike itself had a confirmed mechanical defect',
+    'The ad budget was too small to reach enough people',
+    'An unanswered safety question combined with visible templated replies triggered a public trust crisis',
+    'The pre-order page had a payment processing error',
+    'Competitors ran a coordinated negative campaign'
+  ], correctIndex:2,
+  lesson:'Social media crises often stem from process failures — like broken escalation paths — rather than the product itself. Speed and authenticity of response matter enormously once a concern goes public.',
+  kpiNote:'A sentiment jump from 3% to 41% within 72 hours, tied to a specific unresolved complaint, is a crisis signature distinct from ordinary negative feedback.',
+  bestPractice:'Maintain a clear escalation process so safety- or trust-related questions bypass automated responses and reach a real person quickly.'
+},
+{
+  id:'c14', category:'Conversion Optimization Issues', company:'Lantern Learning', industry:'Online Education',
+  objective:'Convert free webinar attendees into paid course buyers', audience:'Career-changers and upskillers, 24-40',
+  channels:['Webinar Funnel','Retargeting Ads'], budget:'$20,000', reach:'12,000 webinar registrants', ctr:'N/A',
+  engagement:'8,400 attended live', conversionRate:'1.3%', leads:'N/A', sales:'109',
+  comments:["I wanted to buy right after the webinar but the checkout page asked me to create an account first with 9 fields.","By the time I found the 'buy' button again the offer had expired.","Too many steps between deciding to buy and actually paying."],
+  socialPerformance:'N/A — webinar funnel',
+  competitorObservation:'Competitor course funnels offer one-click checkout immediately after the webinar with pre-filled registrant information.',
+  primaryMistake:'A high-friction, multi-step checkout process caused motivated buyers to abandon before completing payment during their peak moment of interest.',
+  clues:[
+    {title:'Checkout Funnel Analytics', body:'Of attendees who clicked "Enroll Now" immediately after the webinar, 81% dropped off during a 9-field account creation step before reaching payment.', insight:'A steep drop-off concentrated at a specific step, especially one requiring extensive account setup, points to friction at that exact stage.'},
+    {title:'Time-to-Purchase Analysis', body:'Buyers who purchased did so within 20 minutes of the webinar ending on average; interest and urgency decay rapidly after that window.', insight:'A narrow high-intent window means any added friction during that time disproportionately reduces conversions compared to the same friction later.'},
+    {title:'Pre-fill Data Availability', body:'The registration system already captured attendees\' name and email, but the checkout flow required them to re-enter this information manually.', insight:'Requiring re-entry of already-known information is unnecessary friction that a pre-filled checkout could eliminate entirely.'}
+  ],
+  correctExplanation:'Motivated buyers hit a high-friction, 9-field account creation step right when their interest was at its peak, and because that urgency decays within about 20 minutes, most abandoned before ever reaching payment — despite the system already having their registration details available to pre-fill.',
+  improvements:['Pre-fill checkout fields using existing webinar registration data.','Reduce checkout to a single page with minimal required fields.','Trigger a time-limited but honest urgency offer immediately at webinar close, before interest decays.'],
+  options:[
+    'The webinar content itself failed to demonstrate value',
+    'A high-friction, multi-step checkout process caused buyers to abandon during peak interest',
+    'The retargeting ads used the wrong creative',
+    'The course price was significantly higher than competitors',
+    'The webinar was scheduled at an inconvenient time'
+  ], correctIndex:1,
+  lesson:'Purchase intent has a short half-life. Every unnecessary step added to a checkout flow during a high-intent moment compounds abandonment risk.',
+  kpiNote:'An 81% drop-off concentrated at account creation, combined with a narrow 20-minute purchase window, isolates checkout friction as the cause rather than content or pricing.',
+  bestPractice:'Pre-fill known customer information and minimize checkout steps, especially immediately following high-intent moments like live webinars.'
+},
+{
+  id:'c15', category:'Trust/Credibility Issues', company:'Nova Financial Advisors', industry:'Financial Services',
+  objective:'Generate consultation bookings for financial planning services', audience:'Adults 35-60 planning for retirement',
+  channels:['Google Search Ads','Landing Page'], budget:'$28,000', reach:'180,000', ctr:'3.2%',
+  engagement:'N/A', conversionRate:'0.7%', leads:'130', sales:'22 booked consultations',
+  comments:["The website had no information about who these advisors actually are, no photos, no credentials.","Couldn't find any reviews or certifications listed anywhere on the site.","Felt like I was about to hand my retirement savings to a stranger with no track record shown."],
+  socialPerformance:'N/A',
+  competitorObservation:'Competitor financial advisory sites prominently display advisor photos, certifications (like CFP), and client testimonials above the fold.',
+  primaryMistake:'The landing page lacked any visible trust signals — no advisor credentials, photos, or testimonials — which is especially damaging for a high-stakes financial decision.',
+  clues:[
+    {title:'Landing Page Content Audit', body:'The page contains no advisor names, photos, professional certifications, or client testimonials anywhere in the visible content.', insight:'For high-stakes decisions like financial planning, the complete absence of credibility markers is a major barrier to conversion regardless of traffic quality.'},
+    {title:'Session Recording Review', body:'Recordings show a common pattern: visitors scroll the entire page looking for "About" or credential information, find none, and leave within 40 seconds.', insight:'A visible, repeated search-and-leave pattern for missing information directly identifies what visitors needed but could not find.'},
+    {title:'Industry Conversion Benchmark', body:'Financial services landing pages with visible certifications and testimonials convert at 2-4x the rate of those without, according to industry research.', insight:'A well-established category benchmark tied directly to trust signals supports that their absence is a primary driver of underperformance.'}
+  ],
+  correctExplanation:'Despite strong ad performance driving relevant traffic, the landing page had no visible advisor credentials, photos, or testimonials — critical trust signals for a high-stakes financial decision — so visitors repeatedly left within seconds of failing to find them.',
+  improvements:['Add advisor photos, names, and professional certifications prominently above the fold.','Feature client testimonials and third-party reviews.','Include trust badges such as regulatory registrations where applicable.'],
+  options:[
+    'The Google Ads targeting reached people outside the target age range',
+    'The consultation booking calendar had technical errors',
+    'The landing page lacked visible credentials and trust signals needed for a high-stakes decision',
+    'The ad copy overpromised unrealistic investment returns',
+    'The budget was insufficient to generate enough traffic'
+  ], correctIndex:2,
+  lesson:'For high-stakes or high-trust purchase categories like finance, healthcare, or legal services, visible credibility signals are not optional polish — they are often the primary conversion driver.',
+  kpiNote:'A strong 3.2% CTR paired with a weak 0.7% conversion rate isolates the landing page experience, not ad targeting, especially given the consistent session-recording pattern of visitors searching for missing trust content.',
+  bestPractice:'For considered, high-trust purchases, feature credentials, testimonials, and real people prominently — trust signals often outperform design polish alone.'
+},
+{
+  id:'c16', category:'Ad Fatigue', company:'Bloom & Bark Candles', industry:'Home Fragrance E-commerce',
+  objective:'Sustain sales momentum from a viral product launch', audience:'Retargeting: past website visitors and past purchasers',
+  channels:['Facebook Ads','Instagram Ads'], budget:'$16,000', reach:'310,000 (same core audience, repeated)', ctr:'0.35% (down from 3.8% at launch)',
+  engagement:'Declining week over week', conversionRate:'0.4% (down from 4.1%)', leads:'N/A', sales:'68 (down from 890 in launch month)',
+  comments:["I've seen this exact same candle ad probably 40 times now, I'm so tired of it.","Feels like they never made a new ad after the first one.","I already bought one, why do I keep seeing the same ad for the same product?"],
+  socialPerformance:'Frequency metric has climbed to 14.2 average views per person, far above the 3-5 range considered healthy.',
+  competitorObservation:'Competitor DTC brands refresh creative every 2-3 weeks and cap frequency using automated rules.',
+  primaryMistake:'The same original creative was run for four months without refresh to the same narrow retargeting audience, causing severe ad fatigue and a performance collapse.',
+  clues:[
+    {title:'Frequency Metric History', body:'Ad frequency (average times each person saw the ad) climbed steadily from 2.1 at launch to 14.2 four months later, with no creative changes in between.', insight:'A frequency far above the healthy 3-5 range, especially without creative refresh, is a direct, well-documented cause of ad fatigue and CTR decline.'},
+    {title:'Creative Version History', body:'Campaign records show only one creative version has ever been uploaded to this ad set since it launched four months ago.', insight:'The complete absence of creative refresh over a long flight duration, combined with rising frequency, strongly implicates fatigue as the driver.'},
+    {title:'Performance Decline Curve', body:'CTR and conversion rate declined in a smooth, gradual curve over months rather than dropping suddenly, tracking closely with the rising frequency metric.', insight:'A gradual decline that mirrors a rising frequency curve (rather than a sudden cliff) is the classic signature of fatigue rather than a one-time event or external shock.'}
+  ],
+  correctExplanation:'The same creative ran unchanged to the same narrow retargeting audience for four months, pushing average frequency to 14.2 views per person — well beyond healthy levels — and the resulting ad fatigue caused a smooth, months-long decline in CTR and conversions that closely tracked the rising frequency.',
+  improvements:['Refresh creative every 2-3 weeks, especially for narrow retargeting audiences.','Set automated frequency caps to pause or rotate ads once thresholds are exceeded.','Expand or rotate audience segments to reduce repeated exposure to the same users.'],
+  options:[
+    'A competitor launched a similar candle product at a lower price',
+    'The same creative was shown too often to the same audience, causing ad fatigue',
+    'The retargeting audience was defined too broadly',
+    'Facebook changed its ad auction algorithm that month',
+    'The product went out of stock intermittently'
+  ], correctIndex:1,
+  lesson:'Even a great creative has a shelf life, especially with narrow, repeatedly-targeted audiences. Monitor frequency as a leading indicator and refresh creative proactively before fatigue sets in.',
+  kpiNote:'A frequency climb from 2.1 to 14.2 alongside a smooth, months-long CTR and conversion decline is the defining pattern of ad fatigue rather than an external market shock.',
+  bestPractice:'Set frequency caps and a fixed creative refresh cadence for any always-on retargeting campaign.'
+}
+];
+
+/* ============================================================
+   STATE MANAGEMENT
+============================================================ */
+const STORAGE_KEY = 'mdp_state_v1';
+let state = loadState();
+let currentCase = null;
+let currentCaseNum = 1;
+let boardStartTime = null;
+let importantEvidence = new Set();
+let selectedVerdictIndex = null;
+let usedCaseIds = [];
+
+function defaultState(){
+  return {
+    theme:'orange', xp:0, casesSolved:0, correctAnswers:0, streak:0, bestStreak:0,
+    fastSolves:0, achievements:[], history:[], lastCaseId:null
+  };
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultState(), parsed);
+  }catch(e){ return defaultState(); }
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ /* ignore quota errors */ }
+}
+function currentRank(){
+  let r = RANKS[0];
+  for(const rank of RANKS){ if(state.xp >= rank.minXP) r = rank; }
+  return r;
+}
+function nextRank(){
+  const idx = RANKS.findIndex(r=>r.name===currentRank().name);
+  return RANKS[idx+1] || null;
+}
+
+/* ============================================================
+   UTILITIES
+============================================================ */
+function $(sel, root){ return (root||document).querySelector(sel); }
+function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+function showScreen(id){
+  $all('.screen').forEach(s=>s.classList.remove('active'));
+  $('#'+id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function escapeHtml(str){
+  const d = document.createElement('div'); d.textContent = str; return d.innerHTML;
+}
+
+function pickNewCase(){
+  let pool = CASES.filter(c=>c.id !== state.lastCaseId);
+  if(pool.length===0) pool = CASES;
+  const c = pool[Math.floor(Math.random()*pool.length)];
+  state.lastCaseId = c.id;
+  saveState();
+  return c;
+}
+
+/* ============================================================
+   RENDER: THEME SCREEN
+============================================================ */
+function renderThemeGrid(){
+  const grid = $('#theme-grid');
+  grid.innerHTML = '';
+  THEMES.forEach(t=>{
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'theme-card' + (state.theme===t.id ? ' selected':'');
+    card.setAttribute('role','radio');
+    card.setAttribute('aria-checked', state.theme===t.id ? 'true':'false');
+    card.style.setProperty('--tc-a', t.a);
+    card.style.setProperty('--tc-b', t.b);
+    card.style.setProperty('--tc-bg', t.bg);
+    card.style.setProperty('--tc-paper', t.paper);
+    card.innerHTML = `
+      <div class="swatch"><div class="chip"></div></div>
+      <div class="meta"><h3>${t.name}</h3><span>${t.desc}</span></div>
+    `;
+    card.addEventListener('click', ()=>{
+      state.theme = t.id; saveState();
+      document.body.setAttribute('data-theme', t.id);
+      renderThemeGrid();
+    });
+    grid.appendChild(card);
+  });
+}
+
+/* ============================================================
+   RENDER: BRIEFING
+============================================================ */
+const BRIEF_TEXT = "You have been recruited by the Marketing Investigation Bureau.\n\nCampaigns are failing across the country and no one can explain why. Reach looks fine. Budgets are spent. But sales aren't coming in.\n\nYour job: read the evidence, ignore the noise, and find the real root cause. Every case has a truth hiding behind the metrics.\n\nAre you ready, Detective?";
+
+function typewriter(el, text, speed){
+  el.innerHTML = '';
+  let i = 0;
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  cursor.textContent = '\u00A0';
+  function step(){
+    if(i <= text.length){
+      el.textContent = text.slice(0,i);
+      el.appendChild(cursor);
+      i++;
+      setTimeout(step, speed);
+    }
+  }
+  step();
+}
+
+function renderBriefing(){
+  $('#brief-rank').textContent = currentRank().name;
+  $('#brief-cases').textContent = state.casesSolved;
+  $('#brief-xp').textContent = state.xp;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){
+    $('#type-line').textContent = BRIEF_TEXT;
+  } else {
+    typewriter($('#type-line'), BRIEF_TEXT, 14);
+  }
+}
+
+/* ============================================================
+   RENDER: CASE ASSIGNMENT
+============================================================ */
+function renderAssignment(){
+  const c = currentCase;
+  $('#assign-company').textContent = c.company;
+  $('#assign-industry').textContent = c.industry + ' · Category under investigation';
+  $('#assign-objective').textContent = '"' + c.objective + '" — Target audience: ' + c.audience;
+  const grid = $('#assign-grid');
+  const fields = [
+    ['Channels', c.channels.join(', ')],
+    ['Budget', c.budget],
+    ['Reach', c.reach],
+    ['CTR', c.ctr],
+    ['Conversion Rate', c.conversionRate],
+    ['Sales', c.sales]
+  ];
+  grid.innerHTML = fields.map(([label,val])=>`
+    <div class="field"><label>${escapeHtml(label)}</label><span>${escapeHtml(String(val))}</span></div>
+  `).join('');
+}
+
+/* ============================================================
+   RENDER: INVESTIGATION BOARD
+============================================================ */
+function buildEvidenceCards(c){
+  const cards = [];
+  cards.push({type:'Campaign Summary', title:c.company+' Overview', body:`Objective: ${c.objective}. Ran on ${c.channels.join(', ')} targeting ${c.audience}.`, insight:'This is the baseline campaign setup — compare every other clue against this intended strategy.'});
+  c.clues.forEach((cl,idx)=>{ cards.push({type:'Clue #'+(idx+1), title:cl.title, body:cl.body, insight:cl.insight}); });
+  cards.push({type:'Social/Market Signal', title:'Performance Signal', body:c.socialPerformance, insight:'Compare this signal against the account or industry baseline mentioned to spot the anomaly.'});
+  cards.push({type:'Competitor Intel', title:'Competitor Observation', body:c.competitorObservation, insight:'Competitors facing similar conditions offer a useful benchmark for what "normal" looks like.'});
+  return cards;
+}
+
+function renderBoard(){
+  const c = currentCase;
+  boardStartTime = Date.now();
+  importantEvidence = new Set();
+  $('#board-case-num').textContent = currentCaseNum;
+  $('#board-case-name').textContent = c.company + ' · ' + c.category;
+  updateHud();
+
+  const cardsData = buildEvidenceCards(c);
+  const grid = $('#evidence-grid');
+  grid.innerHTML = '';
+  cardsData.forEach((card, i)=>{
+    const el = document.createElement('div');
+    el.className = 'evidence-card';
+    el.style.setProperty('--rot', (Math.random()*6-3).toFixed(1)+'deg');
+    el.setAttribute('draggable','true');
+    el.setAttribute('tabindex','0');
+    el.setAttribute('role','button');
+    el.setAttribute('aria-label', card.type+': '+card.title+'. Press Enter to examine.');
+    el.dataset.index = i;
+    el.innerHTML = `
+      <div class="pin" aria-hidden="true"></div>
+      <div class="etype"><span>${escapeHtml(card.type)}</span></div>
+      <h4>${escapeHtml(card.title)}</h4>
+      <p>${escapeHtml(card.body.slice(0,90))}${card.body.length>90?'…':''}</p>
+      <div class="card-actions">
+        <button class="mini-btn examine-btn" type="button">Examine</button>
+        <button class="mini-btn pin-btn" type="button">Pin Important</button>
+      </div>
+    `;
+    el.querySelector('.examine-btn').addEventListener('click', (e)=>{ e.stopPropagation(); openClueModal(card); });
+    el.querySelector('.pin-btn').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if(importantEvidence.has(i)){ importantEvidence.delete(i); el.classList.remove('important'); e.target.classList.remove('on'); }
+      else{ importantEvidence.add(i); el.classList.add('important'); e.target.classList.add('on'); }
+    });
+    el.addEventListener('click', ()=>openClueModal(card));
+    el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openClueModal(card); } });
+    // drag & drop
+    el.addEventListener('dragstart', (e)=>{ el.classList.add('dragging'); e.dataTransfer.setData('text/plain', String(i)); });
+    el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
+    grid.appendChild(el);
+  });
+  grid.addEventListener('dragover', (e)=>{
+    e.preventDefault();
+    const dragging = grid.querySelector('.dragging');
+    if(!dragging) return;
+    const after = getDragAfterElement(grid, e.clientX, e.clientY);
+    if(after==null) grid.appendChild(dragging); else grid.insertBefore(dragging, after);
+  });
+
+  // metrics
+  const metricList = $('#metric-list');
+  const metrics = [['Reach',c.reach],['CTR',c.ctr],['Engagement',c.engagement],['Conv. Rate',c.conversionRate],['Leads',c.leads],['Sales',c.sales]];
+  metricList.innerHTML = metrics.map(([label,val])=>`<li><b>${escapeHtml(String(val))}</b><span>${escapeHtml(label)}</span></li>`).join('');
+
+  // comments
+  $('#comment-list').innerHTML = c.comments.map(cm=>`<li>"${escapeHtml(cm)}"</li>`).join('');
+
+  // competitor
+  $('#competitor-note').textContent = c.competitorObservation;
+
+  // notebook
+  const savedNote = sessionStorage.getItem('mdp_note_'+c.id) || '';
+  $('#notebook-text').value = savedNote;
+}
+
+function getDragAfterElement(container, x, y){
+  const els = [...container.querySelectorAll('.evidence-card:not(.dragging)')];
+  return els.reduce((closest, child)=>{
+    const box = child.getBoundingClientRect();
+    const offsetY = y - box.top - box.height/2;
+    const offsetX = x - box.left - box.width/2;
+    const offset = Math.sqrt(offsetX*offsetX + offsetY*offsetY) * (offsetY<0? -1:1);
+    if(offsetY < 0 && offset > closest.offset){ return {offset, element:child}; }
+    return closest;
+  }, {offset:Number.NEGATIVE_INFINITY}).element;
+}
+
+function updateHud(){
+  $('#hud-rank').textContent = currentRank().name;
+  $('#hud-xp').textContent = state.xp;
+  $('#hud-streak').textContent = state.streak;
+}
+
+/* ============================================================
+   CLUE MODAL
+============================================================ */
+function openClueModal(card){
+  $('#clue-modal-type').textContent = card.type;
+  $('#clue-modal-title').textContent = card.title;
+  $('#clue-modal-body').textContent = card.body;
+  $('#clue-modal-insight').innerHTML = '<strong>Detective Insight:</strong> ' + escapeHtml(card.insight);
+  $('#clue-modal').classList.add('active');
+}
+function closeClueModal(){ $('#clue-modal').classList.remove('active'); }
+
+/* ============================================================
+   SOLVE PANEL
+============================================================ */
+function openSolvePanel(){
+  const c = currentCase;
+  $('#solve-title').textContent = `${c.company}: What really caused this campaign to fail?`;
+  const list = $('#solve-options');
+  list.innerHTML = '';
+  selectedVerdictIndex = null;
+  $('#btn-submit-verdict').disabled = true;
+  const letters = ['A','B','C','D','E','F'];
+  c.options.forEach((opt, idx)=>{
+    const item = document.createElement('label');
+    item.className = 'option-item';
+    item.innerHTML = `
+      <span class="letter">${letters[idx]}</span>
+      <input type="radio" name="verdict" value="${idx}" style="display:none;">
+      <span>${escapeHtml(opt)}</span>
+    `;
+    item.addEventListener('click', ()=>{
+      $all('.option-item', list).forEach(i=>i.classList.remove('selected'));
+      item.classList.add('selected');
+      selectedVerdictIndex = idx;
+      $('#btn-submit-verdict').disabled = false;
+    });
+    list.appendChild(item);
+  });
+  $('#solve-overlay').classList.add('active');
+}
+function closeSolvePanel(){ $('#solve-overlay').classList.remove('active'); }
+
+function submitVerdict(){
+  const c = currentCase;
+  const correct = selectedVerdictIndex === c.correctIndex;
+  const elapsedSec = (Date.now() - boardStartTime)/1000;
+  const fast = elapsedSec < 90;
+
+  state.casesSolved++;
+  if(correct){
+    state.correctAnswers++;
+    state.streak++;
+    state.bestStreak = Math.max(state.bestStreak, state.streak);
+  } else {
+    state.streak = 0;
+  }
+  let gained = correct ? 100 : 25;
+  if(correct && fast){ gained += 30; state.fastSolves++; }
+  if(importantEvidence.size>0 && correct){ gained += 10 * Math.min(importantEvidence.size,3); }
+  state.xp += gained;
+
+  state.history.push({
+    caseId:c.id, category:c.category, correct, xpGained:gained,
+    accuracySoFar: Math.round((state.correctAnswers/state.casesSolved)*100),
+    ts: Date.now()
+  });
+  if(state.history.length>40) state.history = state.history.slice(-40);
+
+  saveState();
+  closeSolvePanel();
+  showCaseClosed(correct, gained, fast);
+  checkAchievements();
+}
+
+/* ============================================================
+   CASE CLOSED
+============================================================ */
+function showCaseClosed(correct, gained, fast){
+  const c = currentCase;
+  $('#closed-tag').textContent = 'CASE CLOSED';
+  const box = $('#verdict-box');
+  box.className = 'verdict-box ' + (correct?'correct':'wrong');
+  $('#verdict-tag').className = 'verdict-tag ' + (correct?'correct':'wrong');
+  $('#verdict-tag').textContent = correct ? 'CORRECT VERDICT' : 'INCORRECT VERDICT';
+  $('#verdict-headline').textContent = correct
+    ? 'Nice work, Detective. You found the real cause.'
+    : 'Not quite. Here\'s what actually happened.';
+  $('#verdict-explanation').textContent = c.correctExplanation;
+  $('#verdict-evidence').innerHTML = c.clues.map(cl=>`<li>${escapeHtml(cl.title)}: ${escapeHtml(cl.insight)}</li>`).join('');
+  $('#xp-pop').textContent = `+${gained} XP${fast && correct ? ' (Speed Bonus!)':''} · Streak: ${state.streak}`;
+  showScreen('screen-closed');
+}
+
+/* ============================================================
+   LEARNING REPORT
+============================================================ */
+function renderReport(){
+  const c = currentCase;
+  $('#rep-what').textContent = `${c.company} ran a ${c.category.toLowerCase()} campaign on ${c.channels.join(', ')} targeting ${c.audience}, aiming to ${c.objective.toLowerCase()}. Results fell well short of expectations.`;
+  $('#rep-root').textContent = c.correctExplanation;
+  $('#rep-lesson').textContent = c.lesson;
+  $('#rep-kpi').textContent = c.kpiNote;
+  $('#rep-practice').textContent = c.bestPractice;
+  $('#rep-improvements').innerHTML = c.improvements.map(i=>`<li>${escapeHtml(i)}</li>`).join('');
+  showScreen('screen-report');
+}
+
+/* ============================================================
+   ACHIEVEMENTS / TOASTS
+============================================================ */
+function checkAchievements(){
+  ACHIEVEMENTS.forEach(a=>{
+    if(!state.achievements.includes(a.id) && a.check(state)){
+      state.achievements.push(a.id);
+      showToast(a);
+    }
+  });
+  saveState();
+}
+function showToast(achievement){
+  const wrap = $('#toast-wrap');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<b>${achievement.icon} Achievement Unlocked</b>${escapeHtml(achievement.name)}`;
+  wrap.appendChild(t);
+  setTimeout(()=>t.remove(), 4200);
+}
+
+/* ============================================================
+   KNOWLEDGE CENTER
+============================================================ */
+function renderGlossary(){
+  $('#glossary-list').innerHTML = GLOSSARY.map(g=>`
+    <div class="glossary-item"><h4>${escapeHtml(g.term)}</h4><p>${escapeHtml(g.def)}</p></div>
+  `).join('');
+}
+function openKnowledge(){ $('#knowledge-overlay').classList.add('active'); $('#knowledge-drawer').classList.add('active'); }
+function closeKnowledge(){ $('#knowledge-overlay').classList.remove('active'); $('#knowledge-drawer').classList.remove('active'); }
+
+/* ============================================================
+   STATS DRAWER
+============================================================ */
+function renderStats(){
+  // rank track
+  const track = $('#rank-track');
+  const curName = currentRank().name;
+  let passedCurrent = false;
+  track.innerHTML = RANKS.map(r=>{
+    let cls = 'rank-step';
+    if(r.name===curName){ cls+=' current'; passedCurrent = true; }
+    else if(!passedCurrent){ cls+=' done'; }
+    return `<div class="${cls}"><span class="dot"></span><span>${escapeHtml(r.name)} <span style="color:var(--text-lo);font-size:11px;">(${r.minXP} XP)</span></span></div>`;
+  }).join('');
+
+  // accuracy trend
+  const recent = state.history.slice(-10);
+  const accEl = $('#accuracy-chart');
+  if(recent.length===0){
+    accEl.innerHTML = '<p style="color:var(--text-lo);font-size:12px;">Solve cases to see your accuracy trend.</p>';
+  } else {
+    accEl.innerHTML = recent.map((h,i)=>`<div class="bar" style="height:${Math.max(h.accuracySoFar,4)}%;"><span>${i+1}</span></div>`).join('');
+  }
+
+  // xp growth
+  const xpEl = $('#xp-chart');
+  if(recent.length===0){
+    xpEl.innerHTML = '<p style="color:var(--text-lo);font-size:12px;">No XP history yet.</p>';
+  } else {
+    const maxXp = Math.max(...recent.map(h=>h.xpGained), 10);
+    xpEl.innerHTML = recent.map((h,i)=>`<div class="bar" style="height:${Math.max((h.xpGained/maxXp)*100,4)}%;"><span>${i+1}</span></div>`).join('');
+  }
+
+  // category performance
+  const catEl = $('#category-bars');
+  const catMap = {};
+  state.history.forEach(h=>{
+    if(!catMap[h.category]) catMap[h.category] = {total:0, correct:0};
+    catMap[h.category].total++;
+    if(h.correct) catMap[h.category].correct++;
+  });
+  const cats = Object.keys(catMap);
+  if(cats.length===0){
+    catEl.innerHTML = '<p style="color:var(--text-lo);font-size:12px;">Solve cases across categories to see performance breakdown.</p>';
+  } else {
+    catEl.innerHTML = cats.map(cat=>{
+      const pct = Math.round((catMap[cat].correct/catMap[cat].total)*100);
+      return `<div class="cat-bar-row"><span class="label">${escapeHtml(cat)}</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%;"></div></div><span>${pct}%</span></div>`;
+    }).join('');
+  }
+
+  // badges
+  const badgeGrid = $('#badge-grid');
+  badgeGrid.innerHTML = ACHIEVEMENTS.map(a=>{
+    const unlocked = state.achievements.includes(a.id);
+    return `<div class="badge-item ${unlocked?'unlocked':''}"><div class="bicon">${a.icon}</div><div class="bname">${escapeHtml(a.name)}</div></div>`;
+  }).join('');
+}
+function openStats(){ renderStats(); $('#stats-overlay').classList.add('active'); $('#stats-drawer').classList.add('active'); }
+function closeStats(){ $('#stats-overlay').classList.remove('active'); $('#stats-drawer').classList.remove('active'); }
+
+/* ============================================================
+   FLOW CONTROL
+============================================================ */
+function startNewCase(){
+  currentCase = pickNewCase();
+  currentCaseNum = state.casesSolved + 1;
+  renderAssignment();
+  showScreen('screen-assign');
+}
+
+/* ============================================================
+   EVENT WIRING
+============================================================ */
+function init(){
+  document.body.setAttribute('data-theme', state.theme);
+  renderThemeGrid();
+  renderGlossary();
+
+  $('#btn-continue-theme').addEventListener('click', ()=>{ renderBriefing(); showScreen('screen-briefing'); });
+  $('#btn-start-investigation').addEventListener('click', startNewCase);
+  $('#btn-open-board').addEventListener('click', ()=>{ renderBoard(); showScreen('screen-board'); });
+  $('#btn-open-solve').addEventListener('click', openSolvePanel);
+  $('#btn-cancel-solve').addEventListener('click', closeSolvePanel);
+  $('#btn-submit-verdict').addEventListener('click', submitVerdict);
+  $('#btn-view-report').addEventListener('click', renderReport);
+  $('#btn-next-case').addEventListener('click', startNewCase);
+  $('#btn-view-stats-report').addEventListener('click', openStats);
+
+  $('#clue-modal-close').addEventListener('click', closeClueModal);
+  $('#clue-modal').addEventListener('click', (e)=>{ if(e.target.id==='clue-modal') closeClueModal(); });
+
+  $('#btn-open-knowledge').addEventListener('click', openKnowledge);
+  $('#knowledge-close').addEventListener('click', closeKnowledge);
+  $('#knowledge-overlay').addEventListener('click', closeKnowledge);
+
+  $('#btn-open-stats').addEventListener('click', openStats);
+  $('#stats-close').addEventListener('click', closeStats);
+  $('#stats-overlay').addEventListener('click', closeStats);
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape'){ closeClueModal(); closeSolvePanel(); closeKnowledge(); closeStats(); }
+  });
+
+  // notebook autosave
+  let noteTimer = null;
+  $('#notebook-text').addEventListener('input', (e)=>{
+    if(!currentCase) return;
+    clearTimeout(noteTimer);
+    $('#notebook-save-hint').textContent = 'Saving…';
+    noteTimer = setTimeout(()=>{
+      sessionStorage.setItem('mdp_note_'+currentCase.id, e.target.value);
+      $('#notebook-save-hint').textContent = 'Notes saved for this case.';
+    }, 400);
+  });
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+</script>
+</body>
+</html>
