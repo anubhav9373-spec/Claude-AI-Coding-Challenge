@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Prompt Puzzle Academy — Master AI Prompting Through Play</title>
+<style>
+/* ============================================================
+   PROMPT PUZZLE ACADEMY — DESIGN TOKENS
+   Theme: "The Prompt Bench" — prompts are assembled like modular
+   components on a workbench rail, with glowing connector traces.
+   Display face: Space Grotesk (technical, geometric)
+   Body face:    Inter
+   Prompt/code face: JetBrains Mono (prompts are literally text
+   you write — monospace reflects that, not decoration)
+   ============================================================ */
+:root{
+  --bg-0:#0A0D14;
+  --bg-1:#10141F;
+  --panel:#151A28;
+  --panel-glass: rgba(21,26,40,0.62);
+  --border: rgba(148,163,196,0.14);
+  --border-strong: rgba(148,163,196,0.28);
+  --text-hi:#EAEDF6;
+  --text-mid:#AAB3C9;
+  --text-low:#6C7590;
+  --accent:#7C9CFF;
+  --accent-2:#5EEAD4;
+  --gold:#F4B860;
+  --rose:#FB7185;
+  --violet:#B79CFF;
+  --grad-1: linear-gradient(135deg,#7C9CFF 0%,#B79CFF 55%,#5EEAD4 100%);
+  --grad-2: linear-gradient(135deg, rgba(124,156,255,0.18), rgba(94,234,212,0.10));
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 9px;
+  --shadow-lift: 0 20px 60px -20px rgba(0,0,0,0.6);
+  --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+@font-face{
+  font-family:'Space Grotesk';
+  src: local('Space Grotesk');
+}
+*,*::before,*::after{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 700px at 85% -10%, rgba(124,156,255,0.10), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(94,234,212,0.08), transparent 55%),
+    var(--bg-0);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+@supports not (font-family: 'Space Grotesk'){
+  h1,h2,h3,.font-display{ letter-spacing:0.01em; }
+}
+::selection{ background:var(--accent); color:#050810; }
+button{ font-family:inherit; }
+a{ color:inherit; }
+.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+:focus-visible{ outline:2px solid var(--accent-2); outline-offset:3px; border-radius:6px; }
+
+/* Layout shell */
+#app{ min-height:100vh; display:flex; flex-direction:column; position:relative; }
+.screen{ display:none; flex:1; width:100%; }
+.screen.active{ display:flex; flex-direction:column; animation:screenIn .5s cubic-bezier(.2,.8,.2,1); }
+@keyframes screenIn{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001s !important; transition-duration:.001s !important; }
+}
+
+/* Top brand bar */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 28px; border-bottom:1px solid var(--border);
+  backdrop-filter: blur(10px);
+  position:sticky; top:0; z-index:40; background:rgba(10,13,20,0.7);
+}
+.brand{ display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:18px; letter-spacing:.01em; }
+.brand .mark{ width:34px; height:34px; border-radius:10px; background:var(--grad-1); display:flex; align-items:center; justify-content:center; font-size:17px; box-shadow:0 8px 20px -6px rgba(124,156,255,0.5); }
+.topbar-stats{ display:flex; gap:18px; align-items:center; font-family:var(--font-mono); font-size:13px; color:var(--text-mid); }
+.stat-chip{ display:flex; align-items:center; gap:6px; background:var(--panel); border:1px solid var(--border); padding:7px 12px; border-radius:999px; }
+.stat-chip b{ color:var(--text-hi); font-weight:700; }
+
+/* ============ ONBOARDING ============ */
+.onboard-wrap{ max-width:1100px; margin:0 auto; padding:48px 24px 80px; width:100%; }
+.onboard-hero{ text-align:center; margin-bottom:44px; }
+.eyebrow{ font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-2); display:inline-flex; align-items:center; gap:8px; margin-bottom:14px; }
+.eyebrow::before{ content:''; width:6px; height:6px; border-radius:50%; background:var(--accent-2); box-shadow:0 0 12px var(--accent-2); }
+.onboard-hero h1{ font-family:var(--font-display); font-size:clamp(32px,5vw,52px); margin:0 0 12px; line-height:1.05; background:linear-gradient(135deg,#fff,#AEB9E0 60%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.onboard-hero p{ color:var(--text-mid); font-size:16px; max-width:560px; margin:0 auto; }
+
+.step-track{ display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:36px; font-family:var(--font-mono); font-size:12px; color:var(--text-low); }
+.step-track .dot{ width:8px; height:8px; border-radius:50%; background:var(--border-strong); transition:.3s; }
+.step-track .seg{ width:36px; height:2px; background:var(--border); }
+.step-track .dot.on{ background:var(--accent-2); box-shadow:0 0 10px var(--accent-2); }
+
+.onboard-step{ display:none; }
+.onboard-step.active{ display:block; animation:screenIn .4s ease; }
+.step-title{ font-family:var(--font-display); font-size:22px; margin:0 0 6px; }
+.step-sub{ color:var(--text-mid); font-size:14px; margin:0 0 26px; }
+
+.grid-cards{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
+.pick-card{
+  background:var(--panel-glass); border:1px solid var(--border); border-radius:var(--radius-md);
+  padding:20px 16px; cursor:pointer; text-align:left; position:relative; overflow:hidden;
+  transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  display:flex; flex-direction:column; gap:10px; color:var(--text-hi);
+}
+.pick-card::after{ content:''; position:absolute; inset:0; background:var(--grad-2); opacity:0; transition:opacity .25s; }
+.pick-card:hover, .pick-card:focus-visible{ transform:translateY(-4px); border-color:var(--border-strong); box-shadow:var(--shadow-lift); }
+.pick-card:hover::after, .pick-card:focus-visible::after{ opacity:1; }
+.pick-card.selected{ border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), var(--shadow-lift); }
+.pick-card.selected::after{ opacity:1; }
+.pick-card .icon{ font-size:26px; position:relative; z-index:1; }
+.pick-card .name{ font-weight:600; font-size:14.5px; position:relative; z-index:1; }
+.pick-card .desc{ font-size:12px; color:var(--text-mid); position:relative; z-index:1; }
+
+.diff-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; }
+/* Buttons don't inherit color from the page by default in most browsers,
+   so this card (a <button>) needs its own explicit, high-contrast colors
+   rather than relying on inheritance — this is what caused the
+   low-contrast/invisible-text bug on the difficulty cards. */
+.diff-card{
+  background:var(--panel-glass); border:1px solid var(--border); border-radius:var(--radius-md);
+  padding:22px 18px; cursor:pointer; transition:.25s; position:relative;
+  color:#FFFFFF; text-align:left;
+}
+.diff-card:hover, .diff-card:focus-visible{ transform:translateY(-4px); border-color:var(--border-strong); }
+.diff-card.selected{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold), var(--shadow-lift); }
+/* Tier label — e.g. "TIER 1/5" */
+.diff-card .lvl{ font-family:var(--font-mono); font-size:11px; color:#94A3B8; }
+/* Difficulty title — always pure white for maximum contrast on the dark panel */
+.diff-card h3{ font-family:var(--font-display); margin:6px 0; font-size:19px; color:#FFFFFF; }
+/* Description — light gray, still well above WCAG AA against the dark background */
+.diff-card p{ color:#CBD5E1; font-size:12.5px; margin:0; }
+/* Explicitly re-assert text colors on hover/focus/selected so no state
+   can accidentally dim the text — only borders/glow change on these states. */
+.diff-card:hover h3, .diff-card:focus-visible h3, .diff-card.selected h3{ color:#FFFFFF; }
+.diff-card:hover p, .diff-card:focus-visible p, .diff-card.selected p{ color:#CBD5E1; }
+.diff-card:hover .lvl, .diff-card:focus-visible .lvl, .diff-card.selected .lvl{ color:#94A3B8; }
+.diff-bars{ display:flex; gap:4px; margin-top:12px; }
+.diff-bars span{ height:5px; flex:1; border-radius:3px; background:var(--border); }
+.diff-bars span.on{ background:var(--grad-1); }
+
+.onboard-actions{ display:flex; justify-content:space-between; align-items:center; margin-top:34px; }
+.btn{
+  font-family:var(--font-body); font-weight:600; font-size:14px; border:none; cursor:pointer;
+  padding:13px 26px; border-radius:12px; transition:.2s; display:inline-flex; align-items:center; gap:8px;
+}
+.btn-primary{ background:var(--grad-1); color:#06090F; box-shadow:0 12px 30px -10px rgba(124,156,255,0.55); }
+.btn-primary:hover{ transform:translateY(-2px); box-shadow:0 16px 34px -8px rgba(124,156,255,0.65); }
+.btn-primary:disabled{ opacity:.35; cursor:not-allowed; transform:none; box-shadow:none; }
+.btn-ghost{ background:transparent; color:var(--text-mid); border:1px solid var(--border); }
+.btn-ghost:hover{ color:var(--text-hi); border-color:var(--border-strong); }
+
+/* ============ GAME SCREEN ============ */
+.game-shell{ max-width:1180px; margin:0 auto; padding:26px 24px 60px; width:100%; flex:1; display:flex; flex-direction:column; }
+.game-header{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px; margin-bottom:20px; }
+.game-title{ font-family:var(--font-display); font-size:20px; margin:0; }
+.game-title .tag{ font-family:var(--font-mono); font-size:11px; color:var(--accent-2); text-transform:uppercase; letter-spacing:.08em; display:block; margin-bottom:4px; }
+.progress-track{ height:8px; background:var(--panel); border-radius:99px; overflow:hidden; border:1px solid var(--border); flex:1; min-width:180px; margin:0 18px; }
+.progress-fill{ height:100%; background:var(--grad-1); width:0%; transition:width .5s cubic-bezier(.2,.8,.2,1); border-radius:99px; }
+.hud{ display:flex; gap:10px; flex-wrap:wrap; }
+.hud .stat-chip{ font-size:12.5px; }
+
+.challenge-card{
+  background:var(--panel-glass); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:28px; backdrop-filter:blur(14px); box-shadow:var(--shadow-lift); position:relative;
+}
+.challenge-kind{ display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--gold); background:rgba(244,184,96,0.1); border:1px solid rgba(244,184,96,0.3); padding:6px 12px; border-radius:99px; margin-bottom:16px; }
+.challenge-brief h2{ font-family:var(--font-display); font-size:22px; margin:0 0 8px; }
+.challenge-brief p{ color:var(--text-mid); font-size:14.5px; line-height:1.55; margin:0 0 20px; }
+.desired-output{ background:rgba(94,234,212,0.06); border:1px solid rgba(94,234,212,0.22); border-radius:var(--radius-md); padding:14px 16px; margin-bottom:22px; font-size:13.5px; color:var(--text-hi); }
+.desired-output b{ color:var(--accent-2); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; display:block; margin-bottom:6px; }
+
+/* Build the prompt: rail + blocks */
+.bench{ display:grid; grid-template-columns:1fr; gap:22px; }
+.rail-label, .pool-label{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-low); margin-bottom:10px; display:block; }
+.rail{
+  min-height:120px; border:2px dashed var(--border-strong); border-radius:var(--radius-md); padding:14px;
+  display:flex; flex-direction:column; gap:10px; background:rgba(124,156,255,0.03);
+  transition:.2s;
+}
+.rail.dragover{ border-color:var(--accent); background:rgba(124,156,255,0.08); }
+.rail-slot{ min-height:44px; border-radius:var(--radius-sm); border:1px dashed var(--border); display:flex; align-items:center; padding:0 4px; font-family:var(--font-mono); font-size:11px; color:var(--text-low); }
+.rail-slot span.slot-tag{ padding:0 10px; white-space:nowrap; }
+.block-pool{ display:flex; flex-wrap:wrap; gap:10px; }
+.pblock{
+  font-family:var(--font-mono); font-size:12.5px; line-height:1.5; background:var(--bg-1); border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm); padding:11px 14px; cursor:grab; max-width:100%; user-select:none;
+  transition:.2s; position:relative;
+}
+.pblock:hover{ border-color:var(--accent); transform:translateY(-2px); }
+.pblock:active{ cursor:grabbing; }
+.pblock .btag{ display:inline-block; font-family:var(--font-body); font-weight:700; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--accent); margin-bottom:5px; }
+.pblock.placed{ opacity:0.35; cursor:not-allowed; }
+.pblock.wrong-flash{ animation:shake .4s; border-color:var(--rose); }
+.pblock.correct-flash{ animation:pulseGood .5s; border-color:var(--accent-2); }
+@keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+@keyframes pulseGood{ 0%{ box-shadow:0 0 0 0 rgba(94,234,212,0.5);} 100%{ box-shadow:0 0 0 14px rgba(94,234,212,0);} }
+.rail-slot.filled{ border-style:solid; border-color:var(--accent-2); background:rgba(94,234,212,0.06); flex-direction:column; align-items:flex-start; padding:10px 12px; }
+.remove-x{ margin-left:auto; background:none; border:none; color:var(--text-low); cursor:pointer; font-size:14px; padding:2px 6px; }
+.remove-x:hover{ color:var(--rose); }
+
+/* Clean the prompt */
+.cluttered-box{ font-family:var(--font-mono); font-size:13.5px; line-height:2; background:var(--bg-1); border:1px solid var(--border-strong); border-radius:var(--radius-md); padding:20px; }
+.chunk{ display:inline; padding:2px 4px; border-radius:5px; cursor:pointer; transition:.15s; }
+.chunk:hover{ background:rgba(251,113,133,0.15); }
+.chunk.removed{ text-decoration:line-through; opacity:.3; background:none; cursor:default; }
+.chunk.keep-flag{ outline:1px dashed rgba(94,234,212,0.4); }
+
+/* Choose the best */
+.choice-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+.choice-card{ background:var(--bg-1); border:1px solid var(--border-strong); border-radius:var(--radius-md); padding:18px; cursor:pointer; transition:.2s; text-align:left; }
+.choice-card:hover{ border-color:var(--accent); transform:translateY(-3px); }
+.choice-card .clabel{ font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-low); margin-bottom:8px; display:block; }
+.choice-card p{ font-family:var(--font-mono); font-size:12.5px; line-height:1.6; color:var(--text-hi); margin:0; white-space:pre-wrap; }
+.choice-card.correct{ border-color:var(--accent-2); box-shadow:0 0 0 1px var(--accent-2); }
+.choice-card.incorrect{ border-color:var(--rose); opacity:.55; }
+
+.action-row{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; flex-wrap:wrap; gap:12px; }
+.hint-box{ margin-top:18px; padding:14px 16px; background:rgba(244,184,96,0.08); border:1px solid rgba(244,184,96,0.3); border-radius:var(--radius-md); font-size:13px; color:var(--gold); display:none; }
+.hint-box.show{ display:block; animation:screenIn .3s ease; }
+
+/* feedback overlay */
+.feedback-panel{ margin-top:20px; padding:18px 20px; border-radius:var(--radius-md); display:none; }
+.feedback-panel.show{ display:block; animation:screenIn .35s ease; }
+.feedback-panel.good{ background:rgba(94,234,212,0.08); border:1px solid rgba(94,234,212,0.3); }
+.feedback-panel.bad{ background:rgba(251,113,133,0.08); border:1px solid rgba(251,113,133,0.3); }
+.feedback-panel h4{ margin:0 0 6px; font-family:var(--font-display); font-size:15px; }
+.feedback-panel p{ margin:0; font-size:13px; color:var(--text-mid); line-height:1.55; }
+.principle-pill{ display:inline-block; margin-top:10px; font-family:var(--font-mono); font-size:11px; padding:5px 11px; border-radius:99px; background:rgba(183,156,255,0.12); border:1px solid rgba(183,156,255,0.35); color:var(--violet); }
+
+/* Score popup + toasts */
+#popupLayer{ position:fixed; inset:0; pointer-events:none; z-index:200; }
+.score-pop{ position:absolute; font-family:var(--font-display); font-weight:700; font-size:22px; color:var(--accent-2); animation:popFloat 1.1s ease forwards; text-shadow:0 0 20px rgba(94,234,212,0.6); }
+@keyframes popFloat{ 0%{ opacity:0; transform:translateY(0) scale(.8);} 15%{opacity:1; transform:translateY(-10px) scale(1);} 100%{ opacity:0; transform:translateY(-70px) scale(1.1);} }
+#toastLayer{ position:fixed; top:20px; right:20px; z-index:210; display:flex; flex-direction:column; gap:10px; }
+.toast{ background:var(--panel); border:1px solid var(--border-strong); border-radius:var(--radius-md); padding:14px 18px; box-shadow:var(--shadow-lift); display:flex; gap:12px; align-items:center; min-width:240px; animation:toastIn .4s cubic-bezier(.2,.8,.2,1); }
+@keyframes toastIn{ from{ opacity:0; transform:translateX(30px);} to{opacity:1; transform:translateX(0);} }
+.toast .t-icon{ font-size:22px; }
+.toast .t-title{ font-weight:700; font-size:13px; }
+.toast .t-sub{ font-size:11.5px; color:var(--text-mid); }
+
+/* ============ REPORT ============ */
+.report-wrap{ max-width:980px; margin:0 auto; padding:50px 24px 90px; width:100%; }
+.report-hero{ text-align:center; margin-bottom:40px; }
+.rank-badge{ width:110px; height:110px; border-radius:50%; margin:0 auto 18px; display:flex; align-items:center; justify-content:center; font-size:44px; background:var(--grad-1); box-shadow:0 20px 50px -14px rgba(124,156,255,0.6); position:relative; }
+.rank-badge::after{ content:''; position:absolute; inset:-8px; border-radius:50%; border:1px dashed var(--border-strong); animation:spin 20s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg);} }
+.report-score{ font-family:var(--font-display); font-size:56px; margin:8px 0 0; }
+.report-rating{ font-size:15px; color:var(--accent-2); font-family:var(--font-mono); }
+
+.report-grid{ display:grid; grid-template-columns:1.1fr 1fr; gap:22px; margin-bottom:22px; }
+@media (max-width:800px){ .report-grid{ grid-template-columns:1fr; } }
+.panel{ background:var(--panel-glass); border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; }
+.panel h3{ font-family:var(--font-display); font-size:16px; margin:0 0 16px; display:flex; align-items:center; gap:8px; }
+.dna-row{ display:flex; align-items:center; gap:12px; margin-bottom:12px; font-size:12.5px; }
+.dna-row .lbl{ width:98px; color:var(--text-mid); font-family:var(--font-mono); font-size:11px; }
+.dna-bar{ flex:1; height:9px; background:var(--bg-1); border-radius:99px; overflow:hidden; border:1px solid var(--border); }
+.dna-bar i{ display:block; height:100%; background:var(--grad-1); border-radius:99px; transition:width 1s cubic-bezier(.2,.8,.2,1); }
+.dna-val{ width:34px; text-align:right; font-family:var(--font-mono); color:var(--text-hi); }
+
+.fb-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.fb-list li{ font-size:13px; color:var(--text-mid); line-height:1.5; padding-left:20px; position:relative; }
+.fb-list li::before{ position:absolute; left:0; top:0; }
+.fb-list.strength li::before{ content:'✓'; color:var(--accent-2); }
+.fb-list.weak li::before{ content:'!'; color:var(--gold); }
+
+.badges-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+.badge-chip{ display:flex; align-items:center; gap:8px; background:var(--bg-1); border:1px solid var(--border-strong); padding:9px 13px; border-radius:12px; font-size:12.5px; }
+.badge-chip.locked{ opacity:.3; }
+
+.final-prompt-box{ font-family:var(--font-mono); font-size:13px; line-height:1.7; background:var(--bg-1); border:1px solid var(--border-strong); border-radius:var(--radius-md); padding:18px; white-space:pre-wrap; }
+
+.report-actions{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:30px; }
+
+/* misc */
+.muted-link{ background:none; border:none; color:var(--text-low); font-size:12.5px; cursor:pointer; text-decoration:underline; }
+.muted-link:hover{ color:var(--text-hi); }
+@media (max-width:640px){
+  .topbar{ padding:14px 16px; }
+  .topbar-stats{ display:none; }
+  .challenge-card{ padding:20px; }
+  .game-header{ flex-direction:column; align-items:stretch; }
+  .progress-track{ margin:0; order:3; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- persistent top bar -->
+  <header class="topbar" id="topbar" style="display:none;">
+    <div class="brand"><span class="mark">🧩</span> Prompt Puzzle Academy</div>
+    <div class="topbar-stats" id="topbarStats">
+      <div class="stat-chip">⚡ XP <b id="hudXp">0</b></div>
+      <div class="stat-chip">🔥 Streak <b id="hudStreak">0</b></div>
+      <div class="stat-chip">🏅 Lv <b id="hudLevel">1</b></div>
+    </div>
+  </header>
+
+  <!-- ===================== ONBOARDING ===================== -->
+  <section class="screen active" id="screen-onboard">
+    <div class="onboard-wrap">
+      <div class="onboard-hero">
+        <span class="eyebrow">Prompt Engineering Gym</span>
+        <h1>Prompt Puzzle Academy</h1>
+        <p>Master AI Prompting Through Play. Two quick choices, then we build your bench.</p>
+      </div>
+
+      <div class="step-track" aria-hidden="true">
+        <div class="dot on" id="dot1"></div><div class="seg"></div>
+        <div class="dot" id="dot2"></div><div class="seg"></div>
+        <div class="dot" id="dot3"></div>
+      </div>
+
+      <!-- STEP 1: domain -->
+      <div class="onboard-step active" id="step1">
+        <h2 class="step-title">Which domain would you like to practice prompting for?</h2>
+        <p class="step-sub">Every scenario, block, and AI output below will be generated around your pick.</p>
+        <div class="grid-cards" id="domainGrid" role="list"></div>
+      </div>
+
+      <!-- STEP 2: difficulty -->
+      <div class="onboard-step" id="step2">
+        <h2 class="step-title">Choose your difficulty.</h2>
+        <p class="step-sub">Higher tiers add more scenarios, trickier distractors, and stricter scoring.</p>
+        <div class="diff-grid" id="diffGrid" role="list"></div>
+      </div>
+
+      <!-- STEP 3: confirm -->
+      <div class="onboard-step" id="step3">
+        <h2 class="step-title">Ready to start learning.</h2>
+        <p class="step-sub" id="confirmSummary"></p>
+        <div style="background:var(--panel-glass);border:1px solid var(--border);border-radius:var(--radius-md);padding:22px;display:flex;gap:24px;flex-wrap:wrap;">
+          <div><div class="lvl" style="font-family:var(--font-mono);font-size:11px;color:var(--text-low);">DOMAIN</div><div id="sumDomain" style="font-weight:700;font-size:15px;"></div></div>
+          <div><div class="lvl" style="font-family:var(--font-mono);font-size:11px;color:var(--text-low);">DIFFICULTY</div><div id="sumDiff" style="font-weight:700;font-size:15px;"></div></div>
+          <div><div class="lvl" style="font-family:var(--font-mono);font-size:11px;color:var(--text-low);">SCENARIOS</div><div id="sumCount" style="font-weight:700;font-size:15px;"></div></div>
+        </div>
+      </div>
+
+      <div class="onboard-actions">
+        <button class="btn btn-ghost" id="btnBack" style="visibility:hidden;">← Back</button>
+        <button class="btn btn-primary" id="btnNext" disabled>Continue →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== GAME ===================== -->
+  <section class="screen" id="screen-game">
+    <div class="game-shell">
+      <div class="game-header">
+        <h2 class="game-title"><span class="tag" id="gameTag">Domain · Difficulty</span><span id="scenarioCounter">Scenario 1 of 6</span></h2>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="hud">
+          <div class="stat-chip">🎯 Score <b id="liveScore">0</b></div>
+          <div class="stat-chip">✖<span id="comboMult">1</span> Combo</div>
+        </div>
+      </div>
+
+      <div class="challenge-card" id="challengeCard">
+        <!-- injected per-challenge -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== REPORT ===================== -->
+  <section class="screen" id="screen-report">
+    <div class="report-wrap">
+      <div class="report-hero">
+        <div class="rank-badge" id="rankEmoji">🏆</div>
+        <div class="eyebrow">Prompt Performance Report</div>
+        <div class="report-score" id="reportScore">0</div>
+        <div class="report-rating" id="reportRating">— / 100</div>
+      </div>
+
+      <div class="report-grid">
+        <div class="panel">
+          <h3>🧬 Prompt DNA</h3>
+          <div id="dnaBars"></div>
+        </div>
+        <div class="panel">
+          <h3>📊 Run Stats</h3>
+          <div id="runStats" style="font-size:13px;color:var(--text-mid);display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+
+      <div class="report-grid">
+        <div class="panel">
+          <h3>💪 Strengths</h3>
+          <ul class="fb-list strength" id="strengthList"></ul>
+        </div>
+        <div class="panel">
+          <h3>🎯 Focus Areas</h3>
+          <ul class="fb-list weak" id="weakList"></ul>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:22px;">
+        <h3>🏅 Achievements This Run</h3>
+        <div class="badges-row" id="badgesRow"></div>
+      </div>
+
+      <div class="panel" style="margin-bottom:22px;">
+        <h3>🧭 Next Milestone</h3>
+        <p id="nextMilestone" style="font-size:13.5px;color:var(--text-mid);line-height:1.6;margin:0;"></p>
+      </div>
+
+      <div class="panel">
+        <h3>✨ Your Final Optimized Prompt</h3>
+        <div class="final-prompt-box" id="finalPromptBox"></div>
+      </div>
+
+      <div class="report-actions">
+        <button class="btn btn-primary" id="btnReplaySame">🔁 Replay Same Domain</button>
+        <button class="btn btn-ghost" id="btnChangeDiff">⚙️ Change Difficulty</button>
+        <button class="btn btn-ghost" id="btnChangeDomain">🌐 Change Domain</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="popupLayer" aria-hidden="true"></div>
+<div id="toastLayer" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ================================================================
+   1. DOMAIN CONTENT LIBRARY
+   Each domain provides task templates. Every field below feeds
+   directly into prompt blocks, weak/optimized/over-engineered
+   prompts, and AI outputs — nothing here is generic filler.
+   ================================================================ */
+const PRINCIPLES = ["Specificity","Context","Role Assignment","Constraints","Formatting","Examples","Audience Awareness","Clarity"];
+
+function T(t,role,context,obj,c1,c2,fmt,audience){
+  return {t,role,context,obj,c1,c2,fmt,audience};
+}
+
+const DOMAINS = [
+{id:"marketing", label:"Marketing & Advertising", icon:"📣", tasks:[
+  T("a product launch campaign","a senior brand marketing strategist","We are launching a mid-range wireless earbud aimed at commuters and gym-goers, budget $40,000, launch in 6 weeks.","Draft a go-to-market campaign concept including channels, key message, and a 3-week content calendar.","Keep the tone energetic but avoid hype words like 'revolutionary' or 'game-changing'.","Prioritize short-form video and email over print.","Present the answer as a table with columns: Week, Channel, Content, Goal.","budget-conscious commuters aged 22-35"),
+  T("a customer persona","a market research analyst","Our SaaS tool helps freelance designers manage client invoices; we have 4,000 users but low retention past month two.","Build a detailed customer persona explaining motivations, pain points, and objections to renewing.","Base the persona on freelance designers specifically, not general small businesses.","Include one direct quote-style pain point in the persona's own voice.","Format as a one-page persona sheet with headers: Bio, Goals, Frustrations, Objections.","product and growth teams"),
+  T("ad copy variations","a direct-response copywriter","We sell an eco-friendly reusable water bottle, $28, targeting outdoor and fitness audiences on Instagram.","Write 3 short ad copy variations testing different emotional angles.","Each variation must be under 30 words.","Include one variation focused on sustainability and one on convenience.","Return as a numbered list labeled by angle.","Instagram users aged 18-40 interested in fitness")
+]},
+{id:"content", label:"Content Creation", icon:"✍️", tasks:[
+  T("a blog article outline","an experienced content strategist","We run a personal finance blog for readers in their 20s just starting to invest.","Create a detailed outline for an article on getting started with index fund investing.","Avoid jargon like 'alpha' or 'beta' without explaining it first.","Include a section addressing common beginner fears.","Format as nested headings (H2/H3) with one-line notes under each.","new investors in their 20s with no finance background"),
+  T("a newsletter issue","a newsletter editor for a productivity brand","Our weekly newsletter has 12,000 subscribers who are mid-level managers interested in time management.","Write the structure and key talking points for this week's issue about reducing meeting overload.","Keep total read time under 4 minutes.","Include one actionable takeaway readers can apply the same day.","Format with a subject line, 3 sections, and a closing CTA.","mid-level managers short on time"),
+  T("a video script","a scriptwriter for short-form educational video","We're creating a 60-second explainer video on how compound interest works, for a finance app's TikTok.","Write a script with on-screen text cues and narration.","The hook must land in the first 3 seconds.","Use one simple analogy a teenager could understand.","Format as two columns: Narration | On-screen text.","teenagers and young adults new to finance")
+]},
+{id:"software-dev", label:"Software Development", icon:"💻", tasks:[
+  T("a user authentication API","a senior backend engineer specializing in secure API design","We're building a SaaS product needing signup, login, and password reset endpoints using Node.js and PostgreSQL.","Design the authentication API including endpoints, request/response schemas, and key security measures.","Use JWT for session tokens and bcrypt for password hashing.","Include rate limiting on login attempts to prevent brute force.","Return the answer as a markdown table of endpoints followed by a short security notes section.","other backend engineers on the team"),
+  T("a memory leak debug plan","a senior Node.js performance engineer","Our production service's memory usage climbs steadily over 48 hours until it crashes; it handles websocket connections.","Propose a step-by-step plan to isolate and confirm the source of the memory leak.","Assume access to heap snapshots and standard Node.js tooling only.","Prioritize steps that don't require redeploying the service.","Format as a numbered checklist with expected outcome per step.","the on-call engineer debugging under time pressure"),
+  T("a code review checklist","a staff engineer responsible for code quality standards","Our team ships React + TypeScript code weekly and has had recurring issues with untested edge cases and prop-drilling.","Create a code review checklist tailored to these recurring issues.","Limit to 10 items so reviewers actually use it.","Group items into Correctness, Maintainability, and Performance.","Format as a checklist with checkboxes.","mid-level engineers doing peer review")
+]},
+{id:"web-dev", label:"Web Development", icon:"🌐", tasks:[
+  T("a responsive navbar component","a frontend engineer specializing in accessible UI","We need a navbar for a marketing site that collapses into a hamburger menu below 768px and supports keyboard nav.","Write the HTML/CSS structure plan and interaction behavior for the navbar.","Must meet WCAG AA contrast and be fully keyboard operable.","No external UI libraries — vanilla only.","Present as a short spec: structure, states, and ARIA attributes.","frontend developers implementing the component"),
+  T("a site performance audit plan","a web performance consultant","A client's e-commerce site has a Lighthouse performance score of 41 and high bounce rate on mobile.","Outline an audit plan to identify and prioritize performance fixes.","Focus first on Largest Contentful Paint and render-blocking resources.","Give the client 5 prioritized action items, not an exhaustive list.","Format as a ranked list with expected impact (High/Med/Low) per item.","a non-technical e-commerce client"),
+  T("a form validation strategy","a frontend engineer focused on UX-friendly forms","Our signup form has high abandonment; users report confusing error messages that appear only after submit.","Propose a validation strategy that reduces abandonment.","Errors must appear inline, not only on submit.","Avoid technical error text like 'regex mismatch'.","Format as before/after examples for 3 common fields.","end users signing up on mobile")
+]},
+{id:"data", label:"Data Analysis", icon:"📊", tasks:[
+  T("a churn analysis summary","a data analyst supporting the retention team","We have 6 months of subscription data showing churn rose from 4% to 7% after a pricing change.","Summarize likely churn drivers and recommend what to investigate next.","Distinguish correlation from causation explicitly.","Recommend at most 3 next investigative steps.","Format as Findings, Caveats, Next Steps sections.","the retention team lead, non-technical"),
+  T("a cohort retention report","a product analytics specialist","We track weekly active users across 8 signup cohorts since a major onboarding redesign.","Explain how to structure a cohort retention report comparing pre- and post-redesign cohorts.","Use relative percentages, not raw counts, for comparability.","Call out any cohort with an anomalous outlier and flag it separately.","Format as a table outline plus a 3-sentence takeaway.","the product team reviewing onboarding impact"),
+  T("a dashboard spec","a BI analyst building an executive dashboard","Executives want a weekly view of revenue, churn, and CAC across 3 product lines.","Specify the metrics, filters, and layout for this dashboard.","Limit to 6 visible metrics to avoid clutter.","Default view should show trailing 12 weeks.","Format as a component list: Widget, Metric, Chart Type.","executives with limited time per review")
+]},
+{id:"biz-strategy", label:"Business Strategy", icon:"♟️", tasks:[
+  T("a market entry analysis","a strategy consultant","A mid-size furniture retailer is considering expanding from the US into Canada within 18 months.","Outline the key factors to evaluate before recommending a go/no-go decision.","Address at least regulatory, logistics, and competitive factors.","Avoid generic SWOT boilerplate — tie each point to furniture retail specifically.","Format as a structured memo with headers per factor.","the retailer's board of directors"),
+  T("a competitive positioning brief","a corporate strategy analyst","Our mid-market CRM competes against a cheaper startup and a more established enterprise incumbent.","Draft a positioning brief clarifying where we should compete and where we should concede.","Recommend one segment to double down on and one to deprioritize.","Support each recommendation with a one-line rationale.","Format as two columns: Compete / Concede.","the executive leadership team"),
+  T("a cost-reduction plan","an operations strategy advisor","A logistics company needs to cut operating costs by 12% within one fiscal year without layoffs.","Propose a prioritized cost-reduction plan.","Explicitly exclude headcount reduction as an option.","Rank proposals by estimated impact vs implementation difficulty.","Format as a 2x2-style ranked list.","the COO and finance director")
+]},
+{id:"product", label:"Product Management", icon:"🧭", tasks:[
+  T("a PRD for a new feature","a senior product manager","Users have requested the ability to export reports to PDF from our analytics dashboard; currently only CSV export exists.","Write a product requirements document for PDF export.","Include explicit out-of-scope items to prevent scope creep.","Define at least 3 acceptance criteria.","Format as sections: Problem, Goals, Requirements, Out of Scope, Acceptance Criteria.","engineering and design collaborators"),
+  T("a feature prioritization framework","a product lead managing a crowded backlog","We have 40 open feature requests and limited engineering capacity for the next quarter.","Propose a lightweight framework to prioritize the backlog.","The framework must be usable by non-PMs in under 10 minutes.","Weigh customer impact and implementation effort explicitly.","Format as a simple scoring table template.","engineers and support staff who will use it"),
+  T("a beta launch plan","a product manager running a limited beta","We're beta-testing a new collaborative editing feature with 50 selected customers over 4 weeks.","Draft a beta launch plan including goals, feedback loop, and exit criteria.","Feedback collection must not rely solely on a survey.","Define clear criteria for graduating to general availability.","Format as a timeline table by week.","the beta customers and internal stakeholders")
+]},
+{id:"support", label:"Customer Support", icon:"🎧", tasks:[
+  T("a de-escalation response","a senior customer support lead","A customer is upset after their order arrived damaged for the second time and is threatening to cancel their subscription.","Draft a response that de-escalates and offers a resolution.","Do not offer a refund before acknowledging the frustration.","Include one concrete next step with a timeframe.","Format as a ready-to-send email.","a frustrated long-time customer"),
+  T("a macro for a common issue","a support operations manager","Support agents spend too long answering 'how do I reset my password' tickets, our #1 ticket category.","Write a support macro template agents can personalize quickly.","Keep it under 80 words before personalization fields.","Include a fallback step if the standard reset link fails.","Format with placeholder fields in brackets.","support agents handling high ticket volume"),
+  T("an escalation policy","a head of customer support","We need clear rules for when a frontline agent should escalate a ticket to a specialist team.","Draft an escalation policy with clear trigger conditions.","Limit to 5 trigger conditions to keep it memorable.","Each condition must state which team receives the escalation.","Format as a simple if/then table.","new support agents in onboarding")
+]},
+{id:"education", label:"Education", icon:"🎓", tasks:[
+  T("a lesson plan","a middle school science teacher","Students are struggling to grasp the concept of photosynthesis; class is 45 minutes, mixed ability levels.","Create a 45-minute lesson plan that improves understanding through an interactive activity.","Include one hands-on or visual activity, not just lecture.","Account for both advanced and struggling students.","Format as a timed agenda: minutes, activity, purpose.","12-13 year old students with mixed ability"),
+  T("an assessment rubric","a high school English teacher","Students are submitting persuasive essays and grading has been inconsistent across sections.","Design a grading rubric for persuasive essays.","Limit to 4 criteria so grading stays efficient.","Each criterion needs a 4-point scale with brief descriptors.","Format as a rubric table.","teachers grading across multiple class sections"),
+  T("a study guide","a tutor preparing students for a unit exam","Students are being tested on the causes of World War I next week and keep confusing the different alliance systems.","Create a study guide clarifying the alliance systems and key causes.","Use a comparison format to reduce the confusion, not prose paragraphs.","Include 3 practice questions at the end.","Format as a comparison table plus a practice question list.","high school students reviewing for an exam")
+]},
+{id:"healthcare", label:"Healthcare", icon:"🩺", tasks:[
+  T("a patient education handout","a nurse educator","Newly diagnosed type 2 diabetes patients often leave appointments confused about daily blood sugar monitoring.","Draft a plain-language patient handout on daily blood sugar monitoring basics.","Write at a 6th-grade reading level.","Avoid clinical jargon like 'glycemic' without a plain explanation.","Format with short headers and bullet points, not paragraphs.","newly diagnosed adult patients, general public"),
+  T("a clinic intake workflow note","a clinic operations manager","Our clinic's intake process causes 15-minute average wait times before patients see a nurse.","Propose a revised intake workflow to reduce wait time.","Do not require hiring additional staff.","Address the paperwork bottleneck specifically.","Format as a before/after step list.","clinic front-desk and nursing staff"),
+  T("a medication reminder message","a pharmacist designing patient communications","Elderly patients on multi-drug regimens frequently miss doses of a twice-daily blood pressure medication.","Write a text reminder message template for this medication.","Keep the message under 160 characters for SMS.","Include a plain instruction, not just 'take your medication'.","Format as the literal SMS text.","elderly patients, some with limited tech familiarity")
+]},
+{id:"finance", label:"Finance", icon:"💰", tasks:[
+  T("a personal budgeting plan","a certified financial planner","A client earns $5,200/month, has $8,000 in credit card debt, and wants to start saving for a house down payment.","Create a budgeting plan balancing debt payoff and savings.","Prioritize the credit card debt before aggressive saving, and explain why.","Give specific percentage allocations, not vague advice.","Format as a monthly allocation table.","a client with no finance background"),
+  T("a quarterly expense variance report","a corporate FP&A analyst","Marketing spent 18% over budget this quarter while engineering came in 6% under; leadership wants an explanation.","Draft the narrative explaining the variance for the leadership report.","Avoid speculation — flag anything unconfirmed as such.","Recommend one corrective action for the overspend.","Format as Summary, Drivers, Recommendation sections.","the CFO and department heads"),
+  T("an investment risk explainer","a financial advisor","A first-time investor wants to put money into index funds but is anxious about market volatility after reading news headlines.","Explain investment risk in a way that addresses this specific anxiety.","Use one concrete historical example, not abstract theory.","Do not give specific stock or fund recommendations.","Format as a short conversational explainer, 3 short paragraphs max.","an anxious first-time retail investor")
+]},
+{id:"hr", label:"Human Resources", icon:"🧑‍💼", tasks:[
+  T("a job posting","an HR recruiter","We're hiring a mid-level product designer for a 12-person startup, remote-friendly, competitive but not top-of-market pay.","Write a job posting that attracts qualified candidates despite the pay constraint.","Be honest about the pay band rather than vague.","Emphasize genuine non-salary benefits, not generic perks language.","Format as standard sections: About, Responsibilities, Requirements, Benefits.","mid-level design candidates evaluating multiple offers"),
+  T("a performance improvement plan","an HR business partner","An otherwise solid employee has missed 3 consecutive deadlines over the last quarter; manager wants a formal PIP.","Draft a performance improvement plan that is fair and specific.","Include measurable, time-bound goals, not vague expectations.","Note the plan must be reviewed with legal-safe, non-punitive language.","Format as Goals, Timeline, Support Provided, Review Date.","the employee and their manager"),
+  T("an onboarding checklist","an HR operations lead","New hires currently report feeling lost in their first week due to an inconsistent onboarding process.","Create a first-week onboarding checklist.","Include both administrative tasks and social/team integration tasks.","Assign an owner (HR, manager, or buddy) to each item.","Format as a checklist table with an Owner column.","new hires and their onboarding buddy")
+]},
+{id:"sales", label:"Sales", icon:"🤝", tasks:[
+  T("a cold outreach email","an SDR at a B2B software company","We sell inventory management software to mid-size warehouses; prospect is an operations director who hasn't responded to 2 prior emails.","Write a third-touch cold email that takes a different angle than a generic follow-up.","Keep it under 90 words.","Reference a specific pain point relevant to warehouse operations, not generic value props.","Format as a ready-to-send email with subject line.","a busy operations director skeptical of vendor emails"),
+  T("an objection-handling script","a sales enablement manager","Reps consistently lose deals when prospects say 'we're already happy with our current vendor.'","Write a response script for this specific objection.","The response must ask a discovery question, not just rebut.","Avoid sounding dismissive of the current vendor.","Format as a short dialogue: Prospect line, Rep response.","new sales reps in training"),
+  T("a renewal risk email","an account manager","A key account's usage has dropped 40% over the last 2 months and renewal is in 6 weeks.","Draft an email to the account's champion to proactively address renewal risk.","Do not directly say 'we noticed your usage dropped' — approach it consultatively.","Include one specific offer to help, such as a check-in call.","Format as a ready-to-send email.","the champion contact at a key account")
+]},
+{id:"ecommerce", label:"E-commerce", icon:"🛒", tasks:[
+  T("a product listing description","an e-commerce copywriter","We sell a stainless steel insulated water bottle, keeps drinks cold 24 hours, priced at $34.99, competing against many similar listings.","Write a product listing description that differentiates from competitors.","Lead with the specific benefit, not the material spec.","Include a short bullet list of 3 key features after the intro.","Format as intro paragraph + bullet list.","online shoppers comparing similar bottles"),
+  T("a cart abandonment email sequence","an e-commerce lifecycle marketer","Our checkout abandonment rate is 68%; we sell mid-range skincare products, average order value $55.","Outline a 3-email cart abandonment sequence.","Only the third email may include a discount.","Space the emails logically (e.g., 1hr, 24hr, 72hr).","Format as a table: Email #, Timing, Goal, Key Message.","shoppers who added items but didn't check out"),
+  T("a return policy rewrite","an e-commerce customer experience manager","Our current return policy is legally accurate but customers frequently misunderstand it and contact support to clarify.","Rewrite the return policy for clarity without changing its legal terms.","Keep every substantive rule intact — only change clarity, not policy.","Use plain language and short sentences.","Format as a simple FAQ: Question, Answer.","customers reading before purchasing")
+]},
+{id:"cyber", label:"Cybersecurity", icon:"🛡️", tasks:[
+  T("a phishing awareness message","a security awareness trainer","Employees have clicked on 3 simulated phishing emails in the last training cycle, mostly ones impersonating IT.","Write an internal message reinforcing phishing awareness after this result.","Do not shame the employees who clicked.","Include 2 concrete red flags to watch for, specific to IT-impersonation emails.","Format as a short internal email.","all employees, non-technical"),
+  T("an incident response summary","a security operations lead","A contained ransomware attempt was blocked on one workstation; no data was exfiltrated, but leadership wants a summary.","Draft an incident summary for leadership.","Avoid unnecessary technical jargon leadership won't need.","Clearly state impact, containment, and next preventive step.","Format as Impact, Containment, Next Steps sections.","non-technical executive leadership"),
+  T("a password policy update","an IT security administrator","Our current password policy requires frequent forced changes, which research shows lowers actual security due to weak patterns.","Draft an updated password policy aligned with current best practice.","Justify the change briefly so employees understand why it's changing.","Recommend passphrase length over complexity rules.","Format as Old Policy vs New Policy comparison.","all employees using the company's systems")
+]},
+{id:"ai-ml", label:"AI & Machine Learning", icon:"🤖", tasks:[
+  T("a model evaluation plan","a machine learning engineer","We fine-tuned a classification model for support ticket routing and need to validate it before production rollout.","Propose an evaluation plan covering metrics and edge cases.","Include a plan for testing against underrepresented ticket categories, not just overall accuracy.","Specify a clear go/no-go threshold.","Format as Metrics, Test Cases, Go/No-Go Criteria sections.","the ML team and product owner"),
+  T("a data labeling guideline","an ML team lead","Annotators disagree frequently when labeling sentiment on ambiguous customer reviews, hurting model quality.","Write labeling guidelines that reduce annotator disagreement.","Include explicit handling for ambiguous or mixed-sentiment cases.","Provide 2 worked examples in the guideline itself.","Format as a guideline doc with a worked-examples section.","external annotators with no ML background"),
+  T("a prompt for a support triage LLM","a solutions engineer","We want an LLM to triage incoming support tickets into Billing, Technical, or Account categories before routing to a human.","Design the system prompt for this triage task.","The model must output only one of the three category labels, nothing else.","Include a fallback instruction for ambiguous tickets.","Format as the literal system prompt text.","a downstream routing system consuming the raw output")
+]},
+{id:"research", label:"Research", icon:"🔬", tasks:[
+  T("a literature review outline","a graduate research assistant","We're studying the effect of remote work on employee wellbeing and have 40 candidate papers from the last 5 years.","Outline a literature review structure for organizing these papers.","Organize thematically, not chronologically.","Include a section explicitly noting gaps in existing research.","Format as nested headings with a one-line note per section.","an academic committee reviewing the thesis proposal"),
+  T("a survey instrument","a UX researcher","We want to measure user satisfaction with a redesigned onboarding flow across 500 recent signups.","Draft a short survey instrument to measure this.","Limit to 8 questions to keep completion rate high.","Include at least one open-ended question for qualitative insight.","Format as a numbered question list with response type noted.","recent product signups, general public"),
+  T("a research summary for stakeholders","a research analyst","Our qualitative study of 20 user interviews found strong frustration with a multi-step checkout, but stakeholders only have 5 minutes to review.","Summarize the findings for time-constrained stakeholders.","Lead with the single most important finding, not methodology.","Limit the summary to one page equivalent.","Format as Key Finding, Supporting Evidence, Recommendation.","executives with 5 minutes to spare")
+]},
+{id:"legal", label:"Legal", icon:"⚖️", tasks:[
+  T("a plain-language contract summary","a contracts paralegal","A small business owner received a 12-page vendor services agreement and doesn't understand several clauses.","Summarize the contract's key obligations and risks in plain language.","Explicitly flag any clause that limits the business owner's ability to cancel.","Do not provide formal legal advice, only a plain-language summary.","Format as a table: Clause, Plain Meaning, Risk Level.","a non-lawyer small business owner"),
+  T("an NDA clause explainer","a corporate legal associate","Employees keep asking what the non-compete clause in the standard NDA actually restricts them from doing.","Explain what the non-compete clause practically restricts.","Be precise about scope (time period and geography) without overstating it.","Note that employees should still consult legal for their specific situation.","Format as a short plain-language Q&A.","employees signing the standard NDA"),
+  T("a compliance checklist","a compliance officer","Our company is expanding data collection on a mobile app and needs to confirm baseline privacy compliance steps.","Draft a compliance checklist for this expansion.","Focus on baseline steps, not a full legal audit.","Flag which items require outside counsel review.","Format as a checklist with a 'Needs Counsel' column.","the product and engineering teams")
+]},
+{id:"social", label:"Social Media", icon:"📱", tasks:[
+  T("a content calendar theme","a social media manager","Our skincare brand's Instagram engagement has been flat for 2 months; we post 4x/week currently.","Propose a themed content calendar to reboot engagement.","Include at least one interactive format (poll, Q&A, or UGC).","Keep the plan to one week as a template, not a full month.","Format as a table: Day, Format, Theme, Goal.","existing Instagram followers, mostly women 25-40"),
+  T("a crisis response post","a social media community manager","A shipping delay affected 15% of orders and customers are complaining publicly in the comments of our latest post.","Draft a public response post addressing the issue.","Acknowledge the issue directly — do not deflect or minimize it.","Include one concrete resolution step and a way to get help.","Format as the literal post caption text.","affected customers commenting publicly"),
+  T("an influencer brief","a social media partnerships manager","We're sending product to 5 micro-influencers (10-50k followers) in the fitness niche for a new protein bar.","Write a brief telling influencers what to cover without sounding scripted.","Give guidance, not a word-for-word script — preserve their authentic voice.","Include one specific must-mention detail (a claim that must be accurate).","Format as sections: Must Include, Avoid, Tone Guidance.","independent fitness content creators")
+]},
+{id:"startup", label:"Startup & Entrepreneurship", icon:"🚀", tasks:[
+  T("an investor update","a startup founder","We're a pre-seed startup with 3 months of runway left, flat MRR growth, but a promising new enterprise pilot just started.","Draft a monthly investor update addressing the tough news honestly.","Do not bury the runway concern — address it directly and early.","Balance the challenge with the genuine positive signal from the pilot.","Format as sections: Highlights, Challenges, Asks.","existing seed investors"),
+  T("a pitch deck narrative","a startup co-founder preparing for seed fundraising","We've built a tool that automates expense reports for small accounting firms and have 40 paying customers.","Outline the narrative arc for a 10-slide pitch deck.","The problem slide must use a concrete example, not an abstract statistic.","End on a clear, specific ask.","Format as a slide-by-slide outline with one line per slide.","seed-stage venture investors"),
+  T("a hiring plan for the first engineer","a non-technical startup founder","We have $80,000 budget to make our first engineering hire and need to decide seniority and scope.","Recommend a hiring approach for this first engineering hire.","Address the tradeoff between a senior generalist and a cheaper junior hire explicitly.","Give a concrete recommendation, not just pros and cons.","Format as Tradeoffs, Recommendation, Next Steps.","a non-technical co-founder making the decision")
+]},
+{id:"creative", label:"Creative Writing", icon:"🖋️", tasks:[
+  T("a short story opening","a fiction writing coach","A writer wants to open a short story set in a small coastal town where a mysterious boat has appeared overnight.","Write guidance for crafting an opening paragraph with strong atmosphere.","The opening must establish setting through sensory detail, not exposition.","Avoid opening with dialogue or a weather cliché.","Format as a short example paragraph plus a one-line technique note.","an intermediate fiction writer"),
+  T("a character backstory","a novelist","A supporting character in a fantasy novel needs a backstory explaining her distrust of authority figures.","Draft a backstory that motivates this specific trait believably.","Root the distrust in one concrete formative event, not a vague trauma statement.","Keep the backstory to one tight paragraph.","Format as a single paragraph.","the author, for internal reference only"),
+  T("a poem prompt","a creative writing teacher","Students in an intro poetry workshop are struggling to move past cliché imagery like 'heart of gold'.","Design a writing prompt that pushes students toward original imagery.","The prompt must forbid at least 2 named cliché phrases.","Include one concrete constraint (like a required unusual object).","Format as the literal prompt text handed to students.","intro-level creative writing students")
+]},
+{id:"uxui", label:"UX/UI Design", icon:"🎨", tasks:[
+  T("a usability test script","a UX researcher","We're testing a redesigned checkout flow with 6 participants to see if a new address autofill feature reduces confusion.","Write a moderated usability test script.","Include neutral task phrasing that doesn't hint at the 'correct' path.","Add a post-task follow-up question about confidence, not just success/fail.","Format as Task, Script Line, Follow-up Question rows.","5-6 recruited test participants"),
+  T("a design critique framework","a design team lead","Our weekly design critiques often turn into vague opinion battles rather than actionable feedback.","Propose a structured framework for running critiques.","Require feedback to reference a specific user goal or heuristic, not personal taste.","Limit critique time per design to 8 minutes to stay focused.","Format as a step-by-step critique agenda.","the design team giving and receiving feedback"),
+  T("an empty state design brief","a product designer","Our new workspace feature currently shows a blank white screen with no guidance when a user has no projects yet.","Write a design brief for the empty state.","The empty state must include one clear primary action, not multiple competing CTAs.","Tone should encourage first use without being overly cute.","Format as sections: Goal, Content, Primary Action, Tone.","first-time users of the workspace feature")
+]}
+];
+// Mixed Topics domain samples across all others at generation time.
+const MIXED_DOMAIN = {id:"mixed", label:"Mixed Topics", icon:"🌀"};
+
+const GENERIC_DISTRACTORS = [
+  {btag:"Vague Ask", text:"Just make it really good, you know what I mean."},
+  {btag:"Filler", text:"Please try your best and use your imagination."},
+  {btag:"Redundant Role", text:"You are an AI assistant that is very smart and helpful."},
+  {btag:"Empty Constraint", text:"Make sure it's not too long and not too short."},
+  {btag:"Non-Format", text:"Just write it however feels natural."}
+];
+
+const CLUTTER_FILLER = [
+  "As you may know, ", "I just wanted to say that ", "please, if you could, ",
+  "obviously ", "to be totally honest, ", "I think it would probably be great if ",
+  "without a doubt, ", "needless to say, ", "just really quickly, ",
+  "again, just to reiterate, ", "at the end of the day, ", "if it's not too much trouble, "
+];
+const CLUTTER_REDUNDANT_TAILS = [
+  " Also, please make sure it's good.", " And again, don't forget to make it good quality.",
+  " Just to repeat, quality matters a lot here.", " Please don't mess this up.",
+  " I really need this to be great, please.", " Thanks so much in advance, I really appreciate it!!"
+];
+
+const DIFFICULTIES = [
+  {id:"beginner", label:"Beginner", desc:"Learn the five building blocks with generous guidance.", bars:1, scenarioCount:6, distractors:2, hintPenalty:4, timeTarget:90},
+  {id:"intermediate", label:"Intermediate", desc:"Fewer hints, sharper distractors, tighter scoring.", bars:2, scenarioCount:6, distractors:3, hintPenalty:6, timeTarget:75},
+  {id:"advanced", label:"Advanced", desc:"Over-engineered traps get convincing. Stay sharp.", bars:3, scenarioCount:7, distractors:4, hintPenalty:8, timeTarget:60},
+  {id:"expert", label:"Expert", desc:"Minimal guidance, maximum nuance across scenarios.", bars:4, scenarioCount:7, distractors:5, hintPenalty:10, timeTarget:50},
+  {id:"master", label:"Master Prompt Engineer", desc:"The full gauntlet — precision required throughout.", bars:5, scenarioCount:8, distractors:5, hintPenalty:14, timeTarget:40}
+];
+
+/* ================================================================
+   2. STATE
+   ================================================================ */
+const STORAGE_KEY = "ppa_progress_v1";
+let progress = loadProgress();
+
+let state = {
+  domain:null, difficulty:null,
+  scenarios:[], currentIndex:0,
+  score:0, xp:0, streak:0, combo:1, level:1,
+  hintsUsed:0, wrongPlacements:0, movesTotal:0, startTime:0,
+  perScenario:[], // {principle, correct:bool, hintUsed:bool, type}
+  badgesEarned:new Set()
+};
+
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { bestScore:0, highestRank:"—", completedRuns:0, achievements:[], domainHistory:[] };
+}
+function saveProgress(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }catch(e){}
+}
+
+/* ================================================================
+   3. UTIL
+   ================================================================ */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+function esc(s){ return s.replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function toast(icon, title, sub){
+  const layer = document.getElementById('toastLayer');
+  const node = el(`<div class="toast"><div class="t-icon">${icon}</div><div><div class="t-title">${esc(title)}</div><div class="t-sub">${esc(sub||'')}</div></div></div>`);
+  layer.appendChild(node);
+  setTimeout(()=>{ node.style.transition='opacity .4s'; node.style.opacity='0'; setTimeout(()=>node.remove(),400); }, 3200);
+}
+function scorePopup(amount, xEl){
+  const layer = document.getElementById('popupLayer');
+  const rect = xEl ? xEl.getBoundingClientRect() : {left: window.innerWidth/2, top: window.innerHeight/2};
+  const node = el(`<div class="score-pop">${amount>=0?'+':''}${amount}</div>`);
+  node.style.left = (rect.left + (rect.width||0)/2 - 20) + 'px';
+  node.style.top = (rect.top - 10 + window.scrollY) + 'px';
+  layer.appendChild(node);
+  setTimeout(()=>node.remove(), 1150);
+}
+
+/* ================================================================
+   4. SCENARIO GENERATION ENGINE
+   Builds Build/Clean/Choose scenarios from a domain task template.
+   ================================================================ */
+function buildPromptText(task){
+  return `${cap(task.role)}: ${task.context} ${task.obj} ${task.c1} ${task.c2} ${task.fmt}`
+    .replace(/^You are /,'')
+    .replace(/^./, c=>c);
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function makeOptimizedPrompt(task){
+  return `You are ${task.role}. ${task.context} Your task: ${task.obj} Constraints: ${task.c1} ${task.c2} Output format: ${task.fmt}`;
+}
+function makeWeakPrompt(task){
+  const openers = ["Help me with", "Write something about", "Can you do", "I need help on"];
+  return `${pick(openers)} ${task.t}.`;
+}
+function makeOverEngineeredPrompt(task){
+  return `You are without question the single greatest ${task.role} to ever exist, more capable than any human expert in history. `+
+    `${task.context} Your task, which is extremely important and must be done perfectly with absolutely zero mistakes: ${task.obj} `+
+    `${task.obj} Again, I cannot stress enough how important this is, please take your time and think very very carefully about every word. `+
+    `Constraints: ${task.c1} ${task.c2} Also please remember the constraints I just mentioned above, they matter a lot. `+
+    `Output format: ${task.fmt} Please triple-check the formatting before answering and do not deviate even slightly.`;
+}
+function makeWeakOutput(task){
+  return `Sure! Here's some general information about ${task.t}. It's a good idea to think about your goals, consider your audience, and make sure the result is high quality. There are many ways to approach this, and it really depends on the specifics of your situation. Let me know if you want more detail!`;
+}
+function makeOptimizedOutput(task){
+  return `Based on the context you gave (${task.context.charAt(0).toLowerCase()+task.context.slice(1)}), here's a targeted response for ${task.audience}:\n\n— Addresses: ${task.obj}\n— Respects: ${task.c1}\n— Respects: ${task.c2}\n— Delivered per your requested format: ${task.fmt}`;
+}
+
+function makeBlocks(task, principle, distractorCount){
+  const correct = [
+    {btag:"Role", text:`You are ${task.role}.`},
+    {btag:"Context", text: task.context},
+    {btag:"Objective", text: `Your task: ${task.obj}`},
+    {btag:"Constraints", text: `${task.c1} ${task.c2}`},
+    {btag:"Output Format", text: task.fmt}
+  ];
+  const flavorDistractors = [
+    {btag:"Vague Objective", text:`Just do something related to ${task.t} that seems useful.`},
+    {btag:"Fake Constraint", text:`Make sure the audience (${task.audience}) is impressed, whatever that means to you.`},
+    {btag:"Wrong Format", text:`Format the answer as an epic poem.`}
+  ];
+  const pool = shuffle([...GENERIC_DISTRACTORS, ...flavorDistractors]).slice(0, distractorCount);
+  const blocks = shuffle([...correct.map(b=>({...b, correct:true})), ...pool.map(b=>({...b, correct:false}))]);
+  return { correctBlocks:correct, allBlocks:blocks };
+}
+
+function makeClutterChunks(task){
+  // Build a cluttered version of the optimized prompt by interleaving
+  // real (keep) segments with filler/redundant (remove) segments.
+  const realSegments = [
+    `You are ${task.role}.`,
+    task.context,
+    `Your task: ${task.obj}`,
+    `${task.c1}`,
+    `${task.c2}`,
+    `Output format: ${task.fmt}`
+  ];
+  const chunks = [];
+  realSegments.forEach((seg, i)=>{
+    if(Math.random() < 0.7){
+      chunks.push({text: cap(pick(CLUTTER_FILLER)) , keep:false});
+    }
+    chunks.push({text: seg, keep:true});
+    if(Math.random() < 0.55){
+      chunks.push({text: pick(CLUTTER_REDUNDANT_TAILS), keep:false});
+    }
+  });
+  return chunks;
+}
+
+function generateScenario(task, difficulty, principle, forcedType){
+  const types = ["build","clean","choose"];
+  const type = forcedType || pick(types);
+  const base = {
+    task, principle, type,
+    title: cap(task.t),
+    desiredOutput: `A response that is specific to ${task.audience}, follows the requested format ("${task.fmt.replace(/^./,c=>c.toLowerCase())}"), and respects all stated constraints.`,
+  };
+  if(type === "build"){
+    const {correctBlocks, allBlocks} = makeBlocks(task, principle, difficulty.distractors);
+    return {...base, correctBlocks, allBlocks};
+  }
+  if(type === "clean"){
+    return {...base, chunks: makeClutterChunks(task)};
+  }
+  // choose
+  const weak = makeWeakPrompt(task);
+  const optimized = makeOptimizedPrompt(task);
+  const overEng = makeOverEngineeredPrompt(task);
+  const options = shuffle([
+    {label:"Prompt A", text:weak, kind:"weak"},
+    {label:"Prompt B", text:optimized, kind:"optimized"},
+    {label:"Prompt C", text:overEng, kind:"over"}
+  ]);
+  return {...base, options,
+    weakOutput: makeWeakOutput(task), optimizedOutput: makeOptimizedOutput(task)};
+}
+
+function generateAllScenarios(domain, difficulty){
+  let taskPool;
+  if(domain.id === "mixed"){
+    taskPool = shuffle(DOMAINS.flatMap(d => d.tasks.map(t => ({...t, __domainLabel:d.label}))));
+  } else {
+    taskPool = shuffle(domain.tasks.concat(domain.tasks)); // allow repeats with variety if pool small
+  }
+  const count = difficulty.scenarioCount;
+  const types = ["build","clean","choose"];
+  const scenarios = [];
+  for(let i=0;i<count;i++){
+    const task = taskPool[i % taskPool.length];
+    const principle = PRINCIPLES[i % PRINCIPLES.length];
+    const type = types[i % types.length];
+    scenarios.push(generateScenario(task, difficulty, principle, type));
+  }
+  return shuffle(scenarios);
+}
+
+/* ================================================================
+   5. ONBOARDING UI
+   ================================================================ */
+let ob = { domainIdx:null, diffIdx:null, step:1 };
+
+function renderDomainGrid(){
+  const grid = document.getElementById('domainGrid');
+  grid.innerHTML = '';
+  const all = [...DOMAINS, MIXED_DOMAIN];
+  all.forEach((d, idx)=>{
+    const card = el(`<button class="pick-card" role="listitem" type="button" data-idx="${idx}">
+      <span class="icon">${d.icon}</span>
+      <span class="name">${esc(d.label)}</span>
+      <span class="desc">${d.id === 'mixed' ? 'Scenarios sampled across every domain' : (d.tasks.length + ' task families')}</span>
+    </button>`);
+    card.addEventListener('click', ()=>{
+      document.querySelectorAll('#domainGrid .pick-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      ob.domainIdx = idx;
+      updateNextEnabled();
+    });
+    grid.appendChild(card);
+  });
+}
+
+function renderDiffGrid(){
+  const grid = document.getElementById('diffGrid');
+  grid.innerHTML = '';
+  DIFFICULTIES.forEach((d, idx)=>{
+    const bars = Array.from({length:5}).map((_,i)=>`<span class="${i < d.bars ? 'on':''}"></span>`).join('');
+    const card = el(`<button class="diff-card" role="listitem" type="button" data-idx="${idx}">
+      <div class="lvl">TIER ${idx+1}/5</div>
+      <h3>${esc(d.label)}</h3>
+      <p>${esc(d.desc)}</p>
+      <div class="diff-bars">${bars}</div>
+    </button>`);
+    card.addEventListener('click', ()=>{
+      document.querySelectorAll('#diffGrid .diff-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      ob.diffIdx = idx;
+      updateNextEnabled();
+    });
+    grid.appendChild(card);
+  });
+}
+
+function updateNextEnabled(){
+  const btn = document.getElementById('btnNext');
+  if(ob.step === 1) btn.disabled = ob.domainIdx === null;
+  else if(ob.step === 2) btn.disabled = ob.diffIdx === null;
+  else btn.disabled = false;
+}
+
+function goToStep(n){
+  ob.step = n;
+  document.querySelectorAll('.onboard-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  [1,2,3].forEach(i=>document.getElementById('dot'+i).classList.toggle('on', i<=n));
+  document.getElementById('btnBack').style.visibility = n===1 ? 'hidden' : 'visible';
+  document.getElementById('btnNext').textContent = n===3 ? 'Start Learning 🚀' : 'Continue →';
+  if(n===3){
+    const all = [...DOMAINS, MIXED_DOMAIN];
+    const d = all[ob.domainIdx], diff = DIFFICULTIES[ob.diffIdx];
+    document.getElementById('confirmSummary').textContent = `We'll generate ${diff.scenarioCount} fresh scenarios blending Build, Clean, and Choose challenges.`;
+    document.getElementById('sumDomain').textContent = d.icon + ' ' + d.label;
+    document.getElementById('sumDiff').textContent = diff.label;
+    document.getElementById('sumCount').textContent = diff.scenarioCount + ' scenarios';
+  }
+  updateNextEnabled();
+}
+
+document.getElementById('btnNext').addEventListener('click', ()=>{
+  if(ob.step < 3){ goToStep(ob.step+1); }
+  else { startGame(); }
+});
+document.getElementById('btnBack').addEventListener('click', ()=>{
+  if(ob.step > 1) goToStep(ob.step-1);
+});
+
+/* ================================================================
+   6. GAME FLOW
+   ================================================================ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('topbar').style.display = id==='screen-onboard' ? 'none' : 'flex';
+}
+
+function startGame(){
+  const all = [...DOMAINS, MIXED_DOMAIN];
+  state.domain = all[ob.domainIdx];
+  state.difficulty = DIFFICULTIES[ob.diffIdx];
+  state.scenarios = generateAllScenarios(state.domain, state.difficulty);
+  state.currentIndex = 0;
+  state.score = 0; state.xp = progress.xp||0; state.streak = 0; state.combo = 1;
+  state.hintsUsed = 0; state.wrongPlacements = 0; state.movesTotal = 0;
+  state.perScenario = [];
+  state.startTime = Date.now();
+  document.getElementById('gameTag').textContent = `${state.domain.label} · ${state.difficulty.label}`;
+  updateHud();
+  showScreen('screen-game');
+  renderScenario();
+}
+
+function updateHud(){
+  document.getElementById('liveScore').textContent = Math.max(0, Math.round(state.score));
+  document.getElementById('hudXp').textContent = state.xp;
+  document.getElementById('hudStreak').textContent = state.streak;
+  document.getElementById('comboMult').textContent = state.combo.toFixed(1);
+  document.getElementById('hudLevel').textContent = Math.floor(state.xp/150)+1;
+}
+
+function currentScenario(){ return state.scenarios[state.currentIndex]; }
+
+function renderScenario(){
+  const sc = currentScenario();
+  const idx = state.currentIndex;
+  document.getElementById('scenarioCounter').textContent = `Scenario ${idx+1} of ${state.scenarios.length}`;
+  document.getElementById('progressFill').style.width = Math.round((idx/state.scenarios.length)*100) + '%';
+
+  const card = document.getElementById('challengeCard');
+  card.innerHTML = '';
+  const kindLabel = {build:"🧱 Build the Prompt", clean:"🧹 Clean the Prompt", choose:"⚖️ Choose the Best Prompt"}[sc.type];
+  const header = el(`<div>
+    <div class="challenge-kind">${kindLabel}</div>
+    <div class="challenge-brief">
+      <h2>${esc(sc.title)}</h2>
+      <p>${esc(sc.task.context)}</p>
+      <div class="desired-output"><b>Desired Output</b>${esc(sc.desiredOutput)}</div>
+    </div>
+  </div>`);
+  card.appendChild(header);
+
+  if(sc.type === "build") renderBuild(card, sc);
+  else if(sc.type === "clean") renderClean(card, sc);
+  else renderChoose(card, sc);
+
+  // hint + feedback + actions
+  const hintBox = el(`<div class="hint-box" id="hintBox"></div>`);
+  const feedback = el(`<div class="feedback-panel" id="feedbackPanel"></div>`);
+  const actions = el(`<div class="action-row">
+    <button class="btn btn-ghost" id="btnHint">💡 Use Hint (−${state.difficulty.hintPenalty} pts)</button>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" id="btnSubmit">Check Answer</button>
+      <button class="btn btn-primary" id="btnContinue" style="display:none;">Continue →</button>
+    </div>
+  </div>`);
+  card.appendChild(hintBox);
+  card.appendChild(feedback);
+  card.appendChild(actions);
+
+  document.getElementById('btnHint').addEventListener('click', ()=>useHint(sc));
+  document.getElementById('btnSubmit').addEventListener('click', ()=>submitAnswer(sc));
+  document.getElementById('btnContinue').addEventListener('click', nextScenario);
+}
+
+/* ---- BUILD THE PROMPT ---- */
+function renderBuild(card, sc){
+  const wrap = el(`<div class="bench">
+    <div>
+      <span class="rail-label">Prompt Assembly Rail — drop blocks in Role → Context → Objective → Constraints → Format order</span>
+      <div class="rail" id="rail"></div>
+    </div>
+    <div>
+      <span class="pool-label">Component Pool — drag or tap a block to place it</span>
+      <div class="block-pool" id="blockPool"></div>
+    </div>
+  </div>`);
+  card.appendChild(wrap);
+
+  const slotOrder = ["Role","Context","Objective","Constraints","Output Format"];
+  const rail = wrap.querySelector('#rail');
+  slotOrder.forEach(tag=>{
+    const slot = el(`<div class="rail-slot" data-tag="${tag}"><span class="slot-tag">${tag} →</span></div>`);
+    rail.appendChild(slot);
+    slot.addEventListener('dragover', e=>{ e.preventDefault(); slot.parentElement.classList.add('dragover'); });
+    slot.addEventListener('dragleave', ()=> slot.parentElement.classList.remove('dragover'));
+    slot.addEventListener('drop', e=>{
+      e.preventDefault(); slot.parentElement.classList.remove('dragover');
+      const bIdx = e.dataTransfer.getData('text/plain');
+      placeBlock(sc, slot, bIdx);
+    });
+  });
+
+  const pool = wrap.querySelector('#blockPool');
+  sc.allBlocks.forEach((b, i)=>{
+    const block = el(`<div class="pblock" draggable="true" tabindex="0" data-idx="${i}" role="button" aria-label="${esc(b.btag)}: ${esc(b.text)}">
+      <span class="btag">${esc(b.btag)}</span>${esc(b.text)}
+    </div>`);
+    block.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', i); });
+    // tap-to-place fallback (touch/keyboard): places into first empty matching-ish slot, or first empty slot
+    block.addEventListener('click', ()=>{
+      if(block.classList.contains('placed')) return;
+      const emptySlot = Array.from(rail.querySelectorAll('.rail-slot')).find(s=>!s.classList.contains('filled'));
+      if(emptySlot) placeBlock(sc, emptySlot, i);
+    });
+    block.addEventListener('keydown', e=>{
+      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); block.click(); }
+    });
+    pool.appendChild(block);
+  });
+}
+
+function placeBlock(sc, slot, bIdx){
+  if(slot.classList.contains('filled')) return;
+  const pool = document.getElementById('blockPool');
+  const blockEl = pool.querySelector(`.pblock[data-idx="${bIdx}"]`);
+  if(!blockEl || blockEl.classList.contains('placed')) return;
+  const b = sc.allBlocks[bIdx];
+  state.movesTotal++;
+  slot.classList.add('filled');
+  slot.dataset.blockIdx = bIdx;
+  slot.innerHTML = `<span class="btag" style="font-family:var(--font-body);font-weight:700;font-size:10px;text-transform:uppercase;color:var(--accent-2);">${esc(slot.dataset.tag)}</span>
+    <span>${esc(b.text)}</span>
+    <button class="remove-x" aria-label="Remove block">✕</button>`;
+  slot.querySelector('.remove-x').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    slot.classList.remove('filled');
+    delete slot.dataset.blockIdx;
+    slot.innerHTML = `<span class="slot-tag">${slot.dataset.tag} →</span>`;
+    blockEl.classList.remove('placed');
+  });
+  blockEl.classList.add('placed');
+  const isRightTag = b.btag === slot.dataset.tag;
+  blockEl.classList.add(isRightTag ? 'correct-flash' : 'wrong-flash');
+  if(!isRightTag) state.wrongPlacements++;
+  setTimeout(()=>blockEl.classList.remove('correct-flash','wrong-flash'), 500);
+}
+
+/* ---- CLEAN THE PROMPT ---- */
+function renderClean(card, sc){
+  const box = el(`<div>
+    <span class="pool-label">Click the cluttered phrases to remove them — keep only what strengthens the prompt.</span>
+    <div class="cluttered-box" id="clutterBox"></div>
+  </div>`);
+  card.appendChild(box);
+  const clutterBox = box.querySelector('#clutterBox');
+  sc.chunks.forEach((c, i)=>{
+    const span = el(`<span class="chunk" data-idx="${i}" tabindex="0" role="button" aria-label="${c.keep?'Keep: ':'Remove: '}${esc(c.text)}">${esc(c.text)} </span>`);
+    span.addEventListener('click', ()=>toggleChunk(span, c));
+    span.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); span.click(); } });
+    clutterBox.appendChild(span);
+  });
+}
+function toggleChunk(span, c){
+  if(span.dataset.done) return;
+  span.dataset.done = "1";
+  span.classList.add('removed');
+  state.movesTotal++;
+  if(c.keep) state.wrongPlacements++;
+}
+
+/* ---- CHOOSE THE BEST PROMPT ---- */
+function renderChoose(card, sc){
+  const grid = el(`<div class="choice-grid" id="choiceGrid"></div>`);
+  card.appendChild(grid);
+  sc.options.forEach((opt, i)=>{
+    const c = el(`<button class="choice-card" type="button" data-idx="${i}">
+      <span class="clabel">${esc(opt.label)}</span>
+      <p>${esc(opt.text)}</p>
+    </button>`);
+    c.addEventListener('click', ()=>{
+      document.querySelectorAll('#choiceGrid .choice-card').forEach(x=>x.style.outline='none');
+      document.querySelectorAll('#choiceGrid .choice-card').forEach(x=>x.classList.remove('selected'));
+      c.classList.add('selected');
+      c.style.outline = '2px solid var(--accent)';
+      grid.dataset.chosen = i;
+    });
+    grid.appendChild(c);
+  });
+}
+
+/* ---- HINTS ---- */
+function useHint(sc){
+  state.hintsUsed++;
+  state.score = Math.max(0, state.score - state.difficulty.hintPenalty);
+  updateHud();
+  const box = document.getElementById('hintBox');
+  const tips = {
+    Specificity: "Vague requests get vague answers — name exact numbers, names, or specifics wherever possible.",
+    Context: "Strong prompts often ground the AI in the real situation before asking for the task.",
+    "Role Assignment": "Assigning a specific role narrows the AI's tone and expertise before it even starts.",
+    Constraints: "Constraints prevent scope creep — they tell the AI what NOT to do, not just what to do.",
+    Formatting: "Specifying the output format saves rework — tables, lists, and length limits all count.",
+    Examples: "One concrete example usually teaches the AI faster than three extra sentences of instruction.",
+    "Audience Awareness": "Who will read the output changes tone and depth just as much as the topic does.",
+    Clarity: "Short, direct sentences beat long ones stuffed with qualifiers and hedging."
+  };
+  box.textContent = "💡 " + (tips[sc.principle] || "Strong prompts define role, context, objective, constraints, and format.");
+  box.classList.add('show');
+  document.getElementById('btnHint').disabled = true;
+  document.getElementById('btnHint').style.opacity = '0.5';
+}
+
+/* ---- SUBMIT / SCORING ---- */
+function submitAnswer(sc){
+  let correctRatio = 0, isFullyCorrect = false, explanation = "";
+  if(sc.type === "build"){
+    const slots = document.querySelectorAll('#rail .rail-slot');
+    let right = 0;
+    slots.forEach(slot=>{
+      const idx = slot.dataset.blockIdx;
+      if(idx !== undefined && sc.allBlocks[idx].btag === slot.dataset.tag) right++;
+    });
+    correctRatio = right / slots.length;
+    isFullyCorrect = right === slots.length;
+    explanation = `You correctly placed ${right} of ${slots.length} blocks. The ideal prompt combines Role, Context, Objective, Constraints, and Output Format in order — each one narrows what the AI can guess wrong.`;
+  } else if(sc.type === "clean"){
+    const total = sc.chunks.length;
+    const keepCount = sc.chunks.filter(c=>c.keep).length;
+    const removeCount = total - keepCount;
+    let correctKeeps = 0, correctRemoves = 0;
+    document.querySelectorAll('#clutterBox .chunk').forEach((span,i)=>{
+      const c = sc.chunks[i];
+      const wasRemoved = span.classList.contains('removed');
+      if(c.keep && !wasRemoved) correctKeeps++;
+      if(!c.keep && wasRemoved) correctRemoves++;
+    });
+    correctRatio = (correctKeeps + correctRemoves) / total;
+    isFullyCorrect = correctRatio > 0.85;
+    explanation = `You kept ${correctKeeps}/${keepCount} essential phrases and removed ${correctRemoves}/${removeCount} filler phrases. Optimized prompts cut hedging, repetition, and empty politeness — every remaining word should do work.`;
+  } else {
+    const grid = document.getElementById('choiceGrid');
+    const chosen = grid.dataset.chosen;
+    if(chosen === undefined){ toast('⚠️','Pick an option first','Choose one of the three prompts.'); return; }
+    const opt = sc.options[Number(chosen)];
+    isFullyCorrect = opt.kind === "optimized";
+    correctRatio = isFullyCorrect ? 1 : 0.15;
+    document.querySelectorAll('#choiceGrid .choice-card').forEach((c,i)=>{
+      c.style.pointerEvents = 'none';
+      if(sc.options[i].kind === "optimized") c.classList.add('correct');
+      else if(i === Number(chosen)) c.classList.add('incorrect');
+    });
+    explanation = isFullyCorrect
+      ? `Correct — the optimized prompt balances Role, Context, Objective, Constraints, and Format without excess. The weak prompt lacked ${sc.principle.toLowerCase()}, and the over-engineered one buried the real instruction in noise.`
+      : `Not quite. The optimized prompt (highlighted) wins because it states role, context, objective, constraints, and format clearly — without the vagueness of the weak version or the bloated repetition of the over-engineered one.`;
+  }
+
+  finishAttempt(sc, correctRatio, isFullyCorrect, explanation);
+}
+
+function finishAttempt(sc, correctRatio, isFullyCorrect, explanation){
+  document.getElementById('btnSubmit').style.display = 'none';
+  document.getElementById('btnHint').style.display = 'none';
+  document.getElementById('btnContinue').style.display = 'inline-flex';
+
+  const hintUsedThisRound = document.getElementById('btnHint').disabled === true;
+  if(isFullyCorrect){
+    state.streak++;
+    state.combo = Math.min(3, 1 + state.streak*0.2);
+  } else {
+    state.streak = 0;
+    state.combo = 1;
+  }
+  const basePoints = Math.round(correctRatio * 100);
+  const comboPoints = Math.round(basePoints * state.combo);
+  const finalPoints = hintUsedThisRound ? Math.round(comboPoints*0.85) : comboPoints;
+  state.score += finalPoints;
+  state.xp += Math.round(finalPoints/4);
+  progress.xp = state.xp;
+  updateHud();
+  scorePopup(finalPoints, document.getElementById('liveScore'));
+
+  state.perScenario.push({principle: sc.principle, type:sc.type, correctRatio, hintUsed:hintUsedThisRound});
+
+  const panel = document.getElementById('feedbackPanel');
+  panel.classList.add('show', isFullyCorrect ? 'good' : 'bad');
+  const headerText = isFullyCorrect ? '✅ Nicely assembled' : '📋 Here is the breakdown';
+  panel.innerHTML = `<h4>${headerText}</h4>
+    <p>${esc(explanation)}</p>
+    <span class="principle-pill">Principle: ${esc(sc.principle)}</span>`;
+
+  maybeAwardBadge();
+}
+
+function maybeAwardBadge(){
+  const total = state.perScenario.length;
+  const correctCount = state.perScenario.filter(p=>p.correctRatio > 0.85).length;
+  const badgeChecks = [
+    {id:"apprentice", name:"Prompt Apprentice", cond: total===1, icon:"🔰"},
+    {id:"context", name:"Context Master", cond: state.perScenario.some(p=>p.principle==="Context" && p.correctRatio>0.85), icon:"🧭"},
+    {id:"constraint", name:"Constraint Wizard", cond: state.perScenario.some(p=>p.principle==="Constraints" && p.correctRatio>0.85), icon:"🔒"},
+    {id:"optimize", name:"Optimization Expert", cond: state.perScenario.filter(p=>p.type==="clean" && p.correctRatio>0.85).length>=2, icon:"⚙️"},
+    {id:"architect", name:"Prompt Architect", cond: state.streak>=3, icon:"🏛️"},
+    {id:"grandmaster", name:"Prompt Grandmaster", cond: correctCount===total && total===state.scenarios.length, icon:"👑"}
+  ];
+  badgeChecks.forEach(b=>{
+    if(b.cond && !state.badgesEarned.has(b.id)){
+      state.badgesEarned.add(b.id);
+      toast(b.icon, "Badge Earned!", b.name);
+    }
+  });
+}
+
+function nextScenario(){
+  state.currentIndex++;
+  if(state.currentIndex >= state.scenarios.length){
+    finishRun();
+  } else {
+    renderScenario();
+  }
+}
+
+/* ================================================================
+   7. REPORT
+   ================================================================ */
+function finishRun(){
+  document.getElementById('progressFill').style.width = '100%';
+  const totalTimeSec = Math.round((Date.now()-state.startTime)/1000);
+
+  // DNA metrics 0-100
+  const byPrinciple = {};
+  state.perScenario.forEach(p=>{ byPrinciple[p.principle] = byPrinciple[p.principle]||[]; byPrinciple[p.principle].push(p.correctRatio); });
+  const avg = arr => arr.length ? Math.round(100*arr.reduce((a,b)=>a+b,0)/arr.length) : 60;
+  const dna = {
+    Clarity: avg(byPrinciple["Clarity"]||[]),
+    Context: avg(byPrinciple["Context"]||byPrinciple["Audience Awareness"]||[]),
+    Constraints: avg(byPrinciple["Constraints"]||[]),
+    Formatting: avg(byPrinciple["Formatting"]||[]),
+    Optimization: avg(state.perScenario.filter(p=>p.type==="clean").map(p=>p.correctRatio)),
+    Efficiency: Math.max(10, 100 - state.wrongPlacements*6 - state.hintsUsed*5)
+  };
+  const overall = Math.round(Object.values(dna).reduce((a,b)=>a+b,0)/6);
+  const finalScore = Math.max(0, Math.min(100, overall));
+
+  const ratings = ["Beginner","Prompt Learner","Prompt Builder","Prompt Engineer","Prompt Strategist","Prompt Architect","Prompt Master"];
+  const ratingIdx = Math.min(ratings.length-1, Math.floor(finalScore/15));
+  const ranks = [["Bronze","🥉"],["Silver","🥈"],["Gold","🥇"],["Platinum","💠"],["Diamond","💎"],["Grandmaster","👑"]];
+  const rankIdx = Math.min(ranks.length-1, Math.floor(finalScore/17));
+
+  // persist progress
+  progress.bestScore = Math.max(progress.bestScore||0, finalScore);
+  progress.highestRank = (progress.highestRank && ranks.findIndex(r=>r[0]===progress.highestRank) > rankIdx) ? progress.highestRank : ranks[rankIdx][0];
+  progress.completedRuns = (progress.completedRuns||0) + 1;
+  progress.achievements = Array.from(new Set([...(progress.achievements||[]), ...Array.from(state.badgesEarned)]));
+  progress.domainHistory = [...(progress.domainHistory||[]), state.domain.label].slice(-10);
+  progress.xp = state.xp;
+  saveProgress();
+
+  renderReport({dna, overall:finalScore, ratingIdx, rankIdx, totalTimeSec});
+  showScreen('screen-report');
+}
+
+function renderReport({dna, overall, ratingIdx, rankIdx, totalTimeSec}){
+  const ratings = ["Beginner","Prompt Learner","Prompt Builder","Prompt Engineer","Prompt Strategist","Prompt Architect","Prompt Master"];
+  const ranks = [["Bronze","🥉"],["Silver","🥈"],["Gold","🥇"],["Platinum","💠"],["Diamond","💎"],["Grandmaster","👑"]];
+
+  document.getElementById('rankEmoji').textContent = ranks[rankIdx][1];
+  document.getElementById('reportScore').textContent = overall;
+  document.getElementById('reportRating').textContent = `${ratings[ratingIdx]} · ${ranks[rankIdx][0]} Rank`;
+
+  const dnaWrap = document.getElementById('dnaBars');
+  dnaWrap.innerHTML = '';
+  Object.entries(dna).forEach(([k,v])=>{
+    const row = el(`<div class="dna-row"><span class="lbl">${k}</span><div class="dna-bar"><i style="width:0%"></i></div><span class="dna-val">${v}</span></div>`);
+    dnaWrap.appendChild(row);
+    requestAnimationFrame(()=>{ row.querySelector('i').style.width = v+'%'; });
+  });
+
+  const stats = document.getElementById('runStats');
+  const mm = Math.floor(totalTimeSec/60), ss = totalTimeSec%60;
+  stats.innerHTML = `
+    <div>⏱ Completion Time: <b>${mm}m ${ss}s</b></div>
+    <div>🧩 Total Moves: <b>${state.movesTotal}</b></div>
+    <div>❌ Wrong Placements: <b>${state.wrongPlacements}</b></div>
+    <div>💡 Hints Used: <b>${state.hintsUsed}</b></div>
+    <div>🔥 Best Streak: <b>${state.streak}</b></div>
+    <div>📈 Personal Best: <b>${progress.bestScore}</b></div>
+    <div>🗂 Completed Runs: <b>${progress.completedRuns}</b></div>
+  `;
+
+  const strengths = Object.entries(dna).filter(([k,v])=>v>=70).map(([k,v])=>`Strong ${k.toLowerCase()} — your prompts consistently nailed this element.`);
+  const weaknesses = Object.entries(dna).filter(([k,v])=>v<60).map(([k,v])=>`${k} needs work — aim for more deliberate ${k.toLowerCase()} in your next prompts.`);
+  document.getElementById('strengthList').innerHTML = (strengths.length?strengths:["Solid, well-rounded fundamentals across the board."]).map(s=>`<li>${esc(s)}</li>`).join('');
+  document.getElementById('weakList').innerHTML = (weaknesses.length?weaknesses:["No major weak spots this run — push into a harder difficulty next."]).map(s=>`<li>${esc(s)}</li>`).join('');
+
+  const allBadgeDefs = [
+    ["apprentice","Prompt Apprentice","🔰"],["context","Context Master","🧭"],["constraint","Constraint Wizard","🔒"],
+    ["optimize","Optimization Expert","⚙️"],["architect","Prompt Architect","🏛️"],["grandmaster","Prompt Grandmaster","👑"]
+  ];
+  document.getElementById('badgesRow').innerHTML = allBadgeDefs.map(([id,name,icon])=>{
+    const earned = state.badgesEarned.has(id);
+    return `<div class="badge-chip ${earned?'':'locked'}"><span>${icon}</span><span>${esc(name)}</span></div>`;
+  }).join('');
+
+  const weakestKey = Object.entries(dna).sort((a,b)=>a[1]-b[1])[0][0];
+  document.getElementById('nextMilestone').textContent = `Focus on ${weakestKey} next run — try the "${state.difficulty.label}" tier again with a new domain to generalize the skill, or step up a difficulty tier for tighter scoring.`;
+
+  const bestTask = state.scenarios[0].task;
+  document.getElementById('finalPromptBox').textContent = makeOptimizedPrompt(bestTask);
+}
+
+document.getElementById('btnReplaySame').addEventListener('click', ()=>{ startGame(); });
+document.getElementById('btnChangeDiff').addEventListener('click', ()=>{ goToStep(2); showScreen('screen-onboard'); });
+document.getElementById('btnChangeDomain').addEventListener('click', ()=>{ ob.domainIdx=null; ob.diffIdx=null; goToStep(1); showScreen('screen-onboard'); });
+
+/* ================================================================
+   8. INIT
+   ================================================================ */
+renderDomainGrid();
+renderDiffGrid();
+goToStep(1);
+
+})();
+</script>
+</body>
+</html>
