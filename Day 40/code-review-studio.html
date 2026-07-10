@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- skill:chrome -->
+<style>
+/* Credit line — bottom-right */
+.design-ui-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  font: 11px/1 system-ui, sans-serif;
+  color: rgba(128,128,128,0.5);
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: opacity 0.4s ease;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+/* Hide chrome on touch devices */
+@media (hover: none) {
+  .design-ui-credit { display: none; }
+}
+
+/* Print fixes */
+@media print {
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .design-ui-credit { display: none !important; }
+}
+
+</style>
+<script>
+(function () {
+    // Design-ui pages are single compositions, so the whole body is editable.
+    function markEditable() {
+        document.body.classList.add('artifact-editable');
+    }
+
+    // Credit badge with idle-fade. Hover devices only.
+    function initChromeUI() {
+        if (!matchMedia('(hover: hover)').matches) return;
+
+        var credit = document.createElement('div');
+        credit.className = 'design-ui-credit';
+        credit.setAttribute('aria-hidden', 'true');
+        credit.innerHTML = '\u{1F49C} by ClickUp Brain';
+        document.body.appendChild(credit);
+
+        var timer = null;
+        var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
+        fade(true);
+        var show = function () {
+            fade(false);
+            clearTimeout(timer);
+            timer = setTimeout(function () { fade(true); }, 3000);
+        };
+        document.addEventListener('mousemove', show);
+        show();
+    }
+
+    function init() {
+        markEditable();
+        initChromeUI();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+</script>
+<!-- /skill:chrome -->
+<!-- skill:libraries -->
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js" integrity="sha384-wHFvAtjmgnkA2PJcMsDaCgdipf7X7YV44X/igbLHpvGiq6T5/PvFKl93grpvtbQT" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded",()=>lucide.createIcons())</script>
+<!-- /skill:libraries -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sever · Code Review Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* surfaces, tinted toward violet primary */
+    --bg:        oklch(15% 0.012 288);
+    --surface-1: oklch(18.5% 0.014 288);
+    --surface-2: oklch(22.5% 0.016 288);
+    --surface-3: oklch(27% 0.018 288);
+    --border:    oklch(31% 0.02 288);
+    --border-strong: oklch(40% 0.025 288);
+
+    --text:      oklch(95% 0.006 288);
+    --text-mid:  oklch(78% 0.012 288);
+    --text-dim:  oklch(64% 0.014 288);
+
+    --accent:    oklch(70% 0.16 292);
+    --accent-hi: oklch(78% 0.15 292);
+    --accent-dim:oklch(46% 0.10 292);
+
+    /* severity scale */
+    --sev-critical: oklch(64% 0.19 24);
+    --sev-high:     oklch(72% 0.16 52);
+    --sev-medium:   oklch(80% 0.14 92);
+    --sev-low:      oklch(72% 0.11 224);
+    --ok:           oklch(74% 0.15 156);
+
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+
+    --ease-out:cubic-bezier(0.16,1,0.3,1);
+    --ease-out-quart:cubic-bezier(0.25,1,0.5,1);
+
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px;
+    --sp-6:24px; --sp-8:32px; --sp-12:48px; --sp-16:64px;
+
+    --z-drawer:40; --z-menu:50; --z-toast:60;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:var(--sans);
+    background:var(--bg);
+    color:var(--text);
+    font-weight:400;
+    line-height:1.55;
+    letter-spacing:0.01em;
+    font-optical-sizing:auto;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  h1,h2,h3,h4{text-wrap:balance;line-height:1.2;font-weight:600;letter-spacing:0}
+  button{font-family:inherit;cursor:pointer}
+  ::selection{background:var(--accent-dim);color:var(--text)}
+
+  :focus-visible{outline:2px solid var(--accent-hi);outline-offset:2px;border-radius:4px}
+
+  /* ---------- app shell ---------- */
+  .app{
+    display:grid;
+    grid-template-columns:minmax(360px,420px) 1fr;
+    min-height:100vh;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    grid-column:1 / -1;
+    display:flex;align-items:center;gap:var(--sp-4);
+    padding:var(--sp-3) var(--sp-6);
+    border-bottom:1px solid var(--border);
+    background:var(--surface-1);
+    position:sticky;top:0;z-index:30;
+  }
+  .brand{display:flex;align-items:center;gap:var(--sp-3);min-width:0}
+  .brand-mark{
+    width:34px;height:34px;border-radius:9px;flex-shrink:0;
+    background:linear-gradient(150deg,var(--accent) 10%,var(--accent-dim));
+    display:grid;place-items:center;
+    box-shadow:0 0 0 1px oklch(80% 0.15 292 / .3), 0 6px 18px oklch(50% 0.15 292 / .35);
+  }
+  .brand-mark i{width:19px;height:19px;color:oklch(18% 0.04 292)}
+  .brand-txt{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+  .brand-txt strong{font-size:0.98rem;font-weight:700;letter-spacing:-0.01em}
+  .brand-txt span{font-size:0.72rem;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .header-spacer{flex:1}
+  .model-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:var(--mono);font-size:0.72rem;font-weight:500;
+    color:var(--text-mid);
+    padding:5px 10px;border:1px solid var(--border);border-radius:999px;
+    background:var(--surface-2);
+  }
+  .model-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  .model-badge .dot.off{background:var(--text-dim);box-shadow:none}
+
+  .icon-btn{
+    display:inline-grid;place-items:center;
+    width:38px;height:38px;border-radius:9px;
+    background:var(--surface-2);border:1px solid var(--border);
+    color:var(--text-mid);transition:.18s var(--ease-out-quart);
+  }
+  .icon-btn:hover{background:var(--surface-3);color:var(--text);border-color:var(--border-strong)}
+  .icon-btn i{width:18px;height:18px}
+
+  /* export menu */
+  .menu-wrap{position:relative}
+  .menu{
+    position:absolute;right:0;top:calc(100% + 8px);
+    min-width:250px;background:var(--surface-2);
+    border:1px solid var(--border-strong);border-radius:12px;
+    padding:6px;z-index:var(--z-menu);
+    box-shadow:0 20px 48px oklch(6% 0.02 288 / .6);
+    opacity:0;transform:translateY(-6px) scale(.98);pointer-events:none;
+    transition:.2s var(--ease-out);
+  }
+  .menu.open{opacity:1;transform:none;pointer-events:auto}
+  .menu button{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    padding:10px 11px;border-radius:8px;border:none;background:none;
+    color:var(--text-mid);font-size:0.86rem;transition:.14s;
+  }
+  .menu button:hover{background:var(--surface-3);color:var(--text)}
+  .menu button i{width:16px;height:16px;color:var(--text-dim)}
+  .menu button:hover i{color:var(--accent-hi)}
+  .menu .divider{height:1px;background:var(--border);margin:6px 4px}
+  .menu .label{padding:8px 11px 4px;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);font-weight:600}
+
+  /* ---------- left panel: composer ---------- */
+  .composer{
+    border-right:1px solid var(--border);
+    background:var(--surface-1);
+    padding:var(--sp-6);
+    display:flex;flex-direction:column;gap:var(--sp-6);
+    overflow-y:auto;
+  }
+  .panel-eyebrow{
+    font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;
+    font-weight:600;color:var(--accent-hi);
+  }
+  .composer h2{font-size:1.15rem;margin-top:2px}
+  .composer .sub{font-size:0.84rem;color:var(--text-dim);margin-top:2px}
+
+  .tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:10px;border:1px solid var(--border)}
+  .tabs button{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+    padding:8px 4px;border:none;background:none;border-radius:7px;
+    color:var(--text-dim);font-size:0.8rem;font-weight:500;transition:.16s var(--ease-out-quart);
+  }
+  .tabs button i{width:15px;height:15px}
+  .tabs button.active{background:var(--surface-3);color:var(--text);box-shadow:0 1px 3px oklch(6% 0 0 /.3)}
+  .tabs button:hover:not(.active){color:var(--text-mid)}
+
+  .tab-panel{display:none;flex-direction:column;gap:var(--sp-4)}
+  .tab-panel.active{display:flex}
+
+  .code-input{
+    position:relative;border:1px solid var(--border);border-radius:12px;
+    background:var(--bg);overflow:hidden;transition:.18s var(--ease-out-quart);
+  }
+  .code-input:focus-within{border-color:var(--accent-dim);box-shadow:0 0 0 3px oklch(60% 0.14 292 / .16)}
+  .code-input .bar{
+    display:flex;align-items:center;gap:6px;padding:8px 12px;
+    border-bottom:1px solid var(--border);background:var(--surface-2);
+  }
+  .code-input .bar .dots{display:flex;gap:5px}
+  .code-input .bar .dots i{width:9px;height:9px;border-radius:50%;background:var(--border-strong)}
+  .code-input .bar span{margin-left:auto;font-family:var(--mono);font-size:0.7rem;color:var(--text-dim)}
+  textarea{
+    width:100%;min-height:230px;resize:vertical;
+    background:transparent;border:none;color:var(--text);
+    font-family:var(--mono);font-size:0.82rem;line-height:1.65;
+    padding:14px;tab-size:2;
+  }
+  textarea:focus{outline:none}
+  textarea::placeholder{color:var(--text-dim)}
+
+  .field-row{display:flex;gap:var(--sp-3);flex-wrap:wrap}
+  .field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:130px}
+  .field label{font-size:0.75rem;font-weight:500;color:var(--text-mid)}
+  .field select,.field input[type=text]{
+    background:var(--bg);border:1px solid var(--border);border-radius:9px;
+    color:var(--text);font-family:var(--sans);font-size:0.85rem;padding:9px 11px;
+    transition:.16s;
+  }
+  .field select:focus,.field input:focus{outline:none;border-color:var(--accent-dim);box-shadow:0 0 0 3px oklch(60% 0.14 292 / .16)}
+
+  /* dropzone */
+  .dropzone{
+    border:1.5px dashed var(--border-strong);border-radius:14px;
+    padding:var(--sp-12) var(--sp-6);text-align:center;
+    color:var(--text-dim);transition:.2s var(--ease-out-quart);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+  }
+  .dropzone.drag{border-color:var(--accent);background:oklch(60% 0.14 292 / .08);color:var(--text-mid)}
+  .dropzone i{width:32px;height:32px;color:var(--accent-hi)}
+  .dropzone strong{color:var(--text);font-size:0.92rem;font-weight:600}
+  .dropzone small{font-size:0.76rem}
+  .file-chip{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;
+    background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+    font-size:0.82rem;
+  }
+  .file-chip i{width:16px;height:16px;color:var(--accent-hi)}
+  .file-chip .fname{font-family:var(--mono);color:var(--text)}
+  .file-chip .fsize{color:var(--text-dim);margin-left:auto;font-family:var(--mono);font-size:0.74rem}
+  .file-chip button{background:none;border:none;color:var(--text-dim);display:grid;place-items:center}
+  .file-chip button:hover{color:var(--sev-critical)}
+  .file-chip button i{width:15px;height:15px}
+
+  .depth-note{
+    display:flex;align-items:flex-start;gap:9px;font-size:0.78rem;color:var(--text-dim);
+    padding:11px 13px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+  }
+  .depth-note i{width:15px;height:15px;color:var(--accent-hi);flex-shrink:0;margin-top:2px}
+
+  .run-btn{
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    width:100%;padding:14px;border:none;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent) 0%,var(--accent-dim) 130%);
+    color:oklch(17% 0.04 292);font-weight:700;font-size:0.95rem;letter-spacing:0.01em;
+    transition:.18s var(--ease-out-quart);
+    box-shadow:0 8px 22px oklch(55% 0.15 292 / .32);
+  }
+  .run-btn:hover{transform:translateY(-1px);box-shadow:0 12px 30px oklch(55% 0.15 292 / .42)}
+  .run-btn:active{transform:translateY(0)}
+  .run-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+  .run-btn i{width:18px;height:18px}
+  .link-run{
+    background:none;border:none;color:var(--text-dim);font-size:0.8rem;
+    text-decoration:underline;text-underline-offset:3px;align-self:center;
+  }
+  .link-run:hover{color:var(--accent-hi)}
+
+  .api-box{display:flex;flex-direction:column;gap:6px}
+  .api-box .field-inline{display:flex;gap:8px}
+  .api-box input{flex:1}
+  .api-box small{font-size:0.72rem;color:var(--text-dim)}
+  .api-box small i{width:11px;height:11px;vertical-align:-1px}
+
+  /* ---------- right panel: results ---------- */
+  .stage{padding:var(--sp-8);overflow-y:auto;display:flex;flex-direction:column;gap:var(--sp-8)}
+
+  /* empty state */
+  .empty{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;gap:var(--sp-4);min-height:70vh;color:var(--text-dim);
+    max-width:52ch;margin:0 auto;
+  }
+  .empty .glyph{
+    width:78px;height:78px;border-radius:20px;display:grid;place-items:center;
+    background:var(--surface-1);border:1px solid var(--border);
+  }
+  .empty .glyph i{width:34px;height:34px;color:var(--accent-hi)}
+  .empty h2{font-size:1.5rem;color:var(--text)}
+  .empty p{font-size:0.92rem;line-height:1.6}
+  .empty .hints{display:flex;gap:var(--sp-3);flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .empty .hints span{
+    font-family:var(--mono);font-size:0.74rem;color:var(--text-mid);
+    padding:6px 11px;border:1px solid var(--border);border-radius:999px;background:var(--surface-1);
+  }
+
+  /* loading skeleton */
+  .loading{display:none;flex-direction:column;gap:var(--sp-6)}
+  .loading.show{display:flex}
+  .load-head{display:flex;align-items:center;gap:14px}
+  .spinner{
+    width:44px;height:44px;border-radius:50%;
+    border:3px solid var(--border);border-top-color:var(--accent);
+    animation:spin .8s linear infinite;flex-shrink:0;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .load-head h3{font-size:1.1rem}
+  .load-head p{font-size:0.84rem;color:var(--text-dim)}
+  .load-steps{display:flex;flex-direction:column;gap:10px}
+  .load-step{display:flex;align-items:center;gap:11px;font-size:0.86rem;color:var(--text-dim);transition:.3s}
+  .load-step i{width:17px;height:17px;flex-shrink:0}
+  .load-step.done{color:var(--text-mid)}
+  .load-step.done i{color:var(--ok)}
+  .load-step.active{color:var(--text)}
+  .load-step.active i{color:var(--accent-hi);animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.4}}
+  .skel{background:var(--surface-1);border:1px solid var(--border);border-radius:14px;overflow:hidden;position:relative}
+  .skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,oklch(30% 0.02 288 /.5),transparent);animation:shimmer 1.6s infinite}
+  @keyframes shimmer{to{transform:translateX(100%)}}
+  .skel.h1{height:150px}.skel.h2{height:90px}
+
+  /* error state */
+  .errbox{display:none;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-4);min-height:60vh;justify-content:center;max-width:46ch;margin:0 auto}
+  .errbox.show{display:flex}
+  .errbox .glyph{width:66px;height:66px;border-radius:18px;display:grid;place-items:center;background:oklch(64% 0.19 24 /.12);border:1px solid oklch(64% 0.19 24 /.4)}
+  .errbox .glyph i{width:30px;height:30px;color:var(--sev-critical)}
+  .errbox h3{font-size:1.25rem;color:var(--text)}
+  .errbox p{font-size:0.88rem;color:var(--text-dim)}
+  .errbox code{font-family:var(--mono);font-size:0.78rem;background:var(--surface-2);padding:2px 7px;border-radius:6px;color:var(--sev-high)}
+  .retry-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border-strong);color:var(--text);font-weight:600;font-size:0.88rem;transition:.16s}
+  .retry-btn:hover{background:var(--surface-3);border-color:var(--accent-dim)}
+  .retry-btn i{width:16px;height:16px}
+
+  /* results */
+  .results{display:none;flex-direction:column;gap:var(--sp-8)}
+  .results.show{display:flex;animation:fadeUp .5s var(--ease-out)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}}
+
+  /* verdict header: gauge + verdict + severity tallies */
+  .verdict{
+    display:grid;grid-template-columns:auto 1fr;gap:var(--sp-8);
+    align-items:center;
+    background:var(--surface-1);border:1px solid var(--border);
+    border-radius:18px;padding:var(--sp-8);
+  }
+  .gauge{position:relative;width:168px;height:168px;flex-shrink:0}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .score{font-family:var(--mono);font-size:2.9rem;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+  .gauge .max{font-size:0.72rem;color:var(--text-dim);margin-top:3px;letter-spacing:0.06em}
+  .verdict-body{display:flex;flex-direction:column;gap:var(--sp-4);min-width:0}
+  .verdict-grade{display:flex;align-items:center;gap:11px}
+  .grade-pill{font-family:var(--mono);font-weight:600;font-size:0.8rem;padding:5px 12px;border-radius:999px}
+  .verdict-body h2{font-size:1.35rem}
+  .verdict-body p{font-size:0.9rem;color:var(--text-mid);line-height:1.6;max-width:62ch}
+  .tallies{display:flex;gap:var(--sp-3);flex-wrap:wrap}
+  .tally{
+    display:flex;align-items:center;gap:8px;padding:8px 13px;border-radius:10px;
+    background:var(--surface-2);border:1px solid var(--border);font-size:0.82rem;
+  }
+  .tally b{font-family:var(--mono);font-size:1rem;font-variant-numeric:tabular-nums}
+  .tally .swatch{width:9px;height:9px;border-radius:2px}
+
+  /* section heads */
+  .sec-head{display:flex;align-items:center;gap:11px;margin-bottom:var(--sp-4)}
+  .sec-head i{width:19px;height:19px;color:var(--accent-hi)}
+  .sec-head h3{font-size:1.1rem}
+  .sec-head .count{margin-left:auto;font-family:var(--mono);font-size:0.78rem;color:var(--text-dim)}
+
+  /* filter chips */
+  .filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:var(--sp-4)}
+  .fchip{
+    font-size:0.78rem;padding:6px 13px;border-radius:999px;
+    background:var(--surface-1);border:1px solid var(--border);color:var(--text-dim);
+    transition:.15s;display:inline-flex;align-items:center;gap:7px;
+  }
+  .fchip:hover{color:var(--text-mid);border-color:var(--border-strong)}
+  .fchip.on{background:var(--surface-3);color:var(--text);border-color:var(--border-strong)}
+  .fchip .swatch{width:8px;height:8px;border-radius:2px}
+
+  /* findings */
+  .findings{display:flex;flex-direction:column;gap:var(--sp-3)}
+  .finding{
+    border:1px solid var(--border);border-radius:14px;background:var(--surface-1);
+    overflow:hidden;transition:.18s var(--ease-out-quart);
+    animation:fadeUp .45s var(--ease-out) backwards;
+    animation-delay:calc(var(--i,0) * 55ms);
+  }
+  .finding:hover{border-color:var(--border-strong)}
+  .finding.open{border-color:var(--accent-dim)}
+  .f-head{display:flex;align-items:center;gap:var(--sp-3);padding:15px var(--sp-4);width:100%;text-align:left;border:none;background:none;color:inherit}
+  .sev-tag{font-family:var(--mono);font-size:0.66rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding:4px 9px;border-radius:6px;flex-shrink:0}
+  .f-title{font-size:0.92rem;font-weight:500;flex:1;min-width:0}
+  .f-cat{font-family:var(--mono);font-size:0.72rem;color:var(--text-dim);white-space:nowrap}
+  .f-loc{font-family:var(--mono);font-size:0.72rem;color:var(--text-mid);background:var(--surface-2);padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .f-chev{width:17px;height:17px;color:var(--text-dim);transition:.25s var(--ease-out-quart);flex-shrink:0}
+  .finding.open .f-chev{transform:rotate(180deg)}
+  .f-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--ease-out)}
+  .finding.open .f-body{grid-template-rows:1fr}
+  .f-body-inner{overflow:hidden}
+  .f-content{padding:0 var(--sp-4) var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-4);border-top:1px solid var(--border);padding-top:var(--sp-4);margin-top:2px}
+  .f-content p{font-size:0.86rem;color:var(--text-mid);line-height:1.6}
+  .f-block-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);font-weight:600;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+  .f-block-label i{width:13px;height:13px}
+  pre{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 15px;overflow-x:auto}
+  pre code{font-family:var(--mono);font-size:0.79rem;line-height:1.7;color:var(--text);white-space:pre}
+  pre.diff .add{color:var(--ok);display:block}
+  pre.diff .del{color:var(--sev-critical);display:block;opacity:.85}
+
+  /* report */
+  .report{background:var(--surface-1);border:1px solid var(--border);border-radius:16px;padding:var(--sp-6)}
+  .report h4{font-size:0.98rem;margin:var(--sp-4) 0 8px;color:var(--text)}
+  .report h4:first-child{margin-top:0}
+  .report p{font-size:0.88rem;color:var(--text-mid);line-height:1.65}
+  .report ul{margin:8px 0 0 2px;list-style:none;display:flex;flex-direction:column;gap:8px}
+  .report li{font-size:0.86rem;color:var(--text-mid);padding-left:22px;position:relative;line-height:1.55}
+  .report li::before{content:"";position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:2px;background:var(--accent)}
+  .report li.good::before{background:var(--ok)}
+
+  /* chat */
+  .chat{background:var(--surface-1);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+  .chat-log{display:flex;flex-direction:column;gap:var(--sp-4);padding:var(--sp-6);max-height:420px;overflow-y:auto}
+  .msg{display:flex;gap:11px;max-width:88%;animation:fadeUp .4s var(--ease-out)}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse}
+  .msg .av{width:30px;height:30px;border-radius:8px;flex-shrink:0;display:grid;place-items:center;font-family:var(--mono);font-size:0.72rem;font-weight:600}
+  .msg.bot .av{background:linear-gradient(150deg,var(--accent),var(--accent-dim));color:oklch(18% 0.04 292)}
+  .msg.user .av{background:var(--surface-3);color:var(--text-mid);border:1px solid var(--border)}
+  .bubble{padding:11px 14px;border-radius:13px;font-size:0.87rem;line-height:1.6}
+  .msg.bot .bubble{background:var(--surface-2);border:1px solid var(--border);border-top-left-radius:4px;color:var(--text-mid)}
+  .msg.user .bubble{background:var(--accent-dim);color:var(--text);border-top-right-radius:4px}
+  .bubble code{font-family:var(--mono);font-size:0.8rem;background:var(--bg);padding:1px 6px;border-radius:5px}
+  .typing{display:flex;gap:4px;padding:4px 2px}
+  .typing i{width:7px;height:7px;border-radius:50%;background:var(--text-dim);animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+  .chat-input{display:flex;gap:10px;padding:var(--sp-4);border-top:1px solid var(--border);background:var(--surface-2)}
+  .chat-input input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--sans);font-size:0.88rem;padding:11px 14px}
+  .chat-input input:focus{outline:none;border-color:var(--accent-dim);box-shadow:0 0 0 3px oklch(60% 0.14 292 /.16)}
+  .chat-input button{width:44px;height:44px;flex-shrink:0;border-radius:10px;border:none;background:var(--accent);color:oklch(18% 0.04 292);display:grid;place-items:center;transition:.15s}
+  .chat-input button:hover{background:var(--accent-hi)}
+  .chat-input button:disabled{opacity:.4;cursor:not-allowed}
+  .chat-input button i{width:18px;height:18px}
+  .chat-suggest{display:flex;gap:8px;flex-wrap:wrap;padding:0 var(--sp-4) var(--sp-4)}
+  .chat-suggest button{font-size:0.76rem;padding:6px 12px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);transition:.14s}
+  .chat-suggest button:hover{color:var(--text);border-color:var(--accent-dim)}
+
+  /* ---------- docs drawer ---------- */
+  .scrim{position:fixed;inset:0;background:oklch(8% 0.02 288 /.6);z-index:var(--z-drawer);opacity:0;pointer-events:none;transition:.3s}
+  .scrim.open{opacity:1;pointer-events:auto}
+  .drawer{
+    position:fixed;top:0;right:0;height:100%;width:min(520px,92vw);
+    background:var(--surface-1);border-left:1px solid var(--border-strong);
+    z-index:var(--z-drawer);transform:translateX(100%);
+    transition:transform .4s var(--ease-out);display:flex;flex-direction:column;
+    box-shadow:-20px 0 60px oklch(6% 0.02 288 /.5);
+  }
+  .drawer.open{transform:none}
+  .drawer-head{display:flex;align-items:center;gap:12px;padding:var(--sp-6);border-bottom:1px solid var(--border)}
+  .drawer-head i.title-i{width:20px;height:20px;color:var(--accent-hi)}
+  .drawer-head h3{font-size:1.1rem;flex:1}
+  .drawer-body{overflow-y:auto;padding:var(--sp-4) var(--sp-6) var(--sp-8)}
+  .doc-item{border-bottom:1px solid var(--border)}
+  .doc-item summary{
+    display:flex;align-items:center;gap:11px;padding:15px 2px;cursor:pointer;
+    list-style:none;font-weight:500;font-size:0.92rem;transition:.15s;
+  }
+  .doc-item summary::-webkit-details-marker{display:none}
+  .doc-item summary:hover{color:var(--accent-hi)}
+  .doc-item summary .num{font-family:var(--mono);font-size:0.74rem;color:var(--accent-hi);width:20px}
+  .doc-item summary .chev{margin-left:auto;width:16px;height:16px;color:var(--text-dim);transition:.25s var(--ease-out-quart)}
+  .doc-item[open] summary .chev{transform:rotate(180deg)}
+  .doc-content{padding:0 2px 18px 33px;font-size:0.85rem;color:var(--text-mid);line-height:1.65;display:flex;flex-direction:column;gap:10px}
+  .doc-content strong{color:var(--text);font-weight:600}
+  .doc-content ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .doc-content li{padding-left:16px;position:relative}
+  .doc-content li::before{content:"→";position:absolute;left:0;color:var(--accent-dim)}
+  .doc-content code{font-family:var(--mono);font-size:0.78rem;background:var(--surface-2);padding:1px 6px;border-radius:5px;color:var(--accent-hi)}
+
+  /* system prompt viewer inside docs */
+  .prompt-view{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;max-height:280px;overflow:auto;margin-top:8px}
+  .prompt-view pre{background:none;border:none;padding:0}
+  .prompt-view code{font-size:0.74rem;line-height:1.7;color:var(--text-mid);white-space:pre-wrap}
+
+  /* toast */
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--surface-3);border:1px solid var(--border-strong);
+    padding:12px 18px;border-radius:11px;font-size:0.86rem;font-weight:500;
+    display:flex;align-items:center;gap:9px;z-index:var(--z-toast);
+    opacity:0;pointer-events:none;transition:.3s var(--ease-out);
+    box-shadow:0 12px 32px oklch(6% 0.02 288 /.5);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  .toast i{width:16px;height:16px;color:var(--ok)}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:940px){
+    .app{grid-template-columns:1fr}
+    .composer{border-right:none;border-bottom:1px solid var(--border);max-height:none}
+    .verdict{grid-template-columns:1fr;justify-items:center;text-align:center}
+    .verdict-body{align-items:center}
+    .verdict-body p{text-align:center}
+    .stage{padding:var(--sp-6) var(--sp-4)}
+  }
+  @media (max-width:520px){
+    header{padding:var(--sp-3) var(--sp-4)}
+    .brand-txt span{display:none}
+    .f-cat{display:none}
+    .composer,.stage{padding:var(--sp-4)}
+    .msg{max-width:96%}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ============ HEADER ============ -->
+  <header>
+    <div class="brand">
+      <div class="brand-mark"><i data-lucide="git-pull-request-arrow"></i></div>
+      <div class="brand-txt">
+        <strong>Sever</strong>
+        <span>Code Review Studio · deep analysis</span>
+      </div>
+    </div>
+    <div class="header-spacer"></div>
+    <div class="model-badge"><span class="dot off" id="apiDot"></span> <span id="modelLabel">claude-sonnet · demo mode</span></div>
+    <button class="icon-btn" id="docsBtn" aria-label="Open documentation" title="Documentation"><i data-lucide="book-open"></i></button>
+    <div class="menu-wrap">
+      <button class="icon-btn" id="exportBtn" aria-label="Export options" aria-haspopup="true" title="Export"><i data-lucide="download"></i></button>
+      <div class="menu" id="exportMenu" role="menu">
+        <div class="label">System Prompt</div>
+        <button id="copyPrompt" role="menuitem"><i data-lucide="clipboard"></i> Copy system prompt</button>
+        <button id="dlPrompt" role="menuitem"><i data-lucide="file-text"></i> Download prompt (.md)</button>
+        <div class="divider"></div>
+        <div class="label">Project</div>
+        <button id="exportConfig" role="menuitem"><i data-lucide="braces"></i> Export configuration (.json)</button>
+        <button id="exportDocs" role="menuitem"><i data-lucide="file-down"></i> Export documentation (.md)</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ COMPOSER (LEFT) ============ -->
+  <aside class="composer">
+    <div>
+      <div class="panel-eyebrow">Review target</div>
+      <h2>Submit code for deep review</h2>
+      <p class="sub">Paste a diff, drop a file, or add context. Sever runs a senior-level pass across security, logic, performance, and maintainability.</p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="active" data-tab="paste" role="tab"><i data-lucide="code"></i> Paste</button>
+      <button data-tab="upload" role="tab"><i data-lucide="upload-cloud"></i> File</button>
+      <button data-tab="context" role="tab"><i data-lucide="sliders-horizontal"></i> Context</button>
+    </div>
+
+    <!-- paste -->
+    <div class="tab-panel active" data-panel="paste">
+      <div class="code-input">
+        <div class="bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <span id="lineCount">0 lines</span>
+        </div>
+        <textarea id="codeArea" spellcheck="false" placeholder="// Paste code or a unified diff here&#10;function transfer(from, to, amount) {&#10;  from.balance -= amount;&#10;  to.balance += amount;&#10;  return true;&#10;}"></textarea>
+      </div>
+    </div>
+
+    <!-- upload -->
+    <div class="tab-panel" data-panel="upload">
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload a source file">
+        <i data-lucide="file-up"></i>
+        <strong>Drop a source file</strong>
+        <small>or click to browse · .js .ts .py .go .rs .java .rb .php</small>
+      </div>
+      <input type="file" id="fileInput" hidden accept=".js,.ts,.tsx,.jsx,.py,.go,.rs,.java,.rb,.php,.c,.cpp,.cs,.txt">
+      <div id="fileChip" style="display:none"></div>
+    </div>
+
+    <!-- context -->
+    <div class="tab-panel" data-panel="context">
+      <div class="field-row">
+        <div class="field">
+          <label for="langSel">Language</label>
+          <select id="langSel">
+            <option>Auto-detect</option><option>JavaScript</option><option>TypeScript</option>
+            <option>Python</option><option>Go</option><option>Rust</option><option>Java</option>
+            <option>Ruby</option><option>PHP</option><option>C++</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="focusSel">Primary focus</label>
+          <select id="focusSel">
+            <option>Full review</option><option>Security</option><option>Performance</option>
+            <option>Logic &amp; correctness</option><option>Maintainability</option><option>API design</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="ctxInput">What should the reviewer know? (optional)</label>
+        <input type="text" id="ctxInput" placeholder="e.g. hot path, runs on every request; PR for payment service">
+      </div>
+    </div>
+
+    <div class="depth-note">
+      <i data-lucide="scan-search"></i>
+      <div><strong style="color:var(--text-mid)">Deep Analysis</strong> is on. Expect exhaustive coverage: security, concurrency, edge cases, and architectural tradeoffs, not just style nits.</div>
+    </div>
+
+    <button class="run-btn" id="runBtn"><i data-lucide="sparkles"></i> Run deep review</button>
+
+    <div class="api-box">
+      <div class="field-inline">
+        <input type="password" id="apiKey" placeholder="Anthropic API key (optional, for live review)">
+      </div>
+      <small><i data-lucide="lock"></i> Stored only in this browser tab. Leave blank to run a fully-featured demo review.</small>
+    </div>
+  </aside>
+
+  <!-- ============ STAGE (RIGHT) ============ -->
+  <main class="stage">
+    <!-- EMPTY -->
+    <div class="empty" id="emptyState">
+      <div class="glyph"><i data-lucide="radar"></i></div>
+      <h2>No review yet</h2>
+      <p>Submit code on the left and Sever will return a quality score, severity-ranked findings, a written report, and an open thread for follow-ups.</p>
+      <div class="hints">
+        <span>▸ security</span><span>▸ correctness</span><span>▸ performance</span><span>▸ maintainability</span>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading" id="loadingState">
+      <div class="load-head">
+        <div class="spinner"></div>
+        <div>
+          <h3>Running deep review</h3>
+          <p id="loadSub">Parsing input and building context…</p>
+        </div>
+      </div>
+      <div class="load-steps" id="loadSteps">
+        <div class="load-step" data-step="0"><i data-lucide="file-search"></i> Parsing &amp; normalizing input</div>
+        <div class="load-step" data-step="1"><i data-lucide="shield-alert"></i> Scanning for security &amp; correctness issues</div>
+        <div class="load-step" data-step="2"><i data-lucide="gauge"></i> Evaluating performance &amp; maintainability</div>
+        <div class="load-step" data-step="3"><i data-lucide="list-checks"></i> Ranking findings &amp; drafting report</div>
+      </div>
+      <div class="skel h1"></div>
+      <div class="skel h2"></div>
+      <div class="skel h2"></div>
+    </div>
+
+    <!-- ERROR -->
+    <div class="errbox" id="errorState">
+      <div class="glyph"><i data-lucide="unplug"></i></div>
+      <h3>Review couldn't complete</h3>
+      <p id="errMsg">The request to the model failed. Check your API key and network, then retry.</p>
+      <button class="retry-btn" id="retryBtn"><i data-lucide="rotate-cw"></i> Retry review</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results" id="resultsState">
+      <!-- verdict -->
+      <section class="verdict">
+        <div class="gauge">
+          <svg width="168" height="168" viewBox="0 0 168 168">
+            <circle cx="84" cy="84" r="72" fill="none" stroke="var(--surface-3)" stroke-width="13"/>
+            <circle id="gaugeArc" cx="84" cy="84" r="72" fill="none" stroke="var(--accent)" stroke-width="13"
+              stroke-linecap="round" stroke-dasharray="452" stroke-dashoffset="452"
+              style="transition:stroke-dashoffset 1.1s var(--ease-out), stroke .6s"/>
+          </svg>
+          <div class="center">
+            <div class="score" id="scoreNum">0</div>
+            <div class="max">/ 100 QUALITY</div>
+          </div>
+        </div>
+        <div class="verdict-body">
+          <div class="verdict-grade">
+            <span class="grade-pill" id="gradePill">—</span>
+            <span style="font-family:var(--mono);font-size:0.76rem;color:var(--text-dim)" id="verdictMeta"></span>
+          </div>
+          <h2 id="verdictTitle">Review summary</h2>
+          <p id="verdictSummary"></p>
+          <div class="tallies" id="tallies"></div>
+        </div>
+      </section>
+
+      <!-- findings -->
+      <section>
+        <div class="sec-head">
+          <i data-lucide="list-tree"></i>
+          <h3>Findings</h3>
+          <span class="count" id="findCount"></span>
+        </div>
+        <div class="filters" id="filters"></div>
+        <div class="findings" id="findings"></div>
+      </section>
+
+      <!-- report -->
+      <section>
+        <div class="sec-head">
+          <i data-lucide="clipboard-list"></i>
+          <h3>Review report</h3>
+        </div>
+        <div class="report" id="report"></div>
+      </section>
+
+      <!-- chat -->
+      <section>
+        <div class="sec-head">
+          <i data-lucide="messages-square"></i>
+          <h3>Follow-up thread</h3>
+        </div>
+        <div class="chat">
+          <div class="chat-log" id="chatLog"></div>
+          <div class="chat-suggest" id="chatSuggest">
+            <button>Why is finding #1 critical?</button>
+            <button>Show a safer rewrite</button>
+            <button>What would you merge-block on?</button>
+          </div>
+          <div class="chat-input">
+            <input type="text" id="chatBox" placeholder="Ask a follow-up about this review…" aria-label="Follow-up question">
+            <button id="chatSend" aria-label="Send"><i data-lucide="arrow-up"></i></button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- ============ DOCS DRAWER ============ -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Documentation" aria-hidden="true">
+  <div class="drawer-head">
+    <i data-lucide="book-open" class="title-i"></i>
+    <h3>Design documentation</h3>
+    <button class="icon-btn" id="drawerClose" aria-label="Close"><i data-lucide="x"></i></button>
+  </div>
+  <div class="drawer-body" id="docsBody"><!-- injected --></div>
+</aside>
+
+<div class="toast" id="toast"><i data-lucide="check-circle-2"></i> <span id="toastMsg">Copied</span></div>
+
+<script>
+/* ============================================================
+   CONFIG + SYSTEM PROMPT
+   ============================================================ */
+const CONFIG = {
+  assistant: "Sever — Code Review Assistant",
+  version: "1.0.0",
+  domain: "Software Development / Code Review",
+  persona: { level:"Intermediate developers", goal:"Solve problem", frequency:"Occasional / ad hoc" },
+  inputs: ["Text (code/diff)","Uploaded file","Multiple inputs (code + context)","Conversation"],
+  output: "Mixed: score + severity-ranked findings + report + chat",
+  tone: "Expert Consultant (senior-engineer candor)",
+  reasoning_depth: "Deep Analysis",
+  model: "claude-sonnet-4"
+};
+
+const SYSTEM_PROMPT = `# ROLE
+You are Sever, a senior staff software engineer acting as an automated code reviewer. You review code the way a trusted principal engineer reviews a teammate's pull request: direct, specific, and technically candid. Your audience is intermediate developers who ship regularly and want senior-level insight, not hand-holding.
+
+# RESPONSIBILITIES
+- Perform a DEEP review of the submitted code or diff.
+- Identify concrete defects across five categories: Security, Correctness/Logic, Performance, Maintainability, and API/Design.
+- Assign an overall quality score (0-100) and a letter grade.
+- Rank every finding by severity: critical, high, medium, low.
+- For each finding, give a precise location, a clear explanation of impact, and an actionable fix (with a code snippet when useful).
+- Produce a concise written report: overall assessment, strengths, top risks, and a merge recommendation.
+- Answer follow-up questions in the same review context.
+
+# SCOPE
+- In scope: source code, diffs, snippets, single files, and the reviewer context the user provides.
+- Focus areas may be narrowed by the user (e.g. "Security only"); respect that focus but still flag any critical issue you see.
+- Out of scope: running the code, accessing external systems, or reviewing code the user did not provide.
+
+# CONSTRAINTS
+- Be specific. Reference the exact function, line, or construct. Never give generic advice like "add error handling" without saying where and why.
+- Match severity to real-world impact, not stylistic preference. A missing semicolon is not "high".
+- Prefer the smallest correct fix. Do not rewrite architecture unless the user asks or a critical flaw requires it.
+- Candor over politeness, but never condescension. Critique the code, not the author.
+- Do not invent issues to pad the list. If the code is clean, say so and score it honestly.
+
+# SAFETY RULES
+- Never introduce insecure patterns in suggested fixes (e.g. string-concatenated SQL, disabled TLS verification, hardcoded secrets).
+- Flag any hardcoded credential, secret, or key you see, and instruct the user to rotate it.
+- Do not execute, exfiltrate, or store submitted code beyond the current session.
+- If code appears intended for clearly malicious use (malware, credential theft), decline to improve its effectiveness and explain why.
+
+# MISSING DATA HANDLING
+- If the snippet is truncated or lacks context (imports, types, callers), state the assumption you are making and review under that assumption. Do not refuse over incompleteness.
+- If language is ambiguous, infer it from syntax and note the inference.
+- If no code is provided at all, ask for it in one short line. Do not fabricate a review.
+
+# EDGE CASES
+- Non-code input: politely note it isn't reviewable code and ask for a snippet.
+- Extremely long input: prioritize the highest-severity findings and say coverage was capped.
+- Already-clean code: return a high score, few or zero findings, and explain what was done well.
+- Diffs: review the change and its interaction with surrounding context, not the whole file.
+
+# REFUSAL RULES
+- Refuse only for clearly malicious intent (see Safety Rules) or requests unrelated to reviewing code.
+- A refusal is one short paragraph: what you won't do and why. Offer a safe alternative when one exists.
+
+# OUTPUT SCHEMA
+Return a single JSON object, no prose outside it, matching:
+{
+  "score": <integer 0-100>,
+  "grade": "<A|B|C|D|F>",
+  "verdict_title": "<short headline>",
+  "summary": "<2-3 sentence overall assessment>",
+  "merge_recommendation": "<approve | approve-with-changes | request-changes | block>",
+  "findings": [
+    {
+      "id": <int>,
+      "severity": "<critical|high|medium|low>",
+      "category": "<Security|Correctness|Performance|Maintainability|Design>",
+      "title": "<short title>",
+      "location": "<file:line or function name>",
+      "explanation": "<why it matters>",
+      "fix": "<how to fix it>",
+      "fix_code": "<optional code snippet, may be empty>"
+    }
+  ],
+  "report": {
+    "assessment": "<paragraph>",
+    "strengths": ["<...>"],
+    "risks": ["<...>"]
+  }
+}`;
+
+/* ============================================================
+   DEMO DATA (fully-featured review without an API key)
+   ============================================================ */
+const DEMO = {
+  score: 58, grade:"C",
+  verdict_title:"Functional, but unsafe for money movement",
+  summary:"The core logic works for the happy path, but the transfer function has a critical concurrency and validation gap that makes it unsafe for real balances. Fix the atomicity and input checks before this goes near production.",
+  merge_recommendation:"request-changes",
+  findings:[
+    {id:1,severity:"critical",category:"Correctness",title:"Balance transfer is not atomic and skips validation",location:"transfer() · L1-L5",
+      explanation:"Two concurrent transfers can read the same balance and both succeed, allowing overdrafts or double-spends. There's also no check that `amount` is positive or that `from` has sufficient funds, so a negative amount silently reverses the transfer.",
+      fix:"Guard the inputs, verify sufficient balance, and perform the debit/credit inside a transaction or atomic lock so the read-modify-write can't interleave.",
+      fix_code:"- from.balance -= amount;\n- to.balance += amount;\n+ if (amount <= 0) throw new Error('amount must be positive');\n+ if (from.balance < amount) throw new Error('insufficient funds');\n+ await db.tx(async t => {\n+   await t.debit(from.id, amount);\n+   await t.credit(to.id, amount);\n+ });"},
+    {id:2,severity:"high",category:"Security",title:"No authorization check on the sender",location:"transfer() · entry",
+      explanation:"Nothing verifies that the caller owns or is permitted to move funds out of `from`. Any authenticated user could pass an arbitrary account id.",
+      fix:"Assert the current principal owns `from` (or holds a transfer grant) before touching balances.",
+      fix_code:""},
+    {id:3,severity:"medium",category:"Correctness",title:"Boolean return hides failure modes",location:"transfer() · return",
+      explanation:"Returning bare `true` gives callers no way to distinguish success from the many failure paths, so errors get swallowed upstream.",
+      fix:"Return a result object or throw typed errors; reserve booleans for genuinely binary outcomes.",
+      fix_code:""},
+    {id:4,severity:"low",category:"Maintainability",title:"Mutating inputs directly reduces testability",location:"transfer() · L2-L3",
+      explanation:"Directly mutating the passed-in account objects couples the function to caller state and makes it awkward to unit test in isolation.",
+      fix:"Operate through a repository/service boundary and return new state rather than mutating arguments.",
+      fix_code:""}
+  ],
+  report:{
+    assessment:"This is a compact function that reads clearly, which is a genuine strength. But it treats money movement like arithmetic on plain objects: no validation, no authorization, no atomicity. Those are not edge cases in a financial context, they're the core requirements. Address findings #1 and #2 before anything else; #3 and #4 are about making the code honest and maintainable once it's correct.",
+    strengths:["Readable, single-purpose function","Naming is clear and intent is obvious","Small enough to reason about fully"],
+    risks:["Race condition enables overdraft / double-spend","Missing authorization on the source account","Silent failure via boolean return"]
+  }
+};
+
+/* ============================================================
+   ELEMENT REFS + LUCIDE
+   ============================================================ */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function icons(){ if(window.lucide) lucide.createIcons(); }
+icons();
+
+const states={empty:$("#emptyState"),loading:$("#loadingState"),error:$("#errorState"),results:$("#resultsState")};
+function show(name){
+  states.empty.style.display = name==="empty"?"flex":"none";
+  states.loading.classList.toggle("show",name==="loading");
+  states.error.classList.toggle("show",name==="error");
+  states.results.classList.toggle("show",name==="results");
+}
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg){ $("#toastMsg").textContent=msg; $("#toast").classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>$("#toast").classList.remove("show"),2200); }
+
+/* ---------- tabs ---------- */
+$$(".tabs button").forEach(b=>b.addEventListener("click",()=>{
+  $$(".tabs button").forEach(x=>x.classList.remove("active"));
+  $$(".tab-panel").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  $(`.tab-panel[data-panel="${b.dataset.tab}"]`).classList.add("active");
+}));
+
+/* ---------- line counter ---------- */
+const codeArea=$("#codeArea");
+codeArea.addEventListener("input",()=>{
+  const n=codeArea.value?codeArea.value.split("\n").length:0;
+  $("#lineCount").textContent=`${n} line${n===1?"":"s"}`;
+});
+
+/* ---------- file upload ---------- */
+const dz=$("#dropzone"),fi=$("#fileInput");let uploaded=null;
+dz.addEventListener("click",()=>fi.click());
+dz.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();fi.click();}});
+["dragover","dragenter"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("drag");}));
+["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove("drag");}));
+dz.addEventListener("drop",e=>{if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0]);});
+fi.addEventListener("change",e=>{if(e.target.files[0])readFile(e.target.files[0]);});
+function readFile(f){
+  const r=new FileReader();
+  r.onload=()=>{ uploaded={name:f.name,size:f.size,content:r.result}; renderChip(); };
+  r.readAsText(f);
+}
+function renderChip(){
+  const c=$("#fileChip");
+  c.style.display="block";c.className="file-chip";
+  c.innerHTML=`<i data-lucide="file-code-2"></i><span class="fname">${uploaded.name}</span><span class="fsize">${(uploaded.size/1024).toFixed(1)} KB</span><button id="rmFile" aria-label="Remove"><i data-lucide="x"></i></button>`;
+  icons();
+  $("#rmFile").addEventListener("click",()=>{uploaded=null;c.style.display="none";fi.value="";});
+}
+
+/* ---------- gather input ---------- */
+function gatherCode(){
+  const active=$(".tabs button.active").dataset.tab;
+  if(active==="upload"&&uploaded)return uploaded.content;
+  if(codeArea.value.trim())return codeArea.value;
+  if(uploaded)return uploaded.content;
+  return "";
+}
+
+/* ============================================================
+   RUN REVIEW
+   ============================================================ */
+const SEV={critical:{c:"var(--sev-critical)",l:"Critical"},high:{c:"var(--sev-high)",l:"High"},medium:{c:"var(--sev-medium)",l:"Medium"},low:{c:"var(--sev-low)",l:"Low"}};
+let lastReview=null, loadTimers=[];
+
+$("#runBtn").addEventListener("click",runReview);
+$("#retryBtn").addEventListener("click",runReview);
+
+async function runReview(){
+  const code=gatherCode();
+  if(!code.trim()){ toast("Add some code first"); codeArea.focus(); return; }
+  show("loading"); animateLoadSteps();
+  const key=$("#apiKey").value.trim();
+
+  try{
+    let data;
+    if(key){ data=await callClaude(code,key); }
+    else{ await wait(2600); data=structuredClone(DEMO); }
+    clearLoad();
+    lastReview=data;
+    renderReview(data);
+    show("results");
+  }catch(err){
+    clearLoad();
+    $("#errMsg").innerHTML = key
+      ? `The model request failed: <code>${(err.message||"unknown error").slice(0,120)}</code>. Check your key and network, then retry.`
+      : "Something went wrong building the demo review. Retry to try again.";
+    show("error");
+  }
+}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+function animateLoadSteps(){
+  const steps=$$("#loadSteps .load-step");
+  const subs=["Parsing input and building context…","Scanning for security & correctness issues…","Weighing performance & maintainability…","Ranking findings and drafting the report…"];
+  steps.forEach(s=>s.classList.remove("active","done"));
+  let i=0;
+  const tick=()=>{
+    if(i>0)steps[i-1].classList.replace("active","done"),steps[i-1].classList.add("done");
+    if(i<steps.length){ steps[i].classList.add("active"); $("#loadSub").textContent=subs[i]; i++; loadTimers.push(setTimeout(tick,650)); }
+  };
+  tick();
+}
+function clearLoad(){ loadTimers.forEach(clearTimeout); loadTimers=[]; }
+
+/* ---------- live Claude call ---------- */
+async function callClaude(code,key){
+  const lang=$("#langSel").value, focus=$("#focusSel").value, ctx=$("#ctxInput").value.trim();
+  const userMsg=`Review the following code.\nLanguage: ${lang}\nPrimary focus: ${focus}\nReviewer context: ${ctx||"none"}\n\n\`\`\`\n${code}\n\`\`\`\n\nReturn ONLY the JSON object defined in your output schema.`;
+  const res=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2400,system:SYSTEM_PROMPT,messages:[{role:"user",content:userMsg}]})
+  });
+  if(!res.ok){ const t=await res.text(); throw new Error(`HTTP ${res.status} ${t}`); }
+  const json=await res.json();
+  const text=(json.content&&json.content[0]&&json.content[0].text)||"";
+  const m=text.match(/\{[\s\S]*\}/);
+  if(!m)throw new Error("Model returned no parseable JSON");
+  return JSON.parse(m[0]);
+}
+
+/* ============================================================
+   RENDER REVIEW
+   ============================================================ */
+function gradeColor(g){return {A:"var(--ok)",B:"var(--ok)",C:"var(--sev-medium)",D:"var(--sev-high)",F:"var(--sev-critical)"}[g]||"var(--accent)";}
+function scoreColor(s){return s>=80?"var(--ok)":s>=65?"var(--sev-medium)":s>=45?"var(--sev-high)":"var(--sev-critical)";}
+
+function renderReview(d){
+  // gauge
+  const arc=$("#gaugeArc"), circ=452;
+  arc.style.stroke=scoreColor(d.score);
+  $("#scoreNum").style.color=scoreColor(d.score);
+  requestAnimationFrame(()=>{ setTimeout(()=>{ arc.style.strokeDashoffset=circ-(circ*d.score/100); },60); });
+  countUp($("#scoreNum"),d.score,1100);
+
+  // grade + meta
+  const gp=$("#gradePill");
+  gp.textContent=`GRADE ${d.grade}`;
+  gp.style.color=gradeColor(d.grade); gp.style.background=`color-mix(in oklch, ${gradeColor(d.grade)} 16%, transparent)`;
+  const rec=(d.merge_recommendation||"").replace(/-/g," ");
+  $("#verdictMeta").textContent=rec?`→ ${rec}`:"";
+  $("#verdictTitle").textContent=d.verdict_title||"Review summary";
+  $("#verdictSummary").textContent=d.summary||"";
+
+  // tallies
+  const counts={critical:0,high:0,medium:0,low:0};
+  d.findings.forEach(f=>counts[f.severity]=(counts[f.severity]||0)+1);
+  $("#tallies").innerHTML=Object.entries(SEV).map(([k,v])=>
+    `<div class="tally"><span class="swatch" style="background:${v.c}"></span><b>${counts[k]||0}</b> ${v.l}</div>`).join("");
+
+  // filters
+  $("#findCount").textContent=`${d.findings.length} total`;
+  const cats=["all",...Object.keys(SEV).filter(k=>counts[k])];
+  $("#filters").innerHTML=cats.map((k,i)=>
+    k==="all"?`<button class="fchip on" data-f="all">All findings</button>`
+    :`<button class="fchip" data-f="${k}"><span class="swatch" style="background:${SEV[k].c}"></span>${SEV[k].l}</button>`).join("");
+  $$("#filters .fchip").forEach(b=>b.addEventListener("click",()=>{
+    $$("#filters .fchip").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+    const f=b.dataset.f;
+    $$("#findings .finding").forEach(el=>{ el.style.display=(f==="all"||el.dataset.sev===f)?"":"none"; });
+  }));
+
+  // findings
+  const order={critical:0,high:1,medium:2,low:3};
+  const sorted=[...d.findings].sort((a,b)=>order[a.severity]-order[b.severity]);
+  $("#findings").innerHTML=sorted.map((f,i)=>{
+    const v=SEV[f.severity]||SEV.low;
+    const fixCode=f.fix_code?`<div><div class="f-block-label"><i data-lucide="wrench"></i>Suggested fix</div><pre class="diff"><code>${diffFmt(f.fix_code)}</code></pre></div>`:"";
+    return `<div class="finding" data-sev="${f.severity}" style="--i:${i}">
+      <button class="f-head" aria-expanded="false">
+        <span class="sev-tag" style="color:${v.c};background:color-mix(in oklch, ${v.c} 15%, transparent)">${v.l}</span>
+        <span class="f-title">${esc(f.title)}</span>
+        <span class="f-cat">${esc(f.category)}</span>
+        <span class="f-loc">${esc(f.location)}</span>
+        <i data-lucide="chevron-down" class="f-chev"></i>
+      </button>
+      <div class="f-body"><div class="f-body-inner"><div class="f-content">
+        <p>${esc(f.explanation)}</p>
+        <div><div class="f-block-label"><i data-lucide="lightbulb"></i>Recommendation</div><p>${esc(f.fix)}</p></div>
+        ${fixCode}
+      </div></div></div>
+    </div>`;
+  }).join("");
+  $$("#findings .f-head").forEach(h=>h.addEventListener("click",()=>{
+    const f=h.closest(".finding"); const open=f.classList.toggle("open");
+    h.setAttribute("aria-expanded",open);
+  }));
+
+  // report
+  const r=d.report||{};
+  $("#report").innerHTML=`
+    <h4>Overall assessment</h4><p>${esc(r.assessment||"")}</p>
+    ${r.strengths&&r.strengths.length?`<h4>What's working</h4><ul>${r.strengths.map(s=>`<li class="good">${esc(s)}</li>`).join("")}</ul>`:""}
+    ${r.risks&&r.risks.length?`<h4>Top risks</h4><ul>${r.risks.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}`;
+
+  // reset chat
+  $("#chatLog").innerHTML="";
+  botSay(`Review's in: <b>${d.score}/100</b>, recommendation to <b>${(d.merge_recommendation||"").replace(/-/g," ")}</b>. Ask me anything about the findings or want a rewrite.`);
+  icons();
+}
+
+function diffFmt(s){
+  return esc(s).split("\n").map(l=>{
+    if(l.startsWith("+"))return `<span class="add">${l}</span>`;
+    if(l.startsWith("-"))return `<span class="del">${l}</span>`;
+    return l;
+  }).join("\n");
+}
+function esc(s){return String(s==null?"":s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+function countUp(el,to,dur){
+  const start=performance.now();
+  const step=t=>{ const p=Math.min((t-start)/dur,1); const e=1-Math.pow(1-p,3); el.textContent=Math.round(e*to); if(p<1)requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+
+/* ============================================================
+   CHAT (follow-ups)
+   ============================================================ */
+const chatLog=$("#chatLog"),chatBox=$("#chatBox");
+function botSay(html){ const m=document.createElement("div");m.className="msg bot";m.innerHTML=`<div class="av">S</div><div class="bubble">${html}</div>`;chatLog.appendChild(m);chatLog.scrollTop=chatLog.scrollHeight; }
+function userSay(txt){ const m=document.createElement("div");m.className="msg user";m.innerHTML=`<div class="av">You</div><div class="bubble">${esc(txt)}</div>`;chatLog.appendChild(m);chatLog.scrollTop=chatLog.scrollHeight; }
+function typing(){ const m=document.createElement("div");m.className="msg bot";m.id="typing";m.innerHTML=`<div class="av">S</div><div class="bubble"><div class="typing"><i></i><i></i><i></i></div></div>`;chatLog.appendChild(m);chatLog.scrollTop=chatLog.scrollHeight; }
+
+async function sendChat(txt){
+  if(!txt.trim())return;
+  userSay(txt); chatBox.value="";
+  const key=$("#apiKey").value.trim();
+  typing();
+  try{
+    let reply;
+    if(key&&lastReview){ reply=await chatClaude(txt,key); }
+    else{ await wait(900); reply=demoReply(txt); }
+    $("#typing")?.remove(); botSay(reply);
+  }catch(e){ $("#typing")?.remove(); botSay(`Couldn't reach the model: <code>${esc((e.message||"").slice(0,80))}</code>. Retry in a sec.`); }
+}
+function demoReply(q){
+  const l=q.toLowerCase();
+  if(l.includes("critical")||l.includes("#1"))return "Finding #1 is critical because the debit/credit isn't atomic: two concurrent calls can both read the same balance and succeed, so a user can overdraft or double-spend. In a money-movement path that's a direct financial loss, not a theoretical race.";
+  if(l.includes("rewrite")||l.includes("safer")||l.includes("fix"))return "Wrap the read-modify-write in a transaction, validate <code>amount &gt; 0</code>, and check sufficient funds before mutating. That single change closes findings #1 and most of #3. Want the full snippet in your language?";
+  if(l.includes("merge")||l.includes("block"))return "I'd <b>request changes</b>, not hard-block. Findings #1 and #2 (atomicity + authorization) are must-fix before merge. #3 and #4 can land as a fast follow-up if you file them.";
+  return "Good question. Based on this review, the highest-leverage move is fixing the atomicity in <code>transfer()</code> first, everything else is lower risk. Want me to expand on any specific finding?";
+}
+async function chatClaude(q,key){
+  const res=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,
+      system:SYSTEM_PROMPT+"\n\nYou are now answering follow-up questions about a review you already produced. Be concise and specific. Respond in plain text (short HTML like <b> and <code> is fine).",
+      messages:[{role:"user",content:`Here is the review you produced as JSON:\n${JSON.stringify(lastReview)}\n\nFollow-up question: ${q}`}]})
+  });
+  if(!res.ok)throw new Error("HTTP "+res.status);
+  const j=await res.json();
+  return (j.content&&j.content[0]&&j.content[0].text)||"(no response)";
+}
+$("#chatSend").addEventListener("click",()=>sendChat(chatBox.value));
+chatBox.addEventListener("keydown",e=>{if(e.key==="Enter")sendChat(chatBox.value);});
+$("#chatSuggest").addEventListener("click",e=>{if(e.target.tagName==="BUTTON")sendChat(e.target.textContent);});
+
+/* ============================================================
+   EXPORT MENU
+   ============================================================ */
+const exportMenu=$("#exportMenu");
+$("#exportBtn").addEventListener("click",e=>{e.stopPropagation();exportMenu.classList.toggle("open");});
+document.addEventListener("click",()=>exportMenu.classList.remove("open"));
+exportMenu.addEventListener("click",e=>e.stopPropagation());
+
+function download(name,content,type="text/plain"){
+  const b=new Blob([content],{type});const u=URL.createObjectURL(b);
+  const a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);
+}
+$("#copyPrompt").addEventListener("click",()=>{navigator.clipboard.writeText(SYSTEM_PROMPT).then(()=>toast("System prompt copied"));exportMenu.classList.remove("open");});
+$("#dlPrompt").addEventListener("click",()=>{download("sever-system-prompt.md",SYSTEM_PROMPT,"text/markdown");toast("Prompt downloaded");exportMenu.classList.remove("open");});
+$("#exportConfig").addEventListener("click",()=>{
+  const cfg={...CONFIG,system_prompt:SYSTEM_PROMPT,last_review:lastReview||null,exported_at:new Date().toISOString()};
+  download("sever-config.json",JSON.stringify(cfg,null,2),"application/json");toast("Configuration exported");exportMenu.classList.remove("open");
+});
+$("#exportDocs").addEventListener("click",()=>{download("sever-documentation.md",DOCS_MD,"text/markdown");toast("Documentation exported");exportMenu.classList.remove("open");});
+
+/* ============================================================
+   DOCS DRAWER
+   ============================================================ */
+const DOCS=[
+  {n:"01",t:"Assistant purpose",body:`<p><strong>Sever</strong> is a code review assistant for intermediate developers who want a senior-level pass on a snippet, file, or diff, on demand. The goal of a session is to <strong>solve a problem</strong>: find the real defects and how to fix them, ranked by severity.</p>`},
+  {n:"02",t:"User persona",body:`<p><strong>"Maya," mid-level engineer, 3 years in.</strong> Ships regularly, reaches for Sever ad hoc when a change feels risky. Wants candor and specificity, not a linter or hand-holding.</p><ul><li>Level: intermediate</li><li>Session goal: solve a problem in the code</li><li>Frequency: occasional / when stuck</li><li>Tone expected: expert consultant</li></ul>`},
+  {n:"03",t:"System prompt design",body:`<p>The prompt is built in nine explicit blocks so behavior is predictable: <strong>Role, Responsibilities, Scope, Constraints, Safety Rules, Missing Data Handling, Edge Cases, Refusal Rules, Output Schema.</strong> It enforces specificity, severity discipline, and a strict JSON contract the UI parses directly.</p><div class="prompt-view"><pre><code id="promptText"></code></pre></div>`},
+  {n:"04",t:"UI design decisions",body:`<ul><li><strong>Not a chatbot.</strong> The anchor is a quality gauge + severity-ranked findings, matching how engineers actually triage a review.</li><li><strong>Severity-first color.</strong> Semantic scale (critical→low) drives every finding; the violet accent stays reserved for actions so it never competes with severity signal.</li><li><strong>Dark by default.</strong> Warm-tinted dark surfaces (not pure black), monospace code surfaces, because devs live here.</li><li><strong>Progressive disclosure.</strong> Findings collapse to a scannable list and expand to explanation + fix + diff.</li></ul>`},
+  {n:"05",t:"Extension opportunities",body:`<ul><li>Git provider integration: review PRs directly from GitHub/GitLab</li><li>Multi-file / whole-repo review with cross-file context</li><li>Persistent review history and trend scoring per repo</li><li>Team mode: shared review standards and reviewer assignment</li><li>Auto-apply fixes as a suggested commit</li></ul>`},
+  {n:"06",t:"Memory strategy",body:`<p>Current build is stateless per review (privacy-first, nothing leaves the tab). A production version would add:</p><ul><li><strong>Session memory:</strong> the active review JSON grounds all follow-ups (already wired in the chat call).</li><li><strong>Project memory:</strong> per-repo conventions, prior findings, accepted exceptions.</li><li><strong>User memory:</strong> preferred strictness, language defaults, ignored rule categories.</li></ul>`},
+  {n:"07",t:"Tool integration ideas",body:`<ul><li>Static analyzers (ESLint, Semgrep, Bandit) as ground-truth inputs to fuse with the model pass</li><li>Test runner to validate suggested fixes before proposing them</li><li>Dependency/CVE scanners for supply-chain findings</li><li>Issue tracker: file medium/low findings as tickets automatically</li></ul>`}
+];
+const DOCS_MD=`# Sever — Code Review Studio · Documentation\n\n`+DOCS.map(d=>`## ${d.n}. ${d.t}\n\n${d.body.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim()}\n`).join("\n")+`\n## System Prompt\n\n\`\`\`\n${SYSTEM_PROMPT}\n\`\`\`\n`;
+
+$("#docsBody").innerHTML=DOCS.map((d,i)=>`
+  <details class="doc-item" ${i===0?"open":""}>
+    <summary><span class="num">${d.n}</span> ${d.t} <i data-lucide="chevron-down" class="chev"></i></summary>
+    <div class="doc-content">${d.body}</div>
+  </details>`).join("");
+$("#promptText").textContent=SYSTEM_PROMPT;
+icons();
+
+const drawer=$("#drawer"),scrim=$("#scrim");
+function openDrawer(){drawer.classList.add("open");scrim.classList.add("open");drawer.setAttribute("aria-hidden","false");}
+function closeDrawer(){drawer.classList.remove("open");scrim.classList.remove("open");drawer.setAttribute("aria-hidden","true");}
+$("#docsBtn").addEventListener("click",openDrawer);
+$("#drawerClose").addEventListener("click",closeDrawer);
+scrim.addEventListener("click",closeDrawer);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();exportMenu.classList.remove("open");}});
+
+/* ---------- api key -> model badge ---------- */
+$("#apiKey").addEventListener("input",e=>{
+  const on=e.target.value.trim().length>10;
+  $("#apiDot").classList.toggle("off",!on);
+  $("#modelLabel").textContent=on?"claude-sonnet-4 · live":"claude-sonnet · demo mode";
+});
+
+/* init */
+show("empty");
+</script>
+</body>
+</html>
