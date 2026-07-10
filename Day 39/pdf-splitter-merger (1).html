@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<!-- skill:chrome -->
+<style>
+/* Print fixes */
+@media print {
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+</style>
+<script>
+(function () {
+    // Design-ui pages are single compositions, so the whole body is editable.
+    function markEditable() {
+        document.body.classList.add('artifact-editable');
+    }
+
+    function init() {
+        markEditable();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+</script>
+<!-- /skill:chrome -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Splitter and Merger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root {
+  --bg: oklch(0.985 0.006 75);
+  --surface: oklch(0.997 0.003 75);
+  --surface-2: oklch(0.965 0.008 75);
+  --surface-3: oklch(0.945 0.01 75);
+  --border: oklch(0.9 0.01 75);
+  --border-strong: oklch(0.82 0.014 75);
+  --text: oklch(0.26 0.02 70);
+  --text-muted: oklch(0.52 0.016 70);
+  --text-faint: oklch(0.66 0.012 70);
+  --accent: oklch(0.53 0.115 165);
+  --accent-hover: oklch(0.46 0.115 165);
+  --accent-soft: oklch(0.93 0.04 165);
+  --accent-text: oklch(0.997 0.003 165);
+  --error: oklch(0.55 0.19 25);
+  --error-soft: oklch(0.95 0.045 25);
+  --error-border: oklch(0.82 0.1 25);
+  --success: oklch(0.55 0.12 155);
+  --success-soft: oklch(0.93 0.05 155);
+  --warning: oklch(0.72 0.13 70);
+  --warning-soft: oklch(0.95 0.06 75);
+  --shadow-sm: 0 1px 2px oklch(0.4 0.02 70 / 0.06), 0 1px 1px oklch(0.4 0.02 70 / 0.04);
+  --shadow-md: 0 4px 12px oklch(0.4 0.02 70 / 0.08), 0 2px 4px oklch(0.4 0.02 70 / 0.05);
+  --shadow-lg: 0 12px 32px oklch(0.4 0.02 70 / 0.12), 0 4px 8px oklch(0.4 0.02 70 / 0.06);
+  --page-shadow: 0 2px 8px oklch(0.4 0.02 70 / 0.14), 0 1px 2px oklch(0.4 0.02 70 / 0.1);
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --font-ui: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+}
+[data-theme="dark"] {
+  --bg: oklch(0.17 0.008 70);
+  --surface: oklch(0.21 0.01 70);
+  --surface-2: oklch(0.25 0.012 70);
+  --surface-3: oklch(0.29 0.014 70);
+  --border: oklch(0.31 0.012 70);
+  --border-strong: oklch(0.4 0.014 70);
+  --text: oklch(0.93 0.008 75);
+  --text-muted: oklch(0.7 0.013 75);
+  --text-faint: oklch(0.56 0.012 75);
+  --accent: oklch(0.72 0.11 165);
+  --accent-hover: oklch(0.78 0.11 165);
+  --accent-soft: oklch(0.32 0.06 165);
+  --accent-text: oklch(0.16 0.02 165);
+  --error: oklch(0.68 0.16 25);
+  --error-soft: oklch(0.32 0.08 25);
+  --error-border: oklch(0.45 0.12 25);
+  --success: oklch(0.72 0.12 155);
+  --success-soft: oklch(0.3 0.06 155);
+  --warning: oklch(0.78 0.12 75);
+  --warning-soft: oklch(0.32 0.06 75);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.35);
+  --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.45);
+  --page-shadow: 0 2px 10px oklch(0 0 0 / 0.5);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  transition: background 0.4s var(--ease-out), color 0.4s var(--ease-out);
+}
+h1,h2,h3 { text-wrap: balance; line-height: 1.15; }
+p { text-wrap: pretty; }
+::selection { background: var(--accent-soft); color: var(--accent); }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; border-radius: var(--radius-sm); }
+input:focus-visible { outline-offset: 1px; }
+
+/* ---------- Header ---------- */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-4) var(--sp-6);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklch, var(--surface) 80%, transparent);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 50;
+}
+.brand { display: flex; align-items: center; gap: var(--sp-3); }
+.brand-mark {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: var(--accent); color: var(--accent-text);
+  display: grid; place-items: center; box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+.brand-mark svg { width: 22px; height: 22px; }
+.brand-name { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15;
+  background: linear-gradient(90deg, oklch(0.62 0.19 25), oklch(0.65 0.18 55), oklch(0.62 0.17 145), oklch(0.55 0.16 230), oklch(0.55 0.18 300));
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+.brand-tag { font-size: 0.72rem; color: var(--text-faint); letter-spacing: 0.04em; text-transform: uppercase; font-weight: 600; }
+.topbar-actions { display: flex; align-items: center; gap: var(--sp-2); }
+.icon-btn {
+  width: 40px; height: 40px; border-radius: var(--radius);
+  display: grid; place-items: center; color: var(--text-muted);
+  border: 1px solid transparent;
+  transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out), transform 0.15s var(--ease-out);
+}
+.icon-btn:hover { background: var(--surface-2); color: var(--text); }
+.icon-btn:active { transform: scale(0.92); }
+.icon-btn svg { width: 20px; height: 20px; }
+
+/* ---------- Layout ---------- */
+.wrap { max-width: 1180px; margin: 0 auto; padding: var(--sp-6) var(--sp-6) var(--sp-8); }
+.hero { text-align: center; margin: var(--sp-5) 0 var(--sp-6); }
+.hero h1 {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: -0.02em; margin-bottom: var(--sp-3);
+}
+.hero p { color: var(--text-muted); font-size: 1.08rem; max-width: 54ch; margin: 0 auto; }
+
+/* ---------- Tabs ---------- */
+.tabs {
+  display: inline-flex; gap: var(--sp-1); padding: var(--sp-1);
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 13px; margin: 0 auto var(--sp-6); position: relative;
+}
+.tabs-outer { display: flex; justify-content: center; }
+.tab {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-5); border-radius: 9px;
+  font-weight: 600; font-size: 0.95rem; color: var(--text-muted);
+  transition: color 0.2s var(--ease-out); position: relative; z-index: 1;
+}
+.tab svg { width: 18px; height: 18px; }
+.tab[aria-selected="true"] { color: var(--accent-text); }
+.tab-pill {
+  position: absolute; top: var(--sp-1); bottom: var(--sp-1);
+  background: var(--accent); border-radius: 9px; box-shadow: var(--shadow-sm);
+  transition: transform 0.4s var(--ease-out-expo), width 0.4s var(--ease-out-expo);
+  z-index: 0;
+}
+.panel { display: none; animation: fade-up 0.5s var(--ease-out) both; }
+.panel.active { display: block; }
+@keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ---------- Dropzone ---------- */
+.dropzone {
+  border: 2px dashed var(--border-strong); border-radius: var(--radius-lg);
+  background: var(--surface); padding: var(--sp-8) var(--sp-6);
+  text-align: center; transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+  cursor: pointer;
+}
+.dropzone:hover { border-color: var(--accent); background: var(--surface-2); }
+.dropzone.dragging { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.008); }
+.dz-icon {
+  width: 64px; height: 64px; border-radius: 18px; margin: 0 auto var(--sp-4);
+  background: var(--accent-soft); color: var(--accent);
+  display: grid; place-items: center;
+}
+.dz-icon svg { width: 30px; height: 30px; }
+.dz-title { font-size: 1.2rem; font-weight: 600; margin-bottom: var(--sp-2); }
+.dz-sub { color: var(--text-muted); font-size: 0.95rem; }
+.dz-sub b { color: var(--accent); font-weight: 600; }
+.dz-hint { margin-top: var(--sp-4); font-size: 0.8rem; color: var(--text-faint); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5); border-radius: var(--radius);
+  font-weight: 600; font-size: 0.95rem;
+  transition: background 0.18s var(--ease-out), transform 0.15s var(--ease-out), box-shadow 0.18s var(--ease-out), opacity 0.18s var(--ease-out);
+}
+.btn svg { width: 18px; height: 18px; }
+.btn-primary { background: var(--accent); color: var(--accent-text); box-shadow: var(--shadow-sm); }
+.btn-primary:hover { background: var(--accent-hover); box-shadow: var(--shadow-md); }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+.btn-primary:disabled:hover { background: var(--accent); }
+.btn-ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface-3); border-color: var(--border-strong); }
+.btn-ghost:active { transform: translateY(1px); }
+.btn-lg { padding: var(--sp-4) var(--sp-6); font-size: 1.02rem; }
+.btn-danger { background: var(--error-soft); color: var(--error); border: 1px solid var(--error-border); }
+.btn-danger:hover { background: var(--error); color: var(--surface); }
+
+/* ---------- Doc header bar ---------- */
+.docbar {
+  display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap;
+  padding: var(--sp-4) var(--sp-5); background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: var(--sp-5); box-shadow: var(--shadow-sm);
+}
+.docbar-icon {
+  width: 46px; height: 56px; border-radius: 8px; flex-shrink: 0;
+  background: var(--error-soft); color: var(--error);
+  display: grid; place-items: center; position: relative;
+}
+.docbar-icon svg { width: 24px; height: 24px; }
+.docbar-meta { flex: 1; min-width: 180px; }
+.docbar-name { font-weight: 600; font-size: 1.02rem; word-break: break-word; }
+.docbar-stats { color: var(--text-muted); font-size: 0.88rem; display: flex; gap: var(--sp-4); margin-top: 2px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+.docbar-stats span { display: inline-flex; align-items: center; gap: 5px; }
+.docbar-stats svg { width: 14px; height: 14px; }
+
+/* ---------- Section blocks ---------- */
+.block { margin-bottom: var(--sp-6); }
+.block-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-4); flex-wrap: wrap; }
+.block-title { font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: var(--sp-2); }
+.block-title .step { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--accent-text); font-size: 0.78rem; display: grid; place-items: center; font-weight: 700; }
+.block-note { font-size: 0.85rem; color: var(--text-muted); }
+
+/* ---------- Mode selector ---------- */
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--sp-3); }
+.mode {
+  text-align: left; padding: var(--sp-4); border-radius: var(--radius);
+  border: 1.5px solid var(--border); background: var(--surface);
+  transition: border-color 0.2s var(--ease-out), background 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+  display: flex; gap: var(--sp-3); align-items: flex-start;
+}
+.mode:hover { border-color: var(--border-strong); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.mode[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.mode-ic { width: 34px; height: 34px; border-radius: 9px; background: var(--surface-2); color: var(--text-muted); display: grid; place-items: center; flex-shrink: 0; transition: background 0.2s, color 0.2s; }
+.mode[aria-pressed="true"] .mode-ic { background: var(--accent); color: var(--accent-text); }
+.mode-ic svg { width: 18px; height: 18px; }
+.mode-t { font-weight: 600; font-size: 0.94rem; }
+.mode-d { font-size: 0.8rem; color: var(--text-muted); margin-top: 1px; line-height: 1.4; }
+
+/* ---------- Controls ---------- */
+.control-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--sp-5); box-shadow: var(--shadow-sm); }
+.field-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: var(--sp-2); display: block; }
+.inp {
+  width: 100%; padding: var(--sp-3) var(--sp-3); border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--bg); color: var(--text);
+  font-family: inherit; font-size: 0.95rem; font-variant-numeric: tabular-nums;
+  transition: border-color 0.18s var(--ease-out), box-shadow 0.18s var(--ease-out);
+}
+.inp:hover { border-color: var(--border-strong); }
+.inp:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.inp.invalid { border-color: var(--error); background: var(--error-soft); }
+.inp.invalid:focus { box-shadow: 0 0 0 3px var(--error-soft); }
+
+.range-row { display: flex; gap: var(--sp-2); align-items: center; margin-bottom: var(--sp-2); }
+.range-row .inp { flex: 1; }
+.range-num { width: 26px; height: 26px; border-radius: 7px; background: var(--surface-2); color: var(--text-muted); font-size: 0.8rem; font-weight: 700; display: grid; place-items: center; flex-shrink: 0; }
+.range-del { width: 34px; height: 34px; border-radius: var(--radius-sm); color: var(--text-faint); display: grid; place-items: center; flex-shrink: 0; transition: color 0.15s, background 0.15s; }
+.range-del:hover { color: var(--error); background: var(--error-soft); }
+.range-del svg { width: 16px; height: 16px; }
+.link-add { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-weight: 600; font-size: 0.88rem; padding: var(--sp-2) 0; margin-top: var(--sp-1); }
+.link-add:hover { color: var(--accent-hover); }
+.link-add svg { width: 15px; height: 15px; }
+.field-err { color: var(--error); font-size: 0.8rem; margin-top: var(--sp-2); display: none; align-items: center; gap: 5px; }
+.field-err.show { display: flex; }
+.field-err svg { width: 14px; height: 14px; }
+.stepper { display: flex; align-items: center; gap: var(--sp-3); }
+.stepper .inp { width: 90px; text-align: center; }
+.step-btn { width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface-2); font-size: 1.3rem; color: var(--text-muted); display: grid; place-items: center; transition: all 0.15s; }
+.step-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---------- Thumbnails ---------- */
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: var(--sp-4); }
+.thumb {
+  position: relative; border-radius: var(--radius-sm); cursor: pointer;
+  animation: thumb-in 0.4s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 22ms);
+}
+@keyframes thumb-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: none; } }
+.thumb-canvas-wrap {
+  aspect-ratio: 1 / 1.32; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); overflow: hidden; display: grid; place-items: center;
+  box-shadow: var(--page-shadow); transition: border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+.thumb:hover .thumb-canvas-wrap { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+.thumb canvas { width: 100%; height: 100%; object-fit: contain; display: block; }
+.thumb-skel { width: 100%; height: 100%; background: linear-gradient(100deg, var(--surface-2) 30%, var(--surface-3) 50%, var(--surface-2) 70%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.thumb-num {
+  position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+  background: var(--text); color: var(--bg); font-size: 0.72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; font-variant-numeric: tabular-nums; box-shadow: var(--shadow-sm);
+}
+.thumb-check {
+  position: absolute; top: 7px; right: 7px; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--border-strong); display: grid; place-items: center;
+  opacity: 0; transform: scale(0.8); transition: all 0.18s var(--ease-out);
+}
+.thumb-check svg { width: 13px; height: 13px; color: var(--accent-text); stroke-width: 3.5; }
+.selectable .thumb-check { opacity: 1; }
+.thumb.selected .thumb-canvas-wrap { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.thumb.selected .thumb-check { background: var(--accent); border-color: var(--accent); opacity: 1; }
+.thumb.range-hit .thumb-canvas-wrap { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+
+/* ---------- Output preview ---------- */
+.outputs { display: grid; gap: var(--sp-3); }
+.out-item {
+  display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  animation: fade-up 0.35s var(--ease-out) both;
+}
+.out-badge { width: 34px; height: 42px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; flex-shrink: 0; font-weight: 700; font-size: 0.78rem; }
+.out-info { flex: 1; min-width: 0; }
+.out-name { font-weight: 600; font-size: 0.94rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.out-detail { font-size: 0.82rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.out-pages { font-size: 0.78rem; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.empty-note { text-align: center; padding: var(--sp-5); color: var(--text-faint); font-size: 0.9rem; background: var(--surface-2); border-radius: var(--radius); border: 1px dashed var(--border); }
+
+/* ---------- Merge list ---------- */
+.mergelist { display: grid; gap: var(--sp-3); }
+.mfile {
+  display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-3) var(--sp-4);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); transition: box-shadow 0.2s var(--ease-out), border-color 0.2s var(--ease-out), opacity 0.2s;
+  animation: fade-up 0.35s var(--ease-out) both;
+}
+.mfile.dragging { opacity: 0.4; }
+.mfile.drop-target { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.mfile-grip { color: var(--text-faint); cursor: grab; display: grid; place-items: center; touch-action: none; }
+.mfile-grip:active { cursor: grabbing; }
+.mfile-grip svg { width: 18px; height: 18px; }
+.mfile-thumb { width: 44px; height: 56px; border-radius: 6px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--border); flex-shrink: 0; display: grid; place-items: center; }
+.mfile-thumb canvas { width: 100%; height: 100%; object-fit: contain; }
+.mfile-info { flex: 1; min-width: 0; }
+.mfile-name { font-weight: 600; font-size: 0.94rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mfile-meta { font-size: 0.82rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.mfile-order { display: flex; flex-direction: column; gap: 2px; }
+.mfile-ord-btn { width: 26px; height: 20px; border-radius: 5px; color: var(--text-faint); display: grid; place-items: center; transition: color 0.15s, background 0.15s; }
+.mfile-ord-btn:hover:not(:disabled) { color: var(--accent); background: var(--surface-2); }
+.mfile-ord-btn:disabled { opacity: 0.3; cursor: default; }
+.mfile-ord-btn svg { width: 15px; height: 15px; }
+.mfile-del { width: 34px; height: 34px; border-radius: var(--radius-sm); color: var(--text-faint); display: grid; place-items: center; transition: color 0.15s, background 0.15s; flex-shrink: 0; }
+.mfile-del:hover { color: var(--error); background: var(--error-soft); }
+.mfile-del svg { width: 17px; height: 17px; }
+
+/* ---------- Summary strip ---------- */
+.summary { display: flex; gap: var(--sp-5); flex-wrap: wrap; padding: var(--sp-4) var(--sp-5); background: var(--accent-soft); border-radius: var(--radius); margin: var(--sp-5) 0; }
+.sum-item { display: flex; flex-direction: column; }
+.sum-val { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; color: var(--accent); line-height: 1; font-variant-numeric: tabular-nums; }
+.sum-lbl { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 4px; }
+
+/* ---------- Action bar ---------- */
+.actionbar { display: flex; gap: var(--sp-3); flex-wrap: wrap; align-items: center; justify-content: space-between; margin-top: var(--sp-6); padding-top: var(--sp-5); border-top: 1px solid var(--border); }
+.actionbar-left { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+
+/* ---------- Toast ---------- */
+.toasts { position: fixed; bottom: var(--sp-5); right: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-2); z-index: 100; max-width: 360px; }
+.toast {
+  display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-lg); font-size: 0.9rem; font-weight: 500;
+  animation: toast-in 0.4s var(--ease-out-expo) both;
+}
+.toast.leaving { animation: toast-out 0.28s var(--ease-in-out) forwards; }
+@keyframes toast-in { from { opacity: 0; transform: translateX(30px) scale(0.95); } to { opacity: 1; transform: none; } }
+@keyframes toast-out { to { opacity: 0; transform: translateX(30px); } }
+.toast-ic { width: 20px; height: 20px; flex-shrink: 0; }
+.toast.success .toast-ic { color: var(--success); }
+.toast.error .toast-ic { color: var(--error); }
+.toast.info .toast-ic { color: var(--accent); }
+
+/* ---------- Overlay / progress ---------- */
+.overlay { position: fixed; inset: 0; background: color-mix(in oklch, var(--bg) 70%, transparent); backdrop-filter: blur(6px); z-index: 90; display: none; place-items: center; }
+.overlay.show { display: grid; animation: fade-up 0.3s var(--ease-out); }
+.progress-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--sp-6); box-shadow: var(--shadow-lg); text-align: center; width: min(340px, 90vw); }
+.spinner { width: 52px; height: 52px; margin: 0 auto var(--sp-4); position: relative; }
+.spinner svg { width: 100%; height: 100%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.progress-title { font-weight: 600; font-size: 1.05rem; margin-bottom: var(--sp-2); }
+.progress-sub { color: var(--text-muted); font-size: 0.88rem; margin-bottom: var(--sp-4); }
+.progress-track { height: 7px; background: var(--surface-2); border-radius: 20px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 20px; width: 0%; transition: width 0.3s var(--ease-out); }
+
+/* ---------- Help modal ---------- */
+dialog { border: none; padding: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); background: var(--surface); color: var(--text); max-width: 460px; width: 92vw; }
+dialog::backdrop { background: oklch(0.2 0.02 70 / 0.4); backdrop-filter: blur(3px); }
+.dlg-head { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-5) var(--sp-5) var(--sp-3); }
+.dlg-head h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; }
+.dlg-body { padding: 0 var(--sp-5) var(--sp-5); }
+.kbd-row { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-3) 0; border-bottom: 1px solid var(--border); }
+.kbd-row:last-child { border-bottom: none; }
+.kbd-desc { font-size: 0.92rem; }
+kbd { font-family: var(--font-ui); font-size: 0.78rem; font-weight: 600; padding: 3px 9px; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 6px; box-shadow: 0 1.5px 0 var(--border-strong); }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.hidden { display: none !important; }
+
+@media (max-width: 640px) {
+  .wrap { padding: var(--sp-4) var(--sp-4) var(--sp-7); }
+  .topbar { padding: var(--sp-3) var(--sp-4); }
+  .brand-tag { display: none; }
+  .thumbs { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: var(--sp-3); }
+  .actionbar { flex-direction: column; align-items: stretch; }
+  .actionbar .btn, .actionbar-left { width: 100%; }
+  .actionbar-left { flex-direction: column; }
+  .toasts { left: var(--sp-3); right: var(--sp-3); max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/><path d="M9 13h6M9 17h4"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">PDF Splitter and Merger</div>
+      <div class="brand-tag">Split &amp; Merge PDFs</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="icon-btn" id="helpBtn" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h0M10 10h0M14 10h0M18 10h0M6 14h0M10 14h0M18 14h0M8 14h8"/></svg>
+    </button>
+    <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle theme">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1>Reshape your PDFs in the browser</h1>
+    <p>Split one document into many, or stitch several into one. Everything runs locally on your device, nothing ever leaves it.</p>
+  </div>
+
+  <div class="tabs-outer">
+    <div class="tabs" role="tablist" aria-label="Tools">
+      <div class="tab-pill" id="tabPill"></div>
+      <button class="tab" role="tab" id="tab-split" aria-selected="true" aria-controls="panel-split">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5 20 10M9.5 4.5 4 10"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><path d="M12 3v9"/></svg>
+        Split
+      </button>
+      <button class="tab" role="tab" id="tab-merge" aria-selected="false" aria-controls="panel-merge" tabindex="-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><path d="M6 9v3a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V9M12 15v6"/></svg>
+        Merge
+      </button>
+    </div>
+  </div>
+
+  <!-- ============ SPLIT PANEL ============ -->
+  <section class="panel active" id="panel-split" role="tabpanel" aria-labelledby="tab-split">
+    <div id="splitEmpty">
+      <div class="dropzone" id="splitDrop" tabindex="0" role="button" aria-label="Upload a PDF to split">
+        <div class="dz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0L8 7m4-4 4 4"/><path d="M20 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg></div>
+        <div class="dz-title">Drop a PDF here to split</div>
+        <div class="dz-sub">or <b>browse your files</b> · single PDF, up to a few hundred pages</div>
+        <div class="dz-hint">Processed entirely on your device. No uploads, no accounts.</div>
+      </div>
+      <input type="file" id="splitInput" accept="application/pdf,.pdf" class="hidden">
+    </div>
+
+    <div id="splitWork" class="hidden">
+      <div class="docbar">
+        <div class="docbar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/></svg></div>
+        <div class="docbar-meta">
+          <div class="docbar-name" id="splitFileName">document.pdf</div>
+          <div class="docbar-stats">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><b id="splitPageCount">0</b>&nbsp;pages</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15V5a2 2 0 0 1 2-2h11l5 5v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg><span id="splitFileSize">0 KB</span></span>
+          </div>
+        </div>
+        <button class="btn btn-ghost" id="splitReplace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 6.7 3M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-6.7-3M3 21v-5h5"/></svg>Replace</button>
+      </div>
+
+      <div class="block">
+        <div class="block-head"><h2 class="block-title"><span class="step">1</span>Choose how to split</h2></div>
+        <div class="modes" id="splitModes" role="group" aria-label="Split mode">
+          <button class="mode" data-mode="ranges" aria-pressed="true">
+            <span class="mode-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/></svg></span>
+            <span><span class="mode-t">Custom ranges</span><span class="mode-d">One file per range you define, e.g. 1-3, 5, 8-10</span></span>
+          </button>
+          <button class="mode" data-mode="after" aria-pressed="false">
+            <span class="mode-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l-2 4 2 4M19 8l2 4-2 4"/></svg></span>
+            <span><span class="mode-t">Split after pages</span><span class="mode-d">Cut the document at chosen page breaks</span></span>
+          </button>
+          <button class="mode" data-mode="every" aria-pressed="false">
+            <span class="mode-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+            <span><span class="mode-t">Every N pages</span><span class="mode-d">Break into equal chunks of a fixed size</span></span>
+          </button>
+          <button class="mode" data-mode="select" aria-pressed="false">
+            <span class="mode-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+            <span><span class="mode-t">Extract pages</span><span class="mode-d">Pick pages from the grid into one new PDF</span></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="block-head">
+          <h2 class="block-title"><span class="step">2</span><span id="ctrlTitle">Define your ranges</span></h2>
+          <span class="block-note" id="ctrlHint">Each range becomes its own PDF file.</span>
+        </div>
+        <div class="control-card">
+          <!-- ranges -->
+          <div id="ctrl-ranges" class="ctrl-body">
+            <label class="field-label">Page ranges</label>
+            <div id="rangeList"></div>
+            <button class="link-add" id="addRange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add another range</button>
+            <div class="field-err" id="rangeErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h0"/></svg><span></span></div>
+          </div>
+          <!-- after -->
+          <div id="ctrl-after" class="ctrl-body hidden">
+            <label class="field-label" for="afterInput">Split after these page numbers</label>
+            <input class="inp" id="afterInput" placeholder="e.g. 3, 7, 12" inputmode="numeric">
+            <div class="field-err" id="afterErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h0"/></svg><span></span></div>
+          </div>
+          <!-- every -->
+          <div id="ctrl-every" class="ctrl-body hidden">
+            <label class="field-label" for="everyInput">Pages per file</label>
+            <div class="stepper">
+              <button class="step-btn" id="everyMinus" aria-label="Decrease">−</button>
+              <input class="inp" id="everyInput" type="number" min="1" value="1" inputmode="numeric">
+              <button class="step-btn" id="everyPlus" aria-label="Increase">+</button>
+            </div>
+            <div class="field-err" id="everyErr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h0"/></svg><span></span></div>
+          </div>
+          <!-- select -->
+          <div id="ctrl-select" class="ctrl-body hidden">
+            <p style="color:var(--text-muted);font-size:0.9rem;">Click pages in the preview below to add them. Selected: <b id="selCount" style="color:var(--accent)">0</b></p>
+            <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-3);flex-wrap:wrap;">
+              <button class="btn btn-ghost" id="selAll" style="padding:8px 14px;font-size:0.85rem;">Select all</button>
+              <button class="btn btn-ghost" id="selNone" style="padding:8px 14px;font-size:0.85rem;">Clear</button>
+              <button class="btn btn-ghost" id="selOdd" style="padding:8px 14px;font-size:0.85rem;">Odd pages</button>
+              <button class="btn btn-ghost" id="selEven" style="padding:8px 14px;font-size:0.85rem;">Even pages</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="block-head">
+          <h2 class="block-title"><span class="step">3</span>Preview &amp; output</h2>
+          <span class="block-note" id="thumbToggleWrap"><button class="link-add" id="thumbToggle" style="padding:0">Hide page thumbnails</button></span>
+        </div>
+        <div id="thumbsWrap" class="block" style="margin-bottom:var(--sp-5)">
+          <div class="thumbs" id="splitThumbs" aria-label="Page previews"></div>
+        </div>
+        <div class="block-head" style="margin-bottom:var(--sp-3)"><h3 class="block-title" style="font-size:0.95rem">Resulting files</h3></div>
+        <div class="outputs" id="outputPreview"></div>
+      </div>
+
+      <div class="actionbar">
+        <div class="actionbar-left">
+          <button class="btn btn-ghost" id="splitReset">Start over</button>
+        </div>
+        <button class="btn btn-primary btn-lg" id="splitGo" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 12-4-4m4 4 4-4"/><path d="M20 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
+          <span id="splitGoLabel">Split &amp; download</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MERGE PANEL ============ -->
+  <section class="panel" id="panel-merge" role="tabpanel" aria-labelledby="tab-merge">
+    <div class="dropzone" id="mergeDrop" tabindex="0" role="button" aria-label="Upload PDFs to merge">
+      <div class="dz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0L8 7m4-4 4 4"/><path d="M20 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg></div>
+      <div class="dz-title">Drop PDFs here to merge</div>
+      <div class="dz-sub">or <b>browse your files</b> · add two or more, in any order</div>
+      <div class="dz-hint">Drag to reorder after adding. Everything stays on your device.</div>
+    </div>
+    <input type="file" id="mergeInput" accept="application/pdf,.pdf" multiple class="hidden">
+
+    <div id="mergeWork" class="hidden">
+      <div class="summary" id="mergeSummary">
+        <div class="sum-item"><span class="sum-val" id="sumFiles">0</span><span class="sum-lbl">Files</span></div>
+        <div class="sum-item"><span class="sum-val" id="sumPages">0</span><span class="sum-lbl">Total pages</span></div>
+        <div class="sum-item"><span class="sum-val" id="sumSize">0</span><span class="sum-lbl">Combined size</span></div>
+      </div>
+
+      <div class="block">
+        <div class="block-head">
+          <h2 class="block-title">Files to merge</h2>
+          <span class="block-note">Drag the handle or use arrows to set order</span>
+        </div>
+        <div class="mergelist" id="mergeList"></div>
+      </div>
+
+      <div class="actionbar">
+        <div class="actionbar-left">
+          <button class="btn btn-ghost" id="mergeAddMore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add more</button>
+          <button class="btn btn-ghost" id="mergeClear">Clear all</button>
+        </div>
+        <button class="btn btn-primary btn-lg" id="mergeGo" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 12-4-4m4 4 4-4"/><path d="M20 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
+          Merge &amp; download
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- overlay -->
+<div class="overlay" id="overlay">
+  <div class="progress-card">
+    <div class="spinner"><svg viewBox="0 0 50 50" fill="none"><circle cx="25" cy="25" r="20" stroke="var(--surface-2)" stroke-width="5"/><circle cx="25" cy="25" r="20" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-dasharray="90 150"/></svg></div>
+    <div class="progress-title" id="progTitle">Processing</div>
+    <div class="progress-sub" id="progSub">Working through your document</div>
+    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+  </div>
+</div>
+
+<!-- shortcuts dialog -->
+<dialog id="helpDlg">
+  <div class="dlg-head">
+    <h3>Keyboard shortcuts</h3>
+    <button class="icon-btn" id="helpClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="dlg-body">
+    <div class="kbd-row"><span class="kbd-desc">Switch to Split</span><kbd>S</kbd></div>
+    <div class="kbd-row"><span class="kbd-desc">Switch to Merge</span><kbd>M</kbd></div>
+    <div class="kbd-row"><span class="kbd-desc">Open file picker</span><kbd>U</kbd></div>
+    <div class="kbd-row"><span class="kbd-desc">Run current action</span><kbd>Enter</kbd></div>
+    <div class="kbd-row"><span class="kbd-desc">Toggle dark mode</span><kbd>D</kbd></div>
+    <div class="kbd-row"><span class="kbd-desc">Show this panel</span><kbd>?</kbd></div>
+    <div class="kbd-row"><span class="kbd-desc">Close / cancel</span><kbd>Esc</kbd></div>
+  </div>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+  const { PDFDocument } = PDFLib;
+  const pdfjs = window["pdfjsLib"];
+  pdfjs.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const fmtSize = (b) => b < 1024 ? b + " B" : b < 1048576 ? (b / 1024).toFixed(1) + " KB" : (b / 1048576).toFixed(2) + " MB";
+
+  /* ---------- Theme ---------- */
+  const themeBtn = $("#themeBtn"), themeIcon = $("#themeIcon");
+  const sunPath = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+  const moonPath = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>';
+  function setTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    themeIcon.innerHTML = t === "dark" ? moonPath : sunPath;
+    try { localStorage.setItem("reams-theme", t); } catch (e) {}
+  }
+  (function initTheme() {
+    let t; try { t = localStorage.getItem("reams-theme"); } catch (e) {}
+    if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    setTheme(t);
+  })();
+  themeBtn.addEventListener("click", () => setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"));
+
+  /* ---------- Toasts ---------- */
+  const icons = {
+    success: '<svg class="toast-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    error: '<svg class="toast-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h0"/></svg>',
+    info: '<svg class="toast-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h0"/></svg>'
+  };
+  function toast(msg, type = "info", ms = 3200) {
+    const el = document.createElement("div");
+    el.className = "toast " + type;
+    el.innerHTML = icons[type] + "<span>" + msg + "</span>";
+    $("#toasts").appendChild(el);
+    setTimeout(() => { el.classList.add("leaving"); setTimeout(() => el.remove(), 300); }, ms);
+  }
+
+  /* ---------- Overlay progress ---------- */
+  function showProgress(title, sub) { $("#progTitle").textContent = title; $("#progSub").textContent = sub || ""; $("#progFill").style.width = "0%"; $("#overlay").classList.add("show"); }
+  function setProgress(p) { $("#progFill").style.width = Math.max(0, Math.min(100, p)) + "%"; }
+  function hideProgress() { $("#overlay").classList.remove("show"); }
+
+  /* ---------- Tabs ---------- */
+  const tabs = { split: $("#tab-split"), merge: $("#tab-merge") };
+  const panels = { split: $("#panel-split"), merge: $("#panel-merge") };
+  const pill = $("#tabPill");
+  let currentTab = "split";
+  function movePill() {
+    const t = tabs[currentTab];
+    pill.style.width = t.offsetWidth + "px";
+    pill.style.transform = "translateX(" + (t.offsetLeft - t.parentElement.offsetLeft - 4) + "px)";
+  }
+  function switchTab(name) {
+    currentTab = name;
+    Object.keys(tabs).forEach(k => {
+      tabs[k].setAttribute("aria-selected", k === name);
+      tabs[k].tabIndex = k === name ? 0 : -1;
+      panels[k].classList.toggle("active", k === name);
+    });
+    movePill();
+  }
+  tabs.split.addEventListener("click", () => switchTab("split"));
+  tabs.merge.addEventListener("click", () => switchTab("merge"));
+  requestAnimationFrame(movePill);
+  window.addEventListener("resize", movePill);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(movePill);
+
+  /* ================= SPLIT ================= */
+  const split = {
+    bytes: null, name: "", size: 0, pageCount: 0,
+    pdfjsDoc: null, mode: "ranges",
+    ranges: [{ v: "" }], selected: new Set()
+  };
+
+  function setupDrop(zone, input, onFiles) {
+    zone.addEventListener("click", () => input.click());
+    zone.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
+    ["dragenter", "dragover"].forEach(ev => zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.add("dragging"); }));
+    ["dragleave", "drop"].forEach(ev => zone.addEventListener(ev, (e) => { e.preventDefault(); if (ev === "drop" || !zone.contains(e.relatedTarget)) zone.classList.remove("dragging"); }));
+    zone.addEventListener("drop", (e) => { const f = Array.from(e.dataTransfer.files).filter(f => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf")); if (f.length) onFiles(f); else toast("Only PDF files are supported", "error"); });
+    input.addEventListener("change", () => { if (input.files.length) onFiles(Array.from(input.files)); input.value = ""; });
+  }
+
+  async function loadSplitFile(file) {
+    try {
+      showProgress("Reading document", file.name);
+      const buf = await file.arrayBuffer();
+      setProgress(30);
+      const doc = await pdfjs.getDocument({ data: buf.slice(0) }).promise;
+      split.bytes = buf; split.name = file.name; split.size = file.size;
+      split.pageCount = doc.numPages; split.pdfjsDoc = doc;
+      split.mode = "ranges"; split.ranges = [{ v: "1-" + doc.numPages }]; split.selected = new Set();
+      setProgress(60);
+      $("#splitFileName").textContent = file.name;
+      $("#splitPageCount").textContent = doc.numPages;
+      $("#splitFileSize").textContent = fmtSize(file.size);
+      $("#splitEmpty").classList.add("hidden");
+      $("#splitWork").classList.remove("hidden");
+      $$("#splitModes .mode").forEach(m => m.setAttribute("aria-pressed", m.dataset.mode === "ranges"));
+      renderModeControls(); renderRanges(); renderOutputs();
+      setProgress(75);
+      await renderThumbs();
+      hideProgress();
+      toast("Loaded " + doc.numPages + " pages", "success");
+    } catch (err) {
+      hideProgress(); console.error(err);
+      toast("Couldn't read that PDF. It may be corrupted or encrypted.", "error", 5000);
+    }
+  }
+
+  async function renderThumbs() {
+    const wrap = $("#splitThumbs"); wrap.innerHTML = "";
+    const selectable = split.mode === "select";
+    wrap.classList.toggle("selectable", selectable);
+    const nodes = [];
+    for (let i = 1; i <= split.pageCount; i++) {
+      const t = document.createElement("div");
+      t.className = "thumb"; t.style.setProperty("--i", Math.min(i, 30));
+      t.dataset.page = i;
+      t.innerHTML = '<div class="thumb-canvas-wrap"><div class="thumb-skel"></div></div><div class="thumb-num">' + i + '</div><div class="thumb-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>';
+      t.setAttribute("role", "button");
+      t.setAttribute("aria-label", "Page " + i);
+      t.addEventListener("click", () => onThumbClick(i));
+      wrap.appendChild(t); nodes.push(t);
+    }
+    updateThumbHighlights();
+    // lazily render canvases
+    for (let i = 1; i <= split.pageCount; i++) {
+      try {
+        const page = await split.pdfjsDoc.getPage(i);
+        const vp0 = page.getViewport({ scale: 1 });
+        const scale = 190 / vp0.width;
+        const vp = page.getViewport({ scale });
+        const canvas = document.createElement("canvas");
+        canvas.width = vp.width; canvas.height = vp.height;
+        await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
+        const holder = nodes[i - 1].querySelector(".thumb-canvas-wrap");
+        holder.innerHTML = ""; holder.appendChild(canvas);
+      } catch (e) { /* skip */ }
+    }
+  }
+
+  function onThumbClick(page) {
+    if (split.mode !== "select") { switchToSelectWith(page); return; }
+    if (split.selected.has(page)) split.selected.delete(page); else split.selected.add(page);
+    $("#selCount").textContent = split.selected.size;
+    updateThumbHighlights(); renderOutputs();
+  }
+  function switchToSelectWith(page) {
+    setMode("select"); split.selected.add(page);
+    $("#selCount").textContent = split.selected.size;
+    updateThumbHighlights(); renderOutputs();
+    toast("Extract mode: keep clicking pages to add them", "info", 2600);
+  }
+
+  function updateThumbHighlights() {
+    const rangePages = split.mode === "select" ? split.selected : computeHighlightSet();
+    $$("#splitThumbs .thumb").forEach(t => {
+      const p = +t.dataset.page;
+      t.classList.toggle("selected", split.mode === "select" && split.selected.has(p));
+      t.classList.toggle("range-hit", split.mode !== "select" && rangePages.has(p));
+    });
+  }
+  function computeHighlightSet() {
+    const set = new Set();
+    const outs = computeOutputs().outputs;
+    outs.forEach((o, idx) => { if (idx % 2 === 0) o.pages.forEach(p => set.add(p + 1)); });
+    return set;
+  }
+
+  /* ---- mode controls ---- */
+  const modeMeta = {
+    ranges: { title: "Define your ranges", hint: "Each range becomes its own PDF file." },
+    after: { title: "Set your split points", hint: "The document is cut after each page you list." },
+    every: { title: "Set the chunk size", hint: "Splits into equal groups of pages." },
+    select: { title: "Pick pages to extract", hint: "Chosen pages are combined into a single PDF." }
+  };
+  function setMode(mode) {
+    split.mode = mode;
+    $$("#splitModes .mode").forEach(m => m.setAttribute("aria-pressed", m.dataset.mode === mode));
+    renderModeControls();
+  }
+  function renderModeControls() {
+    ["ranges", "after", "every", "select"].forEach(m => $("#ctrl-" + m).classList.toggle("hidden", m !== split.mode));
+    $("#ctrlTitle").textContent = modeMeta[split.mode].title;
+    $("#ctrlHint").textContent = modeMeta[split.mode].hint;
+    $("#splitGoLabel").textContent = split.mode === "select" ? "Extract & download" : "Split & download";
+    $$("#splitThumbs").length && $("#splitThumbs").classList.toggle("selectable", split.mode === "select");
+    $("#splitThumbs").classList.toggle("selectable", split.mode === "select");
+    if (split.mode === "select") $("#selCount").textContent = split.selected.size;
+    updateThumbHighlights(); renderOutputs();
+  }
+  $("#splitModes").addEventListener("click", (e) => { const b = e.target.closest(".mode"); if (b) setMode(b.dataset.mode); });
+
+  /* ---- ranges ---- */
+  function renderRanges() {
+    const list = $("#rangeList"); list.innerHTML = "";
+    split.ranges.forEach((r, idx) => {
+      const row = document.createElement("div"); row.className = "range-row";
+      row.innerHTML = '<span class="range-num">' + (idx + 1) + '</span>' +
+        '<input class="inp" placeholder="e.g. 1-3 or 5" value="' + r.v.replace(/"/g, "&quot;") + '" inputmode="numeric">' +
+        (split.ranges.length > 1 ? '<button class="range-del" aria-label="Remove range"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>' : '');
+      const inp = row.querySelector(".inp");
+      inp.addEventListener("input", () => { split.ranges[idx].v = inp.value; validateAndRenderOutputs(); });
+      const del = row.querySelector(".range-del");
+      if (del) del.addEventListener("click", () => { split.ranges.splice(idx, 1); renderRanges(); validateAndRenderOutputs(); });
+      list.appendChild(row);
+    });
+  }
+  $("#addRange").addEventListener("click", () => { split.ranges.push({ v: "" }); renderRanges(); validateAndRenderOutputs(); });
+  $("#afterInput").addEventListener("input", validateAndRenderOutputs);
+  $("#everyInput").addEventListener("input", validateAndRenderOutputs);
+  $("#everyMinus").addEventListener("click", () => { const el = $("#everyInput"); el.value = Math.max(1, (+el.value || 1) - 1); validateAndRenderOutputs(); });
+  $("#everyPlus").addEventListener("click", () => { const el = $("#everyInput"); el.value = Math.min(split.pageCount || 999, (+el.value || 1) + 1); validateAndRenderOutputs(); });
+  $("#selAll").addEventListener("click", () => { split.selected = new Set(Array.from({ length: split.pageCount }, (_, i) => i + 1)); $("#selCount").textContent = split.selected.size; updateThumbHighlights(); renderOutputs(); });
+  $("#selNone").addEventListener("click", () => { split.selected.clear(); $("#selCount").textContent = 0; updateThumbHighlights(); renderOutputs(); });
+  $("#selOdd").addEventListener("click", () => { split.selected = new Set(); for (let i = 1; i <= split.pageCount; i += 2) split.selected.add(i); $("#selCount").textContent = split.selected.size; updateThumbHighlights(); renderOutputs(); });
+  $("#selEven").addEventListener("click", () => { split.selected = new Set(); for (let i = 2; i <= split.pageCount; i += 2) split.selected.add(i); $("#selCount").textContent = split.selected.size; updateThumbHighlights(); renderOutputs(); });
+
+  function parseRange(str, max) {
+    // returns {pages:[0-idx], error}
+    str = str.trim();
+    if (!str) return { error: "empty" };
+    const m = str.match(/^(\d+)\s*(?:[-–]\s*(\d+))?$/);
+    if (!m) return { error: "Use a number or range like 4 or 2-6" };
+    let a = +m[1], b = m[2] ? +m[2] : a;
+    if (a < 1 || b < 1) return { error: "Pages start at 1" };
+    if (a > max || b > max) return { error: "Only " + max + " pages available" };
+    if (a > b) return { error: "Range is backwards" };
+    const pages = []; for (let i = a; i <= b; i++) pages.push(i - 1);
+    return { pages };
+  }
+
+  function computeOutputs() {
+    const max = split.pageCount; const base = (split.name || "document").replace(/\.pdf$/i, "");
+    let outputs = [], errors = [];
+    if (split.mode === "ranges") {
+      split.ranges.forEach((r, idx) => {
+        if (!r.v.trim()) return;
+        const res = parseRange(r.v, max);
+        if (res.error && res.error !== "empty") { errors.push({ idx, msg: res.error }); return; }
+        if (res.pages) outputs.push({ name: base + "_part" + (outputs.length + 1) + ".pdf", pages: res.pages, label: r.v.trim() });
+      });
+    } else if (split.mode === "after") {
+      const raw = $("#afterInput").value.trim();
+      if (raw) {
+        const parts = raw.split(/[,\s]+/).filter(Boolean);
+        let pts = [], bad = false;
+        parts.forEach(p => { const n = +p; if (!Number.isInteger(n) || n < 1 || n >= max) bad = true; else pts.push(n); });
+        if (bad) errors.push({ field: "after", msg: "Points must be whole numbers between 1 and " + (max - 1) });
+        else {
+          pts = Array.from(new Set(pts)).sort((a, b) => a - b);
+          let start = 1; const bounds = [...pts, max];
+          bounds.forEach((end, i) => { const pages = []; for (let p = start; p <= end; p++) pages.push(p - 1); outputs.push({ name: base + "_part" + (i + 1) + ".pdf", pages, label: start + (end > start ? "-" + end : "") }); start = end + 1; });
+        }
+      }
+    } else if (split.mode === "every") {
+      const n = +$("#everyInput").value;
+      if (!Number.isInteger(n) || n < 1) errors.push({ field: "every", msg: "Enter a whole number of at least 1" });
+      else if (n > max) errors.push({ field: "every", msg: "That's larger than the document (" + max + " pages)" });
+      else { let idx = 1; for (let start = 1; start <= max; start += n) { const end = Math.min(start + n - 1, max); const pages = []; for (let p = start; p <= end; p++) pages.push(p - 1); outputs.push({ name: base + "_part" + idx + ".pdf", pages, label: start + (end > start ? "-" + end : "") }); idx++; } }
+    } else if (split.mode === "select") {
+      const arr = Array.from(split.selected).sort((a, b) => a - b);
+      if (arr.length) outputs.push({ name: base + "_extract.pdf", pages: arr.map(p => p - 1), label: arr.join(", ") });
+    }
+    return { outputs, errors };
+  }
+
+  function validateAndRenderOutputs() {
+    // clear error styling
+    $$("#rangeList .inp").forEach(i => i.classList.remove("invalid"));
+    $("#afterInput").classList.remove("invalid"); $("#everyInput").classList.remove("invalid");
+    $("#rangeErr").classList.remove("show"); $("#afterErr").classList.remove("show"); $("#everyErr").classList.remove("show");
+    const { errors } = computeOutputs();
+    if (errors.length) {
+      if (split.mode === "ranges") {
+        const inps = $$("#rangeList .inp");
+        errors.forEach(e => { if (e.idx != null && inps[e.idx]) inps[e.idx].classList.add("invalid"); });
+        const box = $("#rangeErr"); box.classList.add("show"); box.querySelector("span").textContent = errors[0].msg;
+      } else if (split.mode === "after") { $("#afterInput").classList.add("invalid"); const box = $("#afterErr"); box.classList.add("show"); box.querySelector("span").textContent = errors[0].msg; }
+      else if (split.mode === "every") { $("#everyInput").classList.add("invalid"); const box = $("#everyErr"); box.classList.add("show"); box.querySelector("span").textContent = errors[0].msg; }
+    }
+    updateThumbHighlights(); renderOutputs();
+  }
+
+  function renderOutputs() {
+    const { outputs, errors } = computeOutputs();
+    const box = $("#outputPreview"); box.innerHTML = "";
+    if (!outputs.length) {
+      box.innerHTML = '<div class="empty-note">' + (errors.length ? "Fix the highlighted inputs to see your output files." : "Define at least one range or selection to preview the result.") + '</div>';
+      $("#splitGo").disabled = true; return;
+    }
+    outputs.forEach((o, i) => {
+      const el = document.createElement("div"); el.className = "out-item"; el.style.animationDelay = (i * 30) + "ms";
+      el.innerHTML = '<div class="out-badge">' + (i + 1) + '</div>' +
+        '<div class="out-info"><div class="out-name">' + o.name + '</div><div class="out-detail">' + o.pages.length + ' page' + (o.pages.length > 1 ? "s" : "") + '</div></div>' +
+        '<div class="out-pages">pp. ' + o.label + '</div>';
+      box.appendChild(el);
+    });
+    $("#splitGo").disabled = errors.length > 0;
+  }
+
+  async function runSplit() {
+    const { outputs, errors } = computeOutputs();
+    if (errors.length || !outputs.length) { toast("Check your inputs first", "error"); return; }
+    try {
+      showProgress(split.mode === "select" ? "Extracting pages" : "Splitting document", outputs.length + " file" + (outputs.length > 1 ? "s" : "") + " to generate");
+      const src = await PDFDocument.load(split.bytes);
+      const built = [];
+      for (let i = 0; i < outputs.length; i++) {
+        const o = outputs[i];
+        const nd = await PDFDocument.create();
+        const copied = await nd.copyPages(src, o.pages);
+        copied.forEach(p => nd.addPage(p));
+        const bytes = await nd.save();
+        built.push({ name: o.name, bytes });
+        setProgress(((i + 1) / outputs.length) * 90);
+      }
+      if (built.length === 1) {
+        downloadBytes(built[0].bytes, built[0].name);
+        setProgress(100);
+      } else {
+        const zip = new JSZip();
+        built.forEach(b => zip.file(b.name, b.bytes));
+        const blob = await zip.generateAsync({ type: "blob" }, (m) => setProgress(90 + m.percent * 0.1));
+        downloadBlob(blob, (split.name || "document").replace(/\.pdf$/i, "") + "_split.zip");
+      }
+      hideProgress();
+      toast(built.length === 1 ? "File ready, downloading now" : built.length + " files zipped and downloading", "success");
+    } catch (err) { hideProgress(); console.error(err); toast("Something broke during processing. Try again.", "error", 5000); }
+  }
+  $("#splitGo").addEventListener("click", runSplit);
+
+  function downloadBytes(bytes, name) { downloadBlob(new Blob([bytes], { type: "application/pdf" }), name); }
+  function downloadBlob(blob, name) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  function resetSplit() {
+    split.bytes = null; split.pdfjsDoc = null; split.selected = new Set(); split.ranges = [{ v: "" }];
+    $("#splitWork").classList.add("hidden"); $("#splitEmpty").classList.remove("hidden");
+    $("#splitThumbs").innerHTML = "";
+  }
+  $("#splitReset").addEventListener("click", resetSplit);
+  $("#splitReplace").addEventListener("click", () => $("#splitInput").click());
+  $("#thumbToggle").addEventListener("click", () => {
+    const w = $("#thumbsWrap"); const hidden = w.classList.toggle("hidden");
+    $("#thumbToggle").textContent = hidden ? "Show page thumbnails" : "Hide page thumbnails";
+  });
+  setupDrop($("#splitDrop"), $("#splitInput"), (files) => loadSplitFile(files[0]));
+
+  /* ================= MERGE ================= */
+  const merge = { files: [] }; // {id,name,size,bytes,pageCount,thumbCanvas}
+  let mid = 0;
+
+  async function addMergeFiles(fileList) {
+    showProgress("Reading files", "Analyzing " + fileList.length + " document" + (fileList.length > 1 ? "s" : ""));
+    let done = 0;
+    for (const file of fileList) {
+      try {
+        const buf = await file.arrayBuffer();
+        const doc = await pdfjs.getDocument({ data: buf.slice(0) }).promise;
+        const entry = { id: ++mid, name: file.name, size: file.size, bytes: buf, pageCount: doc.numPages, thumb: null };
+        merge.files.push(entry);
+        // thumbnail
+        try {
+          const page = await doc.getPage(1);
+          const vp0 = page.getViewport({ scale: 1 });
+          const vp = page.getViewport({ scale: 90 / vp0.width });
+          const c = document.createElement("canvas"); c.width = vp.width; c.height = vp.height;
+          await page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+          entry.thumb = c;
+        } catch (e) {}
+      } catch (err) { toast("Skipped " + file.name + " (unreadable)", "error", 4000); }
+      done++; setProgress((done / fileList.length) * 100);
+    }
+    hideProgress();
+    if (merge.files.length) { $("#mergeWork").classList.remove("hidden"); renderMerge(); }
+    if (merge.files.length < 2) toast("Add at least one more PDF to merge", "info");
+  }
+
+  function renderMerge() {
+    const list = $("#mergeList"); list.innerHTML = "";
+    merge.files.forEach((f, idx) => {
+      const el = document.createElement("div"); el.className = "mfile"; el.draggable = true; el.dataset.id = f.id;
+      el.style.animationDelay = (idx * 30) + "ms";
+      const thumbHtml = f.thumb ? "" : '<div class="thumb-skel"></div>';
+      el.innerHTML =
+        '<div class="mfile-grip" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg></div>' +
+        '<div class="mfile-order"><button class="mfile-ord-btn up" aria-label="Move up"' + (idx === 0 ? " disabled" : "") + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg></button><button class="mfile-ord-btn down" aria-label="Move down"' + (idx === merge.files.length - 1 ? " disabled" : "") + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button></div>' +
+        '<div class="mfile-thumb"></div>' +
+        '<div class="mfile-info"><div class="mfile-name">' + f.name + '</div><div class="mfile-meta">' + f.pageCount + ' page' + (f.pageCount > 1 ? "s" : "") + ' · ' + fmtSize(f.size) + '</div></div>' +
+        '<button class="mfile-del" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>';
+      const th = el.querySelector(".mfile-thumb");
+      if (f.thumb) th.appendChild(f.thumb); else th.innerHTML = thumbHtml;
+      el.querySelector(".up").addEventListener("click", () => moveMerge(idx, idx - 1));
+      el.querySelector(".down").addEventListener("click", () => moveMerge(idx, idx + 1));
+      el.querySelector(".mfile-del").addEventListener("click", () => { merge.files.splice(idx, 1); if (!merge.files.length) { $("#mergeWork").classList.add("hidden"); } else renderMerge(); updateMergeSummary(); });
+      attachDnD(el);
+      list.appendChild(el);
+    });
+    updateMergeSummary();
+  }
+  function moveMerge(from, to) { if (to < 0 || to >= merge.files.length) return; const [x] = merge.files.splice(from, 1); merge.files.splice(to, 0, x); renderMerge(); }
+  function updateMergeSummary() {
+    const totalPages = merge.files.reduce((s, f) => s + f.pageCount, 0);
+    const totalSize = merge.files.reduce((s, f) => s + f.size, 0);
+    $("#sumFiles").textContent = merge.files.length;
+    $("#sumPages").textContent = totalPages;
+    $("#sumSize").textContent = fmtSize(totalSize);
+    $("#mergeGo").disabled = merge.files.length < 2;
+  }
+
+  let dragEl = null;
+  function attachDnD(el) {
+    el.addEventListener("dragstart", () => { dragEl = el; el.classList.add("dragging"); });
+    el.addEventListener("dragend", () => { el.classList.remove("dragging"); $$(".mfile").forEach(m => m.classList.remove("drop-target")); dragEl = null; });
+    el.addEventListener("dragover", (e) => { e.preventDefault(); if (el !== dragEl) el.classList.add("drop-target"); });
+    el.addEventListener("dragleave", () => el.classList.remove("drop-target"));
+    el.addEventListener("drop", (e) => {
+      e.preventDefault(); el.classList.remove("drop-target");
+      if (!dragEl || dragEl === el) return;
+      const from = merge.files.findIndex(f => f.id == dragEl.dataset.id);
+      const to = merge.files.findIndex(f => f.id == el.dataset.id);
+      const [x] = merge.files.splice(from, 1); merge.files.splice(to, 0, x);
+      renderMerge();
+    });
+  }
+
+  async function runMerge() {
+    if (merge.files.length < 2) { toast("Need at least two files", "error"); return; }
+    try {
+      showProgress("Merging documents", "Combining " + merge.files.length + " files in order");
+      const out = await PDFDocument.create();
+      for (let i = 0; i < merge.files.length; i++) {
+        const src = await PDFDocument.load(merge.files[i].bytes);
+        const pages = await out.copyPages(src, src.getPageIndices());
+        pages.forEach(p => out.addPage(p));
+        setProgress(((i + 1) / merge.files.length) * 95);
+      }
+      const bytes = await out.save();
+      setProgress(100);
+      downloadBytes(bytes, "merged.pdf");
+      hideProgress();
+      toast("Merged " + merge.files.length + " files, downloading now", "success");
+    } catch (err) { hideProgress(); console.error(err); toast("Merge failed. One of the files may be protected.", "error", 5000); }
+  }
+  $("#mergeGo").addEventListener("click", runMerge);
+  $("#mergeAddMore").addEventListener("click", () => $("#mergeInput").click());
+  $("#mergeClear").addEventListener("click", () => { merge.files = []; $("#mergeWork").classList.add("hidden"); });
+  setupDrop($("#mergeDrop"), $("#mergeInput"), addMergeFiles);
+
+  /* ================= Shortcuts / dialog ================= */
+  const dlg = $("#helpDlg");
+  $("#helpBtn").addEventListener("click", () => dlg.showModal());
+  $("#helpClose").addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", (e) => { const r = dlg.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dlg.close(); });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.target.matches("input, textarea") || dlg.open) {
+      if (e.key === "Enter" && e.target.matches(".inp") && currentTab === "split" && !$("#splitGo").disabled) { runSplit(); }
+      return;
+    }
+    const k = e.key.toLowerCase();
+    if (k === "s") switchTab("split");
+    else if (k === "m") switchTab("merge");
+    else if (k === "d") setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    else if (k === "u") { (currentTab === "split" ? $("#splitInput") : $("#mergeInput")).click(); }
+    else if (e.key === "?") { e.preventDefault(); dlg.showModal(); }
+    else if (e.key === "Enter") {
+      if (currentTab === "split" && !$("#splitWork").classList.contains("hidden") && !$("#splitGo").disabled) runSplit();
+      else if (currentTab === "merge" && !$("#mergeGo").disabled) runMerge();
+    } else if (e.key === "Escape") { hideProgress(); }
+  });
+
+  // arrow-key tab nav
+  [tabs.split, tabs.merge].forEach(t => t.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); switchTab(currentTab === "split" ? "merge" : "split"); tabs[currentTab].focus(); }
+  }));
+
+  window.addEventListener("beforeunload", (e) => {
+    if (split.bytes || merge.files.length) { e.preventDefault(); e.returnValue = ""; }
+  });
+})();
+</script>
+</body>
+</html>
