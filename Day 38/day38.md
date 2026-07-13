@@ -46,6 +46,11 @@ Developed as part of the 60 Days Claude AI Challenge by AB TALKS.
 
 This project was created for Day 38 of the 60 Days Claude AI Challenge by AB TALKS.
 
+## Live Demo
+
+https://anubhav9373-spec.github.io/Claude-AI-Coding-Challenge/Day%2038/
+
+
 Challenge Link:
 https://www.abtalks.in/?ref=JZY5LU
 
