@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Workflow Architect — Autonomous Agent Build Plan</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#EEF1EE;
+  --bg-grid: rgba(16,24,32,0.05);
+  --panel:#FFFFFF;
+  --panel-2:#F5F7F4;
+  --ink:#101820;
+  --ink-soft:#4A5560;
+  --line:rgba(16,24,32,0.12);
+  --line-strong:rgba(16,24,32,0.22);
+  --amber:#E07B1F;
+  --amber-soft:#FBE6D2;
+  --teal:#2E8E82;
+  --teal-soft:#DCEEEB;
+  --red:#C24A3B;
+  --red-soft:#F6E0DC;
+  --shadow: 0 1px 2px rgba(16,24,32,0.06), 0 8px 24px rgba(16,24,32,0.06);
+  --radius: 10px;
+  --font-display:'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body:'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --font-mono:'IBM Plex Mono', 'Consolas', monospace;
+}
+[data-theme="dark"]{
+  --bg:#0A0F0D;
+  --bg-grid: rgba(220,235,230,0.04);
+  --panel:#121A17;
+  --panel-2:#0E1512;
+  --ink:#EAF1EC;
+  --ink-soft:#9FB0A8;
+  --line:rgba(234,241,236,0.10);
+  --line-strong:rgba(234,241,236,0.18);
+  --amber:#F0954A;
+  --amber-soft:#3A2A18;
+  --teal:#57C4B6;
+  --teal-soft:#123531;
+  --red:#E17B6B;
+  --red-soft:#3A1E19;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.35);
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/40px 40px,
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/40px 40px,
+    var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:15.5px;
+  line-height:1.6;
+  transition:background 0.3s ease, color 0.3s ease;
+}
+h1,h2,h3,h4{font-family:var(--font-display); margin:0; letter-spacing:-0.01em;}
+p{margin:0 0 0.8em;}
+::selection{background:var(--amber-soft); color:var(--ink);}
+a{color:var(--teal);}
+button{font-family:var(--font-body); cursor:pointer;}
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-thumb{background:var(--line-strong); border-radius:6px;}
+
+/* ---------- Topbar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 24px;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.topbar .brand{display:flex; align-items:center; gap:10px;}
+.brand-mark{
+  width:30px;height:30px;border-radius:7px;
+  background:linear-gradient(135deg, var(--amber), var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono); font-weight:600; color:#0A0F0D; font-size:13px;
+}
+.brand-text{font-family:var(--font-display); font-weight:700; font-size:15px;}
+.brand-sub{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-soft); letter-spacing:0.06em; text-transform:uppercase;}
+.topbar-actions{display:flex; align-items:center; gap:10px;}
+.icon-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--panel); border:1px solid var(--line); color:var(--ink);
+  padding:7px 12px; border-radius:8px; font-size:12.5px; font-weight:500;
+}
+.icon-btn:hover{border-color:var(--line-strong);}
+.progress-chip{
+  font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft);
+  background:var(--panel-2); border:1px solid var(--line); padding:6px 10px; border-radius:20px;
+}
+.progress-chip b{color:var(--teal);}
+
+/* ---------- Shell ---------- */
+.shell{display:grid; grid-template-columns:250px 1fr; max-width:1320px; margin:0 auto; align-items:start;}
+@media (max-width:960px){ .shell{grid-template-columns:1fr;} .waypoint-nav{display:none;} }
+
+.waypoint-nav{
+  position:sticky; top:60px; align-self:start;
+  padding:28px 14px 40px 24px;
+  height:calc(100vh - 60px);
+  overflow-y:auto;
+}
+.wp-progress-track{
+  height:4px; background:var(--line); border-radius:4px; margin-bottom:18px; overflow:hidden;
+}
+.wp-progress-fill{height:100%; background:linear-gradient(90deg, var(--amber), var(--teal)); width:0%; transition:width 0.4s ease;}
+.wp-list{list-style:none; margin:0; padding:0; position:relative;}
+.wp-list::before{
+  content:''; position:absolute; left:9px; top:6px; bottom:6px; width:2px; background:var(--line);
+}
+.wp-item{position:relative; padding:0 0 22px 28px;}
+.wp-dot{
+  position:absolute; left:2px; top:1px; width:16px; height:16px; border-radius:50%;
+  background:var(--panel); border:2px solid var(--line-strong);
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.25s ease; z-index:1;
+}
+.wp-item.done .wp-dot{background:var(--teal); border-color:var(--teal);}
+.wp-item.done .wp-dot::after{content:'✓'; color:#fff; font-size:9px; font-weight:700;}
+.wp-item.active .wp-dot{border-color:var(--amber); box-shadow:0 0 0 4px var(--amber-soft);}
+.wp-link{display:block; font-size:12.8px; font-weight:500; color:var(--ink-soft); text-decoration:none; line-height:1.35; padding-top:1px;}
+.wp-item.active .wp-link{color:var(--ink); font-weight:600;}
+.wp-item:hover .wp-link{color:var(--ink);}
+.wp-eyebrow{font-family:var(--font-mono); font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:2px; display:block;}
+
+main{padding:0 24px 80px; min-width:0;}
+
+/* ---------- Hero ---------- */
+.hero{padding:56px 0 36px; border-bottom:1px solid var(--line); margin-bottom:44px;}
+.hero-eyebrow{
+  font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--teal); display:flex; align-items:center; gap:8px; margin-bottom:14px;
+}
+.hero-eyebrow::before{content:''; width:7px; height:7px; border-radius:50%; background:var(--amber); box-shadow:0 0 0 3px var(--amber-soft); animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;} 50%{opacity:0.4;}}
+.hero h1{font-size:clamp(30px,4vw,46px); font-weight:700; max-width:820px; line-height:1.08;}
+.hero h1 span{color:var(--teal);}
+.hero p.lede{max-width:640px; font-size:16px; color:var(--ink-soft); margin-top:16px;}
+.hero-cta{display:flex; gap:12px; margin-top:26px; flex-wrap:wrap;}
+.btn{
+  font-weight:600; font-size:13.5px; padding:11px 20px; border-radius:8px; border:1px solid transparent;
+  display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+}
+.btn-primary{background:var(--ink); color:var(--bg);}
+[data-theme="dark"] .btn-primary{background:var(--teal); color:#06110F;}
+.btn-primary:hover{opacity:0.88;}
+.btn-ghost{background:transparent; border:1px solid var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{background:var(--panel-2);}
+
+/* flight path svg */
+.flightpath-wrap{margin-top:40px; padding:22px; background:var(--panel); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow);}
+.flightpath-wrap svg{width:100%; height:auto; display:block;}
+.fp-node-label{font-family:var(--font-mono); font-size:9.5px; fill:var(--ink-soft);}
+.fp-node-num{font-family:var(--font-display); font-weight:700; font-size:11px; fill:var(--bg);}
+
+/* ---------- Section shared ---------- */
+.section-head{margin-bottom:22px; scroll-margin-top:76px;}
+.section-eyebrow{font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.09em; color:var(--amber); margin-bottom:6px; display:block;}
+.section-head h2{font-size:26px; font-weight:700;}
+.section-head p{color:var(--ink-soft); max-width:660px; margin-top:8px; font-size:14.5px;}
+
+.card{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
+}
+
+/* ---------- Decision tree ---------- */
+.decision-card{padding:26px; margin-bottom:64px;}
+.dt-question{font-family:var(--font-display); font-weight:600; font-size:17px; margin-bottom:16px;}
+.dt-options{display:flex; gap:10px; flex-wrap:wrap;}
+.dt-opt{
+  background:var(--panel-2); border:1px solid var(--line); padding:10px 16px; border-radius:8px;
+  font-size:13.5px; font-weight:500; color:var(--ink); transition:all 0.15s ease;
+}
+.dt-opt:hover{border-color:var(--teal); color:var(--teal);}
+.dt-trail{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px;}
+.dt-crumb{font-family:var(--font-mono); font-size:10.5px; background:var(--teal-soft); color:var(--teal); padding:4px 9px; border-radius:12px;}
+.dt-result{
+  margin-top:18px; padding:18px; border-radius:10px; background:var(--amber-soft); border:1px solid var(--amber);
+}
+.dt-result h4{font-size:16px; margin-bottom:6px;}
+.dt-result .dt-why{font-size:13.5px; color:var(--ink-soft); margin-top:6px;}
+.dt-restart{margin-top:14px;}
+
+/* ---------- Stage cards ---------- */
+.stage{margin-bottom:20px; scroll-margin-top:76px;}
+.stage-card{overflow:hidden;}
+.stage-header{
+  display:flex; align-items:center; gap:16px; padding:20px 22px; cursor:pointer; user-select:none;
+}
+.stage-num{
+  font-family:var(--font-display); font-weight:700; font-size:14px; width:38px; height:38px; flex:none;
+  border-radius:9px; background:var(--panel-2); border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center;
+}
+.stage-header:hover .stage-num{border-color:var(--amber); color:var(--amber);}
+.stage-titles{flex:1; min-width:0;}
+.stage-eyebrow{font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.07em; color:var(--ink-soft);}
+.stage-titles h3{font-size:18px; margin-top:2px;}
+.stage-meta{display:flex; align-items:center; gap:10px; flex:none;}
+.time-badge{
+  font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); background:var(--panel-2);
+  border:1px solid var(--line); padding:5px 10px; border-radius:20px; white-space:nowrap;
+}
+.bookmark-btn{
+  background:none; border:none; font-size:17px; color:var(--line-strong); padding:2px; line-height:1;
+}
+.bookmark-btn.active{color:var(--amber);}
+.chevron{width:16px; height:16px; flex:none; transition:transform 0.25s ease; color:var(--ink-soft);}
+.stage.open .chevron{transform:rotate(180deg);}
+.stage-body{max-height:0; overflow:hidden; transition:max-height 0.35s ease;}
+.stage-body-inner{padding:2px 24px 26px; border-top:1px solid var(--line);}
+.stage-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:26px; margin-top:20px;}
+@media (max-width:760px){ .stage-grid{grid-template-columns:1fr;} }
+
+.subhead{
+  font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em;
+  color:var(--teal); margin:22px 0 10px; display:flex; align-items:center; gap:8px;
+}
+.subhead:first-child{margin-top:20px;}
+.subhead::after{content:''; flex:1; height:1px; background:var(--line);}
+
+ul.plain{list-style:none; margin:0; padding:0;}
+ul.plain li{position:relative; padding-left:18px; margin-bottom:8px; font-size:14px;}
+ul.plain li::before{content:'→'; position:absolute; left:0; color:var(--amber); font-size:12px;}
+
+.task-list{list-style:none; margin:0; padding:0;}
+.task-item{display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; font-size:14px;}
+.task-item input[type="checkbox"]{margin-top:3px; width:16px; height:16px; accent-color:var(--teal); flex:none;}
+.task-item label{cursor:pointer;}
+.task-item.checked label{color:var(--ink-soft); text-decoration:line-through;}
+
+.tool-table{width:100%; border-collapse:collapse; font-size:13.3px; margin-top:6px;}
+.tool-table th{
+  text-align:left; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em;
+  color:var(--ink-soft); padding:8px 10px; border-bottom:1px solid var(--line-strong);
+}
+.tool-table td{padding:10px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
+.tool-name{font-weight:600; font-family:var(--font-mono); font-size:12.8px;}
+.tag{
+  display:inline-block; font-family:var(--font-mono); font-size:10px; padding:2px 7px; border-radius:5px;
+  background:var(--teal-soft); color:var(--teal); margin-right:4px; margin-bottom:3px;
+}
+.tag.alt{background:var(--panel-2); color:var(--ink-soft);}
+
+.prompt-box{
+  background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:12px 14px;
+  font-family:var(--font-mono); font-size:12.3px; color:var(--ink); margin-bottom:10px; position:relative;
+  white-space:pre-wrap; line-height:1.55;
+}
+.copy-btn{
+  position:absolute; top:8px; right:8px; font-family:var(--font-mono); font-size:10px; text-transform:uppercase;
+  background:var(--panel); border:1px solid var(--line); color:var(--ink-soft); padding:4px 8px; border-radius:5px;
+}
+.copy-btn:hover{color:var(--teal); border-color:var(--teal);}
+
+.mistake-row{display:flex; gap:10px; margin-bottom:10px; font-size:13.6px; align-items:flex-start;}
+.mistake-row .mk{color:var(--red); font-weight:700; flex:none;}
+.practice-row{display:flex; gap:10px; margin-bottom:10px; font-size:13.6px; align-items:flex-start;}
+.practice-row .mk{color:var(--teal); font-weight:700; flex:none;}
+
+.output-box{
+  background:var(--teal-soft); border:1px solid var(--teal); border-radius:8px; padding:12px 14px; font-size:13.5px; margin-top:6px;
+}
+.efficiency-box{
+  background:var(--amber-soft); border:1px solid var(--amber); border-radius:8px; padding:12px 14px; font-size:13.5px; margin-top:14px;
+}
+.efficiency-box b{display:block; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;}
+
+.notes-area{
+  width:100%; min-height:70px; background:var(--panel-2); border:1px solid var(--line); border-radius:8px;
+  color:var(--ink); font-family:var(--font-body); font-size:13px; padding:10px 12px; margin-top:6px; resize:vertical;
+}
+.notes-area:focus{outline:none; border-color:var(--teal);}
+.save-hint{font-family:var(--font-mono); font-size:10px; color:var(--ink-soft); margin-top:4px;}
+
+/* ---------- comparison table ---------- */
+.compare-wrap{overflow-x:auto; margin-bottom:64px;}
+.compare-table{width:100%; border-collapse:collapse; min-width:760px; font-size:13.2px;}
+.compare-table th{
+  text-align:left; padding:12px 14px; font-family:var(--font-display); font-size:13.5px;
+  background:var(--panel-2); border-bottom:2px solid var(--line-strong); position:sticky; top:0;
+}
+.compare-table th:first-child{width:150px;}
+.compare-table td{padding:11px 14px; border-bottom:1px solid var(--line);}
+.compare-table tr:hover td{background:var(--panel-2);}
+.compare-table td.row-label{font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:var(--ink-soft); letter-spacing:0.04em;}
+.pill{display:inline-block; font-size:11.5px; padding:3px 9px; border-radius:12px; font-weight:500;}
+.pill.easy{background:var(--teal-soft); color:var(--teal);}
+.pill.med{background:var(--amber-soft); color:var(--amber);}
+.pill.hard{background:var(--red-soft); color:var(--red);}
+
+/* ---------- Closing grid sections ---------- */
+.closing-section{margin-bottom:56px; scroll-margin-top:76px;}
+.stack-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px;}
+.stack-card{padding:16px 18px;}
+.stack-card .role{font-family:var(--font-mono); font-size:10px; text-transform:uppercase; color:var(--amber); letter-spacing:0.06em;}
+.stack-card h4{font-size:15px; margin-top:5px;}
+.stack-card p{font-size:12.8px; color:var(--ink-soft); margin-top:6px; margin-bottom:0;}
+
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media (max-width:700px){ .two-col{grid-template-columns:1fr;} }
+.res-card{padding:16px 18px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+.res-card h4{font-size:14px;}
+.res-card p{font-size:12.5px; color:var(--ink-soft); margin:4px 0 0;}
+.res-arrow{color:var(--ink-soft); flex:none;}
+
+.keyword-cloud{display:flex; flex-wrap:wrap; gap:8px;}
+.kw{
+  font-family:var(--font-mono); font-size:12px; padding:7px 12px; border-radius:20px; background:var(--panel);
+  border:1px solid var(--line); color:var(--ink-soft);
+}
+
+.summary-card{padding:26px 28px;}
+.summary-stats{display:flex; gap:28px; flex-wrap:wrap; margin:18px 0 6px; padding-bottom:18px; border-bottom:1px solid var(--line);}
+.stat{}
+.stat b{font-family:var(--font-display); font-size:26px; display:block;}
+.stat span{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.05em;}
+
+.future-list{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+@media (max-width:700px){ .future-list{grid-template-columns:1fr;} }
+.future-item{padding:14px 16px; font-size:13.3px;}
+.future-item .fi-head{display:flex; align-items:center; gap:8px; font-weight:600; margin-bottom:4px; font-size:13.8px;}
+.fi-icon{width:22px; height:22px; border-radius:6px; background:var(--teal-soft); color:var(--teal); display:flex; align-items:center; justify-content:center; font-size:12px; flex:none;}
+
+footer{
+  text-align:center; padding:34px 20px 50px; color:var(--ink-soft); font-size:12px; font-family:var(--font-mono);
+  border-top:1px solid var(--line); margin-top:20px;
+}
+
+/* Print */
+@media print{
+  .waypoint-nav, .topbar, .hero-cta, .decision-card, .bookmark-btn, .copy-btn, .notes-area, .icon-btn{display:none !important;}
+  body{background:#fff; color:#000;}
+  .shell{grid-template-columns:1fr;}
+  .stage-body{max-height:none !important;}
+  .card{box-shadow:none; border:1px solid #ccc;}
+}
+
+.toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0;
+  background:var(--ink); color:var(--bg); font-size:12.5px; font-family:var(--font-mono); padding:10px 18px;
+  border-radius:8px; z-index:100; transition:all 0.25s ease; pointer-events:none;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body data-theme="light">
+
+<div class="toast" id="toast"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">AI</div>
+    <div>
+      <div class="brand-text">AI Workflow Architect</div>
+      <div class="brand-sub">Autonomous Agent Build Plan</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span class="progress-chip">Progress <b id="progressPct">0%</b></span>
+    <button class="icon-btn" onclick="window.print()">🖨 Print</button>
+    <button class="icon-btn" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="waypoint-nav">
+    <div class="wp-progress-track"><div class="wp-progress-fill" id="wpFill"></div></div>
+    <ul class="wp-list" id="wpList">
+      <li class="wp-item" data-target="stage-1"><span class="wp-dot"></span><span class="wp-eyebrow">Waypoint 01</span><a class="wp-link" href="#stage-1">Define Mission &amp; Scope</a></li>
+      <li class="wp-item" data-target="stage-2"><span class="wp-dot"></span><span class="wp-eyebrow">Waypoint 02</span><a class="wp-link" href="#stage-2">Architecture &amp; Tool Design</a></li>
+      <li class="wp-item" data-target="stage-3"><span class="wp-dot"></span><span class="wp-eyebrow">Waypoint 03</span><a class="wp-link" href="#stage-3">Framework &amp; Model Selection</a></li>
+      <li class="wp-item" data-target="stage-4"><span class="wp-dot"></span><span class="wp-eyebrow">Waypoint 04</span><a class="wp-link" href="#stage-4">Core Reasoning Loop</a></li>
+      <li class="wp-item" data-target="stage-5"><span class="wp-dot"></span><span class="wp-eyebrow">Waypoint 05</span><a class="wp-link" href="#stage-5">Tool Integration</a></li>
+      <li class="wp-item" data-target="stage-6"><span class="wp-dot"></span><span class="wp-eyebrow">Waypoint 06</span><a class="wp-link" href="#stage-6">Testing &amp; Guardrails</a></li>
+      <li class="wp-item" data-target="stage-7"><span class="wp-dot"></span><span class="wp-eyebrow">Waypoint 07</span><a class="wp-link" href="#stage-7">Deploy &amp; Monitor</a></li>
+      <li class="wp-item" data-target="closing-summary"><span class="wp-dot"></span><span class="wp-eyebrow">Debrief</span><a class="wp-link" href="#closing-summary">Summary &amp; Stack</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <span class="hero-eyebrow">Flight plan · Software Development / AI Engineer</span>
+      <h1>Build an autonomous <span>AI agent</span> that reasons, calls tools, and finishes the job.</h1>
+      <p class="lede">A complete end-to-end route for shipping a multi-step, tool-using agent — from scoping the mission through deployment and monitoring. Seven waypoints, each with tools, prompts, pitfalls, and time estimates.</p>
+      <div class="hero-cta">
+        <a href="#stage-1" class="btn btn-primary">Start at Waypoint 01 →</a>
+        <a href="#decision-tree" class="btn btn-ghost">Pick my framework first</a>
+      </div>
+
+      <div class="flightpath-wrap">
+        <svg viewBox="0 0 980 150" id="flightSvg">
+          <path d="M40,110 C160,20 260,140 380,60 C480,-5 560,130 660,55 C750,-5 830,110 940,45" fill="none" stroke="var(--line-strong)" stroke-width="2" stroke-dasharray="1 8" stroke-linecap="round"/>
+          <path id="agentTrail" d="M40,110 C160,20 260,140 380,60 C480,-5 560,130 660,55 C750,-5 830,110 940,45" fill="none" stroke="var(--teal)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="900" stroke-dashoffset="900"/>
+          <circle id="agentDot" r="6" fill="var(--amber)"/>
+          <g id="fpNodes"></g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="decision-card card" id="decision-tree">
+      <span class="section-eyebrow">Interactive · Decision tree</span>
+      <h2 style="font-size:20px;margin-bottom:14px;">Which agent framework should I build with?</h2>
+      <div class="dt-trail" id="dtTrail"></div>
+      <div id="dtBody"></div>
+    </section>
+
+    <!-- ================= STAGE 1 ================= -->
+    <div class="stage" id="stage-1">
+      <div class="card stage-card">
+        <div class="stage-header" onclick="toggleStage(this)">
+          <div class="stage-num">01</div>
+          <div class="stage-titles">
+            <div class="stage-eyebrow">Planning</div>
+            <h3>Define the Agent's Mission &amp; Scope</h3>
+          </div>
+          <div class="stage-meta">
+            <span class="time-badge">⏱ 2–4 hrs</span>
+            <button class="bookmark-btn" onclick="toggleBookmark(event,'stage-1')">☆</button>
+            <svg class="chevron" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="stage-body">
+          <div class="stage-body-inner">
+
+            <div class="subhead">Objectives</div>
+            <ul class="plain">
+              <li>Write a one-sentence mission statement the agent must accomplish autonomously.</li>
+              <li>Decide the boundary between what the agent decides and what a human must approve.</li>
+              <li>List the real-world tools/APIs the agent will need access to.</li>
+              <li>Define what "task complete" and "task failed" look like, concretely.</li>
+            </ul>
+
+            <div class="stage-grid">
+              <div>
+                <div class="subhead">Tasks</div>
+                <ul class="task-list" data-stage="1">
+                  <li class="task-item"><input type="checkbox" id="t1-1"><label for="t1-1">Write the mission statement and success criteria</label></li>
+                  <li class="task-item"><input type="checkbox" id="t1-2"><label for="t1-2">List candidate tools/APIs the agent needs (search, code exec, CRM, email, DB)</label></li>
+                  <li class="task-item"><input type="checkbox" id="t1-3"><label for="t1-3">Set autonomy level: fully autonomous, human-in-the-loop, or approval-gated</label></li>
+                  <li class="task-item"><input type="checkbox" id="t1-4"><label for="t1-4">Define hard failure modes the agent must never trigger (e.g. delete prod data)</label></li>
+                  <li class="task-item"><input type="checkbox" id="t1-5"><label for="t1-5">Draft 5–10 representative user requests the agent must handle</label></li>
+                </ul>
+
+                <div class="subhead">Prompt examples</div>
+                <div class="prompt-box">Act as a staff AI engineer. I'm scoping an autonomous agent that [does X for Y users]. Given these 5 example requests: [...], draft (1) a one-sentence mission statement, (2) the minimum tool list required, (3) three failure modes I should guard against.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+                <div class="prompt-box">Here is my agent's mission statement: "[...]". Stress-test it — list edge-case requests that are ambiguous about whether the agent should act autonomously or ask a human first.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+              </div>
+
+              <div>
+                <div class="subhead">Best AI tools</div>
+                <table class="tool-table">
+                  <tr><th>Tool</th><th>Use</th></tr>
+                  <tr><td class="tool-name">Claude (Opus)</td><td>Long-context reasoning to pressure-test scope and edge cases <span class="tag">Recommended</span></td></tr>
+                  <tr><td class="tool-name">ChatGPT (o-series)</td><td>Fast brainstorming of failure modes and user stories <span class="tag alt">Alternative</span></td></tr>
+                  <tr><td class="tool-name">Notion AI / Coda AI</td><td>Turn scope notes into a living PRD teammates can edit</td></tr>
+                </table>
+                <p style="font-size:12.5px;color:var(--ink-soft);margin-top:8px;">Why Claude here: scoping needs the model to hold your whole product context, example requests, and constraints at once and reason about contradictions — that favors strong long-context reasoning over speed.</p>
+
+                <div class="subhead">Expected output</div>
+                <div class="output-box">A one-page agent brief: mission statement, autonomy level, tool list, hard constraints, and 5–10 example tasks.</div>
+
+                <div class="efficiency-box"><b>Efficiency tip</b>Write the failure modes before the happy path — it's the fastest way to discover the agent needs a human approval gate you hadn't planned for.</div>
+              </div>
+            </div>
+
+            <div class="subhead">Best practices</div>
+            <div class="practice-row"><span class="mk">✓</span><span>Scope to one job the agent does end-to-end, not five jobs it does halfway.</span></div>
+            <div class="practice-row"><span class="mk">✓</span><span>Write success criteria as something you could grade automatically later (this becomes your eval set in Waypoint 06).</span></div>
+
+            <div class="subhead">Common mistakes</div>
+            <div class="mistake-row"><span class="mk">✗</span><span>Scoping "a general assistant" instead of a specific, bounded workflow — this is the single biggest cause of agents that never ship.</span></div>
+            <div class="mistake-row"><span class="mk">✗</span><span>Skipping the autonomy-level decision, which surfaces later as a security or trust incident instead of a design choice.</span></div>
+
+            <div class="subhead">Notes</div>
+            <textarea class="notes-area" id="notes-1" placeholder="Jot down your mission statement, scope decisions, constraints..."></textarea>
+            <div class="save-hint">Auto-saved locally in your browser</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= STAGE 2 ================= -->
+    <div class="stage" id="stage-2">
+      <div class="card stage-card">
+        <div class="stage-header" onclick="toggleStage(this)">
+          <div class="stage-num">02</div>
+          <div class="stage-titles">
+            <div class="stage-eyebrow">Planning</div>
+            <h3>Architecture &amp; Tool Design</h3>
+          </div>
+          <div class="stage-meta">
+            <span class="time-badge">⏱ 4–8 hrs</span>
+            <button class="bookmark-btn" onclick="toggleBookmark(event,'stage-2')">☆</button>
+            <svg class="chevron" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="stage-body">
+          <div class="stage-body-inner">
+
+            <div class="subhead">Objectives</div>
+            <ul class="plain">
+              <li>Choose the control pattern: single ReAct loop, planner+executor, or supervisor with sub-agents.</li>
+              <li>Design each tool as a precise function signature the model will call.</li>
+              <li>Decide what state/memory persists between steps and between sessions.</li>
+              <li>Draw the architecture so a teammate could implement it without you.</li>
+            </ul>
+
+            <div class="stage-grid">
+              <div>
+                <div class="subhead">Tasks</div>
+                <ul class="task-list" data-stage="2">
+                  <li class="task-item"><input type="checkbox" id="t2-1"><label for="t2-1">Pick a control pattern (ReAct, plan-and-execute, or multi-agent/supervisor)</label></li>
+                  <li class="task-item"><input type="checkbox" id="t2-2"><label for="t2-2">Write function signatures + docstrings for each tool</label></li>
+                  <li class="task-item"><input type="checkbox" id="t2-3"><label for="t2-3">Decide short-term (scratchpad) vs long-term (vector/DB) memory needs</label></li>
+                  <li class="task-item"><input type="checkbox" id="t2-4"><label for="t2-4">Design the diagram: state, transitions, and where a human can interrupt</label></li>
+                  <li class="task-item"><input type="checkbox" id="t2-5"><label for="t2-5">Define the max-step / loop-termination policy</label></li>
+                </ul>
+
+                <div class="subhead">Prompt examples</div>
+                <div class="prompt-box">I'm designing an agent with this mission: [paste brief]. Propose a control-loop architecture (ReAct vs plan-and-execute vs supervisor+sub-agents) with tradeoffs specific to my use case, and recommend one.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+                <div class="prompt-box">Here are the tools my agent needs: [list]. Write clean function signatures with typed parameters and docstrings good enough for an LLM to call correctly on the first try.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+              </div>
+
+              <div>
+                <div class="subhead">Best AI tools</div>
+                <table class="tool-table">
+                  <tr><th>Tool</th><th>Use</th></tr>
+                  <tr><td class="tool-name">Claude (Opus/Sonnet)</td><td>Architecture reasoning + tool-schema writing <span class="tag">Recommended</span></td></tr>
+                  <tr><td class="tool-name">Eraser.io (DiagramGPT)</td><td>Text-to-diagram for the control-flow chart</td></tr>
+                  <tr><td class="tool-name">Excalidraw + AI plugin</td><td>Fast whiteboard-style architecture sketching <span class="tag alt">Alternative</span></td></tr>
+                </table>
+                <p style="font-size:12.5px;color:var(--ink-soft);margin-top:8px;">Why Claude here: tool-schema design is really an interface-design problem in disguise — the model needs to critique ambiguity in parameter names the way it would review an API, which rewards careful instruction-following.</p>
+
+                <div class="subhead">Expected output</div>
+                <div class="output-box">An architecture diagram, a finalized tool list with function signatures, and a written memory strategy.</div>
+
+                <div class="efficiency-box"><b>Efficiency tip</b>Start with the fewest tools that can complete your example tasks from Waypoint 01. Every extra tool multiplies the ways the agent can pick the wrong one.</div>
+              </div>
+            </div>
+
+            <div class="subhead">Best practices</div>
+            <div class="practice-row"><span class="mk">✓</span><span>Name tools by outcome (search_order_status), not by implementation (call_api_endpoint_3).</span></div>
+            <div class="practice-row"><span class="mk">✓</span><span>Give every tool a maximum blast radius — a read-only tool and a destructive tool should never share a name pattern.</span></div>
+
+            <div class="subhead">Common mistakes</div>
+            <div class="mistake-row"><span class="mk">✗</span><span>Designing 20+ tools upfront "to be safe" — this is the top cause of the model calling the wrong tool.</span></div>
+            <div class="mistake-row"><span class="mk">✗</span><span>No loop-termination policy, so a stuck agent burns tokens (and money) in an infinite retry loop.</span></div>
+
+            <div class="subhead">Notes</div>
+            <textarea class="notes-area" id="notes-2" placeholder="Architecture decisions, tool list, memory strategy..."></textarea>
+            <div class="save-hint">Auto-saved locally in your browser</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= STAGE 3 ================= -->
+    <div class="stage" id="stage-3">
+      <div class="card stage-card">
+        <div class="stage-header" onclick="toggleStage(this)">
+          <div class="stage-num">03</div>
+          <div class="stage-titles">
+            <div class="stage-eyebrow">Setup</div>
+            <h3>Framework &amp; Model Selection</h3>
+          </div>
+          <div class="stage-meta">
+            <span class="time-badge">⏱ 2–3 hrs</span>
+            <button class="bookmark-btn" onclick="toggleBookmark(event,'stage-3')">☆</button>
+            <svg class="chevron" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="stage-body">
+          <div class="stage-body-inner">
+
+            <div class="subhead">Objectives</div>
+            <ul class="plain">
+              <li>Choose an orchestration framework (or decide to hand-roll the loop).</li>
+              <li>Choose the reasoning model, and a cheaper fallback model for simple steps.</li>
+              <li>Confirm the framework supports your chosen control pattern from Waypoint 02.</li>
+            </ul>
+
+            <div class="stage-grid">
+              <div>
+                <div class="subhead">Tasks</div>
+                <ul class="task-list" data-stage="3">
+                  <li class="task-item"><input type="checkbox" id="t3-1"><label for="t3-1">Use the decision tree above to shortlist a framework</label></li>
+                  <li class="task-item"><input type="checkbox" id="t3-2"><label for="t3-2">Prototype "hello world" tool call in that framework</label></li>
+                  <li class="task-item"><input type="checkbox" id="t3-3"><label for="t3-3">Pick primary reasoning model + cheaper routing model</label></li>
+                  <li class="task-item"><input type="checkbox" id="t3-4"><label for="t3-4">Set up project repo, env vars, and API key management</label></li>
+                </ul>
+
+                <div class="subhead">Prompt examples</div>
+                <div class="prompt-box">Compare LangGraph, CrewAI, and a hand-rolled ReAct loop for an agent that [mission]. I need [multi-agent / single-agent], [stateful memory / stateless], deployed on [platform]. Recommend one and justify it against my constraints, not in general.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+                <div class="prompt-box">Write a minimal working example in [LangGraph/CrewAI/Claude Agent SDK] with one tool call, so I can confirm my environment is wired correctly before building the real agent.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+              </div>
+
+              <div>
+                <div class="subhead">Best AI tools</div>
+                <table class="tool-table">
+                  <tr><th>Tool</th><th>Use</th></tr>
+                  <tr><td class="tool-name">Claude Agent SDK / MCP</td><td>Native tool-use + Model Context Protocol for tool interop <span class="tag">Recommended</span></td></tr>
+                  <tr><td class="tool-name">LangGraph</td><td>Graph-based control for complex branching/looping agents <span class="tag alt">Alternative</span></td></tr>
+                  <tr><td class="tool-name">CrewAI / AutoGen</td><td>Multi-agent collaboration patterns out of the box</td></tr>
+                  <tr><td class="tool-name">Claude Code / Cursor</td><td>Scaffold the boilerplate for whichever framework you pick</td></tr>
+                </table>
+                <p style="font-size:12.5px;color:var(--ink-soft);margin-top:8px;">Why this pairing: MCP standardizes how tools are described and called, so switching or adding tools later doesn't mean rewriting your agent's core loop.</p>
+
+                <div class="subhead">Expected output</div>
+                <div class="output-box">A working "hello world" agent that calls one real tool end-to-end, plus a documented model choice.</div>
+
+                <div class="efficiency-box"><b>Efficiency tip</b>Route trivial sub-steps (formatting, extraction) to a smaller/cheaper model and reserve your best model for planning and tool selection — this alone can cut agent run cost by half.</div>
+              </div>
+            </div>
+
+            <div class="subhead">Best practices</div>
+            <div class="practice-row"><span class="mk">✓</span><span>Prototype the smallest possible working loop before adding your real tools.</span></div>
+            <div class="practice-row"><span class="mk">✓</span><span>Pin framework and model versions in your repo — agent behavior is version-sensitive.</span></div>
+
+            <div class="subhead">Common mistakes</div>
+            <div class="mistake-row"><span class="mk">✗</span><span>Choosing a heavyweight multi-agent framework for a single-purpose agent, adding orchestration overhead you don't need.</span></div>
+            <div class="mistake-row"><span class="mk">✗</span><span>Picking the most powerful model for every step instead of only where reasoning quality actually matters.</span></div>
+
+            <div class="subhead">Notes</div>
+            <textarea class="notes-area" id="notes-3" placeholder="Framework decision, model choices, repo setup..."></textarea>
+            <div class="save-hint">Auto-saved locally in your browser</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= STAGE 4 ================= -->
+    <div class="stage" id="stage-4">
+      <div class="card stage-card">
+        <div class="stage-header" onclick="toggleStage(this)">
+          <div class="stage-num">04</div>
+          <div class="stage-titles">
+            <div class="stage-eyebrow">Build</div>
+            <h3>Build the Core Reasoning Loop</h3>
+          </div>
+          <div class="stage-meta">
+            <span class="time-badge">⏱ 1–2 days</span>
+            <button class="bookmark-btn" onclick="toggleBookmark(event,'stage-4')">☆</button>
+            <svg class="chevron" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="stage-body">
+          <div class="stage-body-inner">
+
+            <div class="subhead">Objectives</div>
+            <ul class="plain">
+              <li>Implement the observe → think → act → observe loop.</li>
+              <li>Write the system prompt that defines the agent's role, constraints, and tool-use rules.</li>
+              <li>Add step limits, retries, and a clean "stuck" exit path.</li>
+            </ul>
+
+            <div class="stage-grid">
+              <div>
+                <div class="subhead">Tasks</div>
+                <ul class="task-list" data-stage="4">
+                  <li class="task-item"><input type="checkbox" id="t4-1"><label for="t4-1">Write the system prompt: role, constraints, tool-use rules, output format</label></li>
+                  <li class="task-item"><input type="checkbox" id="t4-2"><label for="t4-2">Implement the loop: plan → call tool → observe result → re-plan</label></li>
+                  <li class="task-item"><input type="checkbox" id="t4-3"><label for="t4-3">Add a max-step counter and graceful "I'm stuck, here's why" exit</label></li>
+                  <li class="task-item"><input type="checkbox" id="t4-4"><label for="t4-4">Log every step (thought, tool call, result) for later debugging</label></li>
+                  <li class="task-item"><input type="checkbox" id="t4-5"><label for="t4-5">Run against your 5–10 example tasks from Waypoint 01</label></li>
+                </ul>
+
+                <div class="subhead">Prompt examples</div>
+                <div class="prompt-box">Write a system prompt for an autonomous agent whose mission is [X]. It has access to these tools: [list]. It must ask for human approval before [Y], never do [Z], and stop after [N] steps if it hasn't finished. Output the prompt only.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+                <div class="prompt-box">Here's my agent's step log for a failed run: [paste log]. Diagnose where the reasoning broke down — wrong tool choice, misread tool output, or premature termination — and suggest a system-prompt fix.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+              </div>
+
+              <div>
+                <div class="subhead">Best AI tools</div>
+                <table class="tool-table">
+                  <tr><th>Tool</th><th>Use</th></tr>
+                  <tr><td class="tool-name">Claude Code</td><td>Writes and iterates on the loop implementation with you <span class="tag">Recommended</span></td></tr>
+                  <tr><td class="tool-name">Cursor / GitHub Copilot</td><td>In-editor pair programming for the same task <span class="tag alt">Alternative</span></td></tr>
+                  <tr><td class="tool-name">LangSmith</td><td>Trace every step of the loop while you debug it live</td></tr>
+                </table>
+                <p style="font-size:12.5px;color:var(--ink-soft);margin-top:8px;">Why Claude Code here: this stage is iterative debugging of agent reasoning, not one-shot code generation — you want a coding agent that can read its own trace logs and propose fixes in context.</p>
+
+                <div class="subhead">Expected output</div>
+                <div class="output-box">A running agent loop that completes at least 6/10 of your example tasks unassisted, with full step logs.</div>
+
+                <div class="efficiency-box"><b>Efficiency tip</b>Log the raw tool inputs/outputs, not just a summary — most reasoning bugs are the agent misreading a tool's actual response shape.</div>
+              </div>
+            </div>
+
+            <div class="subhead">Best practices</div>
+            <div class="practice-row"><span class="mk">✓</span><span>Keep the system prompt as short as it can be while still being unambiguous — verbose prompts get partially ignored.</span></div>
+            <div class="practice-row"><span class="mk">✓</span><span>Make tool outputs the agent sees structured (JSON), not prose, so re-planning is reliable.</span></div>
+
+            <div class="subhead">Common mistakes</div>
+            <div class="mistake-row"><span class="mk">✗</span><span>No step cap — a single ambiguous instruction can loop the agent indefinitely and rack up API cost.</span></div>
+            <div class="mistake-row"><span class="mk">✗</span><span>Testing only the happy path before moving to Waypoint 05, hiding bugs that surface later as "flaky" tool calls.</span></div>
+
+            <div class="subhead">Notes</div>
+            <textarea class="notes-area" id="notes-4" placeholder="System prompt drafts, loop bugs, fixes..."></textarea>
+            <div class="save-hint">Auto-saved locally in your browser</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= STAGE 5 ================= -->
+    <div class="stage" id="stage-5">
+      <div class="card stage-card">
+        <div class="stage-header" onclick="toggleStage(this)">
+          <div class="stage-num">05</div>
+          <div class="stage-titles">
+            <div class="stage-eyebrow">Build</div>
+            <h3>Tool Integration &amp; Function Calling</h3>
+          </div>
+          <div class="stage-meta">
+            <span class="time-badge">⏱ 2–4 days</span>
+            <button class="bookmark-btn" onclick="toggleBookmark(event,'stage-5')">☆</button>
+            <svg class="chevron" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="stage-body">
+          <div class="stage-body-inner">
+
+            <div class="subhead">Objectives</div>
+            <ul class="plain">
+              <li>Wire each designed tool to a real API, database, or service.</li>
+              <li>Handle tool errors so the agent can recover instead of crashing.</li>
+              <li>Add permission checks for any tool with side effects.</li>
+            </ul>
+
+            <div class="stage-grid">
+              <div>
+                <div class="subhead">Tasks</div>
+                <ul class="task-list" data-stage="5">
+                  <li class="task-item"><input type="checkbox" id="t5-1"><label for="t5-1">Implement each tool function against the real API/service</label></li>
+                  <li class="task-item"><input type="checkbox" id="t5-2"><label for="t5-2">Return structured errors the agent can reason about (not raw stack traces)</label></li>
+                  <li class="task-item"><input type="checkbox" id="t5-3"><label for="t5-3">Add rate limiting / timeouts / retries per tool</label></li>
+                  <li class="task-item"><input type="checkbox" id="t5-4"><label for="t5-4">Gate destructive tools behind a confirmation step</label></li>
+                  <li class="task-item"><input type="checkbox" id="t5-5"><label for="t5-5">Unit test each tool independent of the agent</label></li>
+                </ul>
+
+                <div class="subhead">Prompt examples</div>
+                <div class="prompt-box">Here's my tool function: [paste code]. Rewrite its error handling so that failures return a structured, LLM-readable message explaining what went wrong and what the agent could try next.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+                <div class="prompt-box">Generate unit tests for this tool function covering: valid input, missing required field, upstream API timeout, and malformed API response.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+              </div>
+
+              <div>
+                <div class="subhead">Best AI tools</div>
+                <table class="tool-table">
+                  <tr><th>Tool</th><th>Use</th></tr>
+                  <tr><td class="tool-name">Composio</td><td>Pre-built, auth-handled connectors to 100+ SaaS tools <span class="tag">Recommended</span></td></tr>
+                  <tr><td class="tool-name">MCP servers</td><td>Standardized tool interfaces you can swap in/out <span class="tag">Recommended</span></td></tr>
+                  <tr><td class="tool-name">Zapier / Make AI</td><td>No-code glue for simpler integrations <span class="tag alt">Alternative</span></td></tr>
+                  <tr><td class="tool-name">Postman AI</td><td>Generate and test API request schemas quickly</td></tr>
+                </table>
+                <p style="font-size:12.5px;color:var(--ink-soft);margin-top:8px;">Why Composio/MCP here: hand-writing auth and error handling for every third-party API is the slowest part of this stage — pre-built connectors remove that entirely for common tools.</p>
+
+                <div class="subhead">Expected output</div>
+                <div class="output-box">All tools live-tested against real endpoints, with error paths that return usable feedback to the agent instead of crashing the run.</div>
+
+                <div class="efficiency-box"><b>Efficiency tip</b>Write the tool's error message as if you were writing it for the agent, not for a human developer — "no results for query, try broadening it" beats a raw 404.</div>
+              </div>
+            </div>
+
+            <div class="subhead">Best practices</div>
+            <div class="practice-row"><span class="mk">✓</span><span>Treat every tool boundary as untrusted input — validate before executing, especially for anything with write access.</span></div>
+            <div class="practice-row"><span class="mk">✓</span><span>Version and log every tool call in production the same way you did in development.</span></div>
+
+            <div class="subhead">Common mistakes</div>
+            <div class="mistake-row"><span class="mk">✗</span><span>Letting raw exceptions bubble up to the agent — it can't reason about a Python traceback.</span></div>
+            <div class="mistake-row"><span class="mk">✗</span><span>No confirmation gate on destructive tools, which turns one bad plan into a real-world incident.</span></div>
+
+            <div class="subhead">Notes</div>
+            <textarea class="notes-area" id="notes-5" placeholder="Tool integration status, auth notes, error-handling decisions..."></textarea>
+            <div class="save-hint">Auto-saved locally in your browser</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= STAGE 6 ================= -->
+    <div class="stage" id="stage-6">
+      <div class="card stage-card">
+        <div class="stage-header" onclick="toggleStage(this)">
+          <div class="stage-num">06</div>
+          <div class="stage-titles">
+            <div class="stage-eyebrow">Validate</div>
+            <h3>Testing, Evaluation &amp; Guardrails</h3>
+          </div>
+          <div class="stage-meta">
+            <span class="time-badge">⏱ 2–3 days</span>
+            <button class="bookmark-btn" onclick="toggleBookmark(event,'stage-6')">☆</button>
+            <svg class="chevron" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="stage-body">
+          <div class="stage-body-inner">
+
+            <div class="subhead">Objectives</div>
+            <ul class="plain">
+              <li>Turn your example tasks into a repeatable evaluation set.</li>
+              <li>Score trajectories, not just final answers — did it use the right tools, in a reasonable number of steps.</li>
+              <li>Add guardrails for prompt injection, scope creep, and unsafe tool calls.</li>
+            </ul>
+
+            <div class="stage-grid">
+              <div>
+                <div class="subhead">Tasks</div>
+                <ul class="task-list" data-stage="6">
+                  <li class="task-item"><input type="checkbox" id="t6-1"><label for="t6-1">Build a 20–50 task eval set covering happy paths and edge cases</label></li>
+                  <li class="task-item"><input type="checkbox" id="t6-2"><label for="t6-2">Define pass/fail grading (automated where possible, LLM-graded otherwise)</label></li>
+                  <li class="task-item"><input type="checkbox" id="t6-3"><label for="t6-3">Test adversarial inputs: prompt injection via tool outputs, malformed data</label></li>
+                  <li class="task-item"><input type="checkbox" id="t6-4"><label for="t6-4">Add a guardrail layer for out-of-scope or unsafe requests</label></li>
+                  <li class="task-item"><input type="checkbox" id="t6-5"><label for="t6-5">Run regression eval after every prompt or tool change</label></li>
+                </ul>
+
+                <div class="subhead">Prompt examples</div>
+                <div class="prompt-box">Given this agent mission and tool list: [...], generate 30 evaluation tasks: 15 typical, 10 edge-case, 5 adversarial (attempting prompt injection or asking for out-of-scope actions).<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+                <div class="prompt-box">Here is a full agent trajectory (thoughts, tool calls, results, final answer): [paste]. Grade it 1–5 on tool-choice correctness, efficiency of steps, and final-answer accuracy. Explain each score.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+              </div>
+
+              <div>
+                <div class="subhead">Best AI tools</div>
+                <table class="tool-table">
+                  <tr><th>Tool</th><th>Use</th></tr>
+                  <tr><td class="tool-name">LangSmith</td><td>Trajectory tracing + eval dataset management <span class="tag">Recommended</span></td></tr>
+                  <tr><td class="tool-name">Braintrust</td><td>Eval scoring pipelines with human + LLM graders <span class="tag alt">Alternative</span></td></tr>
+                  <tr><td class="tool-name">Weights &amp; Biases Weave</td><td>Experiment tracking across prompt/model versions</td></tr>
+                  <tr><td class="tool-name">Claude (as grader)</td><td>LLM-as-judge scoring for subjective quality</td></tr>
+                </table>
+                <p style="font-size:12.5px;color:var(--ink-soft);margin-top:8px;">Why trace-first tools here: agent bugs are almost always in the middle of a trajectory, not the final answer — you need step-by-step visibility, not just pass/fail.</p>
+
+                <div class="subhead">Expected output</div>
+                <div class="output-box">A versioned eval set with a baseline pass rate, plus a guardrail layer that blocks or escalates unsafe requests.</div>
+
+                <div class="efficiency-box"><b>Efficiency tip</b>Re-run the full eval set on every meaningful change — agents regress in surprising places when you fix one prompt issue.</div>
+              </div>
+            </div>
+
+            <div class="subhead">Best practices</div>
+            <div class="practice-row"><span class="mk">✓</span><span>Grade the trajectory (tool choices, step count), not only whether the final answer looks right.</span></div>
+            <div class="practice-row"><span class="mk">✓</span><span>Include tool outputs that look like instructions in your adversarial tests — that's the real-world injection vector.</span></div>
+
+            <div class="subhead">Common mistakes</div>
+            <div class="mistake-row"><span class="mk">✗</span><span>Evaluating manually by eyeballing a handful of runs instead of a fixed, repeatable eval set.</span></div>
+            <div class="mistake-row"><span class="mk">✗</span><span>No adversarial testing, so the first prompt injection attempt happens in production.</span></div>
+
+            <div class="subhead">Notes</div>
+            <textarea class="notes-area" id="notes-6" placeholder="Eval results, failure patterns, guardrail rules..."></textarea>
+            <div class="save-hint">Auto-saved locally in your browser</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= STAGE 7 ================= -->
+    <div class="stage" id="stage-7">
+      <div class="card stage-card">
+        <div class="stage-header" onclick="toggleStage(this)">
+          <div class="stage-num">07</div>
+          <div class="stage-titles">
+            <div class="stage-eyebrow">Execution</div>
+            <h3>Deployment, Monitoring &amp; Iteration</h3>
+          </div>
+          <div class="stage-meta">
+            <span class="time-badge">⏱ 1–2 days + ongoing</span>
+            <button class="bookmark-btn" onclick="toggleBookmark(event,'stage-7')">☆</button>
+            <svg class="chevron" viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="stage-body">
+          <div class="stage-body-inner">
+
+            <div class="subhead">Objectives</div>
+            <ul class="plain">
+              <li>Ship the agent behind a stable interface (API, chat, or scheduled job).</li>
+              <li>Monitor cost, latency, and trajectory quality in production.</li>
+              <li>Build a feedback loop from real runs back into your eval set.</li>
+            </ul>
+
+            <div class="stage-grid">
+              <div>
+                <div class="subhead">Tasks</div>
+                <ul class="task-list" data-stage="7">
+                  <li class="task-item"><input type="checkbox" id="t7-1"><label for="t7-1">Containerize and deploy behind an API or scheduled trigger</label></li>
+                  <li class="task-item"><input type="checkbox" id="t7-2"><label for="t7-2">Add cost, latency, and failure-rate dashboards</label></li>
+                  <li class="task-item"><input type="checkbox" id="t7-3"><label for="t7-3">Alert on step-limit hits, tool errors, and guardrail triggers</label></li>
+                  <li class="task-item"><input type="checkbox" id="t7-4"><label for="t7-4">Sample production trajectories weekly into your eval set</label></li>
+                  <li class="task-item"><input type="checkbox" id="t7-5"><label for="t7-5">Set a review cadence for prompt/tool updates</label></li>
+                </ul>
+
+                <div class="subhead">Prompt examples</div>
+                <div class="prompt-box">Write a Dockerfile and minimal deployment config for a Python agent service using [framework], exposing a single /run endpoint, deployable to [Fly.io/Modal/AWS].<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+                <div class="prompt-box">Here are this week's production failure logs: [paste]. Cluster them into failure categories, rank by frequency, and suggest which one to fix first.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+              </div>
+
+              <div>
+                <div class="subhead">Best AI tools</div>
+                <table class="tool-table">
+                  <tr><th>Tool</th><th>Use</th></tr>
+                  <tr><td class="tool-name">Modal / Fly.io</td><td>Fast deploy for Python agent services <span class="tag">Recommended</span></td></tr>
+                  <tr><td class="tool-name">Helicone / LangSmith</td><td>Production tracing, cost, and latency monitoring</td></tr>
+                  <tr><td class="tool-name">Docker + AWS/GCP</td><td>Full control for larger-scale deployments <span class="tag alt">Alternative</span></td></tr>
+                  <tr><td class="tool-name">Datadog</td><td>Unified alerting alongside existing infra</td></tr>
+                </table>
+                <p style="font-size:12.5px;color:var(--ink-soft);margin-top:8px;">Why this pairing: agent cost and failure patterns shift once real users hit it — you need cheap, fast redeploys plus per-run tracing from day one, not bolted on later.</p>
+
+                <div class="subhead">Expected output</div>
+                <div class="output-box">A deployed agent with live dashboards, alerting on step-limit and guardrail events, and a weekly eval-refresh habit.</div>
+
+                <div class="efficiency-box"><b>Efficiency tip</b>Treat every production failure as a candidate new eval case — this is the cheapest way to keep the agent improving after launch.</div>
+              </div>
+            </div>
+
+            <div class="subhead">Best practices</div>
+            <div class="practice-row"><span class="mk">✓</span><span>Ship behind a feature flag or limited rollout before opening the agent to all users.</span></div>
+            <div class="practice-row"><span class="mk">✓</span><span>Track cost per completed task, not just total spend — it's the metric that actually tells you if the agent is worth running.</span></div>
+
+            <div class="subhead">Common mistakes</div>
+            <div class="mistake-row"><span class="mk">✗</span><span>Deploying with no monitoring, so the first sign of trouble is a user complaint.</span></div>
+            <div class="mistake-row"><span class="mk">✗</span><span>Treating launch as the finish line instead of the start of the feedback loop.</span></div>
+
+            <div class="subhead">Notes</div>
+            <textarea class="notes-area" id="notes-7" placeholder="Deployment target, monitoring setup, launch notes..."></textarea>
+            <div class="save-hint">Auto-saved locally in your browser</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= COMPARISON TABLE ================= -->
+    <section class="closing-section" id="comparison">
+      <div class="section-head">
+        <span class="section-eyebrow">Reference</span>
+        <h2>Framework comparison</h2>
+        <p>How the major agent frameworks stack up for a multi-step, tool-using agent.</p>
+      </div>
+      <div class="compare-wrap card">
+        <table class="compare-table">
+          <tr><th>Framework</th><th>Best for</th><th>Learning curve</th><th>Multi-agent</th><th>Tool calling</th><th>Memory</th></tr>
+          <tr><td class="row-label">LangGraph</td><td>Complex branching/looping control flow</td><td><span class="pill med">Moderate</span></td><td>Yes</td><td>Native</td><td>Built-in checkpoints</td></tr>
+          <tr><td class="row-label">CrewAI</td><td>Role-based multi-agent collaboration</td><td><span class="pill easy">Easy</span></td><td>Native</td><td>Native</td><td>Basic</td></tr>
+          <tr><td class="row-label">AutoGen</td><td>Research-style agent conversations</td><td><span class="pill hard">Steep</span></td><td>Native</td><td>Native</td><td>Configurable</td></tr>
+          <tr><td class="row-label">Claude Agent SDK / MCP</td><td>Standardized tool interop, Anthropic-native</td><td><span class="pill easy">Easy</span></td><td>Via orchestration</td><td>Native (MCP)</td><td>App-managed</td></tr>
+          <tr><td class="row-label">OpenAI Assistants API</td><td>Quick single-agent prototypes</td><td><span class="pill easy">Easy</span></td><td>No</td><td>Native</td><td>Threads (managed)</td></tr>
+          <tr><td class="row-label">Hand-rolled ReAct loop</td><td>Full control, minimal dependencies</td><td><span class="pill hard">Steep</span></td><td>DIY</td><td>DIY schema</td><td>DIY</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= CLOSING: SUMMARY ================= -->
+    <section class="closing-section" id="closing-summary">
+      <div class="section-head">
+        <span class="section-eyebrow">Debrief</span>
+        <h2>Workflow summary</h2>
+      </div>
+      <div class="card summary-card">
+        <p>This route takes an autonomous, tool-using agent from a one-sentence mission statement to a monitored production service in seven waypoints: scope it, architect it, choose the stack, build the reasoning loop, wire up real tools, prove it works against an eval set, then ship and watch it. Each waypoint hands the next one a concrete artifact — brief → diagram → working stub → running loop → live tools → passing eval → dashboard.</p>
+        <div class="summary-stats">
+          <div class="stat"><b>7</b><span>Waypoints</span></div>
+          <div class="stat"><b>~10–14</b><span>Days, solo builder</span></div>
+          <div class="stat"><b id="statTasks">35</b><span>Total tasks</span></div>
+          <div class="stat" id="statDoneWrap"><b id="statDone">0</b><span>Tasks completed</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing-section">
+      <div class="section-head">
+        <span class="section-eyebrow">Debrief</span>
+        <h2>Recommended AI stack</h2>
+        <p>The default toolchain this route assumes if you don't override any choice in Waypoint 03.</p>
+      </div>
+      <div class="stack-grid">
+        <div class="card stack-card"><span class="role">Reasoning engine</span><h4>Claude (Opus / Sonnet)</h4><p>Planning, tool selection, and self-critique of trajectories.</p></div>
+        <div class="card stack-card"><span class="role">Orchestration</span><h4>Claude Agent SDK + MCP</h4><p>Standardized tool interfaces, easy to extend later.</p></div>
+        <div class="card stack-card"><span class="role">Tool connectors</span><h4>Composio</h4><p>Pre-built, authenticated connectors to common SaaS tools.</p></div>
+        <div class="card stack-card"><span class="role">Coding</span><h4>Claude Code</h4><p>Builds and debugs the loop and tool implementations with you.</p></div>
+        <div class="card stack-card"><span class="role">Evaluation</span><h4>LangSmith</h4><p>Trajectory tracing and a versioned eval dataset.</p></div>
+        <div class="card stack-card"><span class="role">Deployment</span><h4>Modal / Fly.io</h4><p>Fast, cheap redeploys for a Python agent service.</p></div>
+        <div class="card stack-card"><span class="role">Monitoring</span><h4>Helicone</h4><p>Per-run cost, latency, and error tracking in production.</p></div>
+      </div>
+    </section>
+
+    <section class="closing-section">
+      <div class="section-head">
+        <span class="section-eyebrow">Debrief</span>
+        <h2>Learning resources</h2>
+      </div>
+      <div class="two-col">
+        <div class="card res-card"><div><h4>Anthropic — Building Effective Agents</h4><p>Anthropic's own guide to agent design patterns.</p></div><span class="res-arrow">↗</span></div>
+        <div class="card res-card"><div><h4>LangGraph documentation</h4><p>Official docs for graph-based agent control flow.</p></div><span class="res-arrow">↗</span></div>
+        <div class="card res-card"><div><h4>DeepLearning.AI — AI Agents in LangGraph</h4><p>Short course on multi-step agent construction.</p></div><span class="res-arrow">↗</span></div>
+        <div class="card res-card"><div><h4>OpenAI Cookbook — Agents guide</h4><p>Practical patterns for function calling and orchestration.</p></div><span class="res-arrow">↗</span></div>
+        <div class="card res-card"><div><h4>Model Context Protocol spec</h4><p>The open standard for connecting agents to tools.</p></div><span class="res-arrow">↗</span></div>
+        <div class="card res-card"><div><h4>LangSmith — Evaluation docs</h4><p>How to build and run agent trajectory evals.</p></div><span class="res-arrow">↗</span></div>
+      </div>
+    </section>
+
+    <section class="closing-section">
+      <div class="section-head">
+        <span class="section-eyebrow">Debrief</span>
+        <h2>Communities</h2>
+      </div>
+      <div class="two-col">
+        <div class="card res-card"><div><h4>r/LangChain</h4><p>Active discussion on agent frameworks and patterns.</p></div><span class="res-arrow">↗</span></div>
+        <div class="card res-card"><div><h4>LangChain / LangGraph Discord</h4><p>Direct access to maintainers and other builders.</p></div><span class="res-arrow">↗</span></div>
+        <div class="card res-card"><div><h4>MLOps Community Slack</h4><p>Production ML and LLM-ops discussion, including agents.</p></div><span class="res-arrow">↗</span></div>
+        <div class="card res-card"><div><h4>Latent Space Discord</h4><p>AI engineering community, agent-focused threads.</p></div><span class="res-arrow">↗</span></div>
+      </div>
+    </section>
+
+    <section class="closing-section">
+      <div class="section-head">
+        <span class="section-eyebrow">Debrief</span>
+        <h2>Search keywords</h2>
+        <p>Useful search terms if you want to dig deeper on any waypoint.</p>
+      </div>
+      <div class="keyword-cloud">
+        <span class="kw">ReAct agent pattern</span>
+        <span class="kw">LangGraph tutorial</span>
+        <span class="kw">function calling best practices</span>
+        <span class="kw">agent evaluation framework</span>
+        <span class="kw">multi-agent orchestration</span>
+        <span class="kw">MCP tool integration</span>
+        <span class="kw">LLM prompt injection defense</span>
+        <span class="kw">agent trajectory tracing</span>
+        <span class="kw">plan and execute agent</span>
+        <span class="kw">tool use system prompt</span>
+      </div>
+    </section>
+
+    <section class="closing-section">
+      <div class="section-head">
+        <span class="section-eyebrow">Debrief</span>
+        <h2>Additional AI prompts</h2>
+        <p>General-purpose prompts useful at almost any waypoint.</p>
+      </div>
+      <div class="prompt-box">Review this agent's system prompt for ambiguity: [paste]. Flag any instruction a reasonable model could interpret two different ways.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+      <div class="prompt-box">Here are 3 failed agent trajectories: [paste]. Find the common root cause across all three, not just what's different about each.<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+      <div class="prompt-box">Given this tool list and mission, red-team the agent: what's the most damaging sequence of tool calls a malicious or confused user could trigger?<button class="copy-btn" onclick="copyPrompt(this)">Copy</button></div>
+    </section>
+
+    <section class="closing-section">
+      <div class="section-head">
+        <span class="section-eyebrow">Debrief</span>
+        <h2>Future automation opportunities</h2>
+        <p>Where this workflow itself can be automated further once the agent is stable in production.</p>
+      </div>
+      <ul class="future-list">
+        <li class="card future-item"><div class="fi-head"><span class="fi-icon">↻</span>Self-healing tool errors</div>Auto-retry failed tool calls with an LLM-rewritten input before surfacing the failure to a human.</li>
+        <li class="card future-item"><div class="fi-head"><span class="fi-icon">⌘</span>Auto-generated eval sets</div>Turn sampled production trajectories into new eval cases automatically each week.</li>
+        <li class="card future-item"><div class="fi-head"><span class="fi-icon">₵</span>Cost-based model routing</div>Route each step to the cheapest model that historically succeeds at that step type.</li>
+        <li class="card future-item"><div class="fi-head"><span class="fi-icon">◎</span>Supervisor-of-agents</div>Add a lightweight supervisor that spins up specialized sub-agents only when a task needs them.</li>
+      </ul>
+    </section>
+
+    <footer>AI Workflow Architect — Autonomous Agent Build Plan · Progress and notes are stored only in this browser</footer>
+  </main>
+</div>
+
+<script>
+/* ---------- Theme ---------- */
+function toggleTheme(){
+  const body=document.body;
+  const next = body.getAttribute('data-theme')==='dark' ? 'light':'dark';
+  body.setAttribute('data-theme', next);
+  document.getElementById('themeToggle').innerHTML = next==='dark' ? '☀ Light' : '🌙 Dark';
+  try{ localStorage.setItem('awa_theme', next); }catch(e){}
+}
+(function initTheme(){
+  try{
+    const saved = localStorage.getItem('awa_theme');
+    if(saved){
+      document.body.setAttribute('data-theme', saved);
+      document.getElementById('themeToggle').innerHTML = saved==='dark' ? '☀ Light' : '🌙 Dark';
+    }
+  }catch(e){}
+})();
+
+/* ---------- Toast ---------- */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(()=>t.classList.remove('show'),1600);
+}
+
+/* ---------- Stage accordion ---------- */
+function toggleStage(headerEl){
+  const stage = headerEl.closest('.stage');
+  const body = stage.querySelector('.stage-body');
+  const isOpen = stage.classList.contains('open');
+  if(isOpen){
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(()=>{ body.style.maxHeight = '0px'; });
+    stage.classList.remove('open');
+  } else {
+    stage.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    setTimeout(()=>{ if(stage.classList.contains('open')) body.style.maxHeight = 'none'; }, 380);
+  }
+}
+// open stage 1 by default
+document.addEventListener('DOMContentLoaded', ()=>{
+  const first = document.querySelector('#stage-1');
+  first.classList.add('open');
+  const body = first.querySelector('.stage-body');
+  body.style.maxHeight='none';
+});
+
+/* ---------- Copy prompt ---------- */
+function copyPrompt(btn){
+  const box = btn.closest('.prompt-box');
+  const text = box.textContent.replace('Copy','').trim();
+  navigator.clipboard.writeText(text).then(()=>showToast('Prompt copied')).catch(()=>showToast('Copy failed'));
+}
+
+/* ---------- Bookmarks ---------- */
+function loadBookmarks(){ try{ return JSON.parse(localStorage.getItem('awa_bookmarks')||'{}'); }catch(e){ return {}; } }
+function saveBookmarks(b){ try{ localStorage.setItem('awa_bookmarks', JSON.stringify(b)); }catch(e){} }
+function toggleBookmark(evt, stageId){
+  evt.stopPropagation();
+  const b = loadBookmarks();
+  b[stageId] = !b[stageId];
+  saveBookmarks(b);
+  evt.currentTarget.classList.toggle('active', b[stageId]);
+  evt.currentTarget.textContent = b[stageId] ? '★' : '☆';
+  showToast(b[stageId] ? 'Bookmarked' : 'Bookmark removed');
+}
+(function initBookmarks(){
+  const b = loadBookmarks();
+  document.querySelectorAll('.bookmark-btn').forEach(btn=>{
+    const stageId = btn.closest('.stage').id;
+    if(b[stageId]){ btn.classList.add('active'); btn.textContent='★'; }
+  });
+})();
+
+/* ---------- Notes ---------- */
+document.querySelectorAll('.notes-area').forEach(area=>{
+  const key='awa_note_'+area.id;
+  try{ const saved=localStorage.getItem(key); if(saved) area.value=saved; }catch(e){}
+  area.addEventListener('input', ()=>{ try{ localStorage.setItem(key, area.value); }catch(e){} });
+});
+
+/* ---------- Tasks / progress ---------- */
+const ALL_CHECKBOXES = ()=>Array.from(document.querySelectorAll('.task-item input[type="checkbox"]'));
+function loadTasks(){ try{ return JSON.parse(localStorage.getItem('awa_tasks')||'{}'); }catch(e){ return {}; } }
+function saveTasks(t){ try{ localStorage.setItem('awa_tasks', JSON.stringify(t)); }catch(e){} }
+
+function updateProgress(){
+  const boxes = ALL_CHECKBOXES();
+  const total = boxes.length;
+  const done = boxes.filter(b=>b.checked).length;
+  const pct = total? Math.round((done/total)*100) : 0;
+  document.getElementById('progressPct').textContent = pct+'%';
+  document.getElementById('wpFill').style.width = pct+'%';
+  document.getElementById('statTasks').textContent = total;
+  document.getElementById('statDone').textContent = done;
+
+  // per-stage done state on waypoint nav
+  for(let i=1;i<=7;i++){
+    const stageBoxes = Array.from(document.querySelectorAll('.task-list[data-stage="'+i+'"] input[type="checkbox"]'));
+    const stageDone = stageBoxes.length && stageBoxes.every(b=>b.checked);
+    const navItem = document.querySelector('.wp-item[data-target="stage-'+i+'"]');
+    if(navItem) navItem.classList.toggle('done', stageDone);
+  }
+}
+
+ALL_CHECKBOXES().forEach(box=>{
+  const t = loadTasks();
+  if(t[box.id]) box.checked = true;
+  box.closest('.task-item').classList.toggle('checked', box.checked);
+  box.addEventListener('change', ()=>{
+    const tasks = loadTasks();
+    tasks[box.id] = box.checked;
+    saveTasks(tasks);
+    box.closest('.task-item').classList.toggle('checked', box.checked);
+    updateProgress();
+  });
+});
+updateProgress();
+
+/* ---------- Waypoint nav active state on scroll ---------- */
+const wpItems = Array.from(document.querySelectorAll('.wp-item'));
+const targets = wpItems.map(i=>document.getElementById(i.dataset.target)).filter(Boolean);
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    const item = wpItems.find(i=>i.dataset.target===entry.target.id);
+    if(!item) return;
+    if(entry.isIntersecting){
+      wpItems.forEach(i=>i.classList.remove('active'));
+      item.classList.add('active');
+    }
+  });
+}, {rootMargin:'-20% 0px -65% 0px'});
+targets.forEach(t=>observer.observe(t));
+
+/* ---------- Flight path nodes + animated agent dot ---------- */
+(function buildFlightPath(){
+  const svg = document.getElementById('flightSvg');
+  const g = document.getElementById('fpNodes');
+  const path = document.getElementById('agentTrail');
+  const positions = [
+    {x:40,y:110},{x:214,y:47},{x:380,y:60},{x:530,y:8},{x:660,y:55},{x:800,y:38},{x:940,y:45}
+  ];
+  positions.forEach((p,idx)=>{
+    const ns='http://www.w3.org/2000/svg';
+    const circle=document.createElementNS(ns,'circle');
+    circle.setAttribute('cx',p.x); circle.setAttribute('cy',p.y); circle.setAttribute('r',12);
+    circle.setAttribute('fill', idx%2===0 ? 'var(--teal)' : 'var(--amber)');
+    g.appendChild(circle);
+    const num=document.createElementNS(ns,'text');
+    num.setAttribute('x',p.x); num.setAttribute('y',p.y+4); num.setAttribute('text-anchor','middle');
+    num.setAttribute('class','fp-node-num'); num.textContent = String(idx+1).padStart(2,'0');
+    g.appendChild(num);
+    const label=document.createElementNS(ns,'text');
+    label.setAttribute('x',p.x); label.setAttribute('y', idx%2===0? p.y+28 : p.y-20);
+    label.setAttribute('text-anchor','middle'); label.setAttribute('class','fp-node-label');
+    const names=['Scope','Architect','Framework','Loop','Tools','Test','Deploy'];
+    label.textContent = names[idx];
+    g.appendChild(label);
+  });
+
+  // animate dot + trail along path
+  const dot = document.getElementById('agentDot');
+  const len = path.getTotalLength();
+  path.style.strokeDasharray = len;
+  path.style.strokeDashoffset = len;
+  let t=0;
+  function animate(){
+    t += 0.0022;
+    if(t>1) t=0;
+    const pt = path.getPointAtLength(t*len);
+    dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y);
+    path.style.strokeDashoffset = String(len - t*len);
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ---------- Decision tree ---------- */
+const DT = {
+  start: {
+    q: "Do you need multiple specialized agents collaborating on one task?",
+    options: [
+      {label:"Yes, multiple agents", next:"multi"},
+      {label:"No, one agent is enough", next:"control"}
+    ]
+  },
+  multi: {
+    q: "Do you want a code-first graph you fully control, or a faster role-based setup?",
+    options: [
+      {label:"Full control over the graph", next:"result_langgraph"},
+      {label:"Faster role-based setup", next:"result_crewai"}
+    ]
+  },
+  control: {
+    q: "Does your agent need complex branching, loops, or long-running state?",
+    options: [
+      {label:"Yes, complex control flow", next:"result_langgraph"},
+      {label:"No, mostly linear steps", next:"ecosystem"}
+    ]
+  },
+  ecosystem: {
+    q: "Are you already building primarily on Claude / Anthropic tooling?",
+    options: [
+      {label:"Yes, Claude-native", next:"result_claudesdk"},
+      {label:"No preference / OpenAI ecosystem", next:"result_assistants"}
+    ]
+  },
+  result_langgraph: {result:true, name:"LangGraph", why:"You need explicit, inspectable control over branching, retries, and state — LangGraph's graph model is built exactly for that, whether it's one complex agent or several coordinating ones.", kw:"LangGraph tutorial"},
+  result_crewai: {result:true, name:"CrewAI", why:"Role-based multi-agent collaboration with less boilerplate — good fit when you want named agents (researcher, writer, reviewer) working together quickly.", kw:"CrewAI multi-agent tutorial"},
+  result_claudesdk: {result:true, name:"Claude Agent SDK + MCP", why:"A single, mostly-linear agent inside a Claude-native stack — MCP gives you standardized tool interfaces without extra orchestration overhead.", kw:"Model Context Protocol tutorial"},
+  result_assistants: {result:true, name:"OpenAI Assistants API", why:"A single, mostly-linear agent with managed threads/memory — the fastest path to a working prototype without hand-rolling state management.", kw:"OpenAI Assistants API function calling"}
+};
+let dtState = {node:'start', trail:[]};
+function renderDT(){
+  const node = DT[dtState.node];
+  const trailEl = document.getElementById('dtTrail');
+  trailEl.innerHTML = dtState.trail.map(c=>'<span class="dt-crumb">'+c+'</span>').join('');
+  const body = document.getElementById('dtBody');
+  if(node.result){
+    body.innerHTML = `
+      <div class="dt-result">
+        <h4>→ ${node.name}</h4>
+        <p class="dt-why">${node.why}</p>
+        <p class="dt-why" style="margin-top:8px;">Try searching: <span class="kw" style="display:inline-block;">${node.kw}</span></p>
+      </div>
+      <button class="btn btn-ghost dt-restart" onclick="restartDT()">↺ Start over</button>
+    `;
+  } else {
+    body.innerHTML = `
+      <div class="dt-question">${node.q}</div>
+      <div class="dt-options">
+        ${node.options.map(o=>`<button class="dt-opt" onclick="chooseDT('${o.next}','${o.label.replace(/'/g,"\\'")}')">${o.label}</button>`).join('')}
+      </div>
+    `;
+  }
+}
+function chooseDT(next,label){
+  dtState.trail.push(label);
+  dtState.node = next;
+  renderDT();
+}
+function restartDT(){
+  dtState = {node:'start', trail:[]};
+  renderDT();
+}
+renderDT();
+</script>
+</body>
+</html>
