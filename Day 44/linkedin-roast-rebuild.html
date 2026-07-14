@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- skill:chrome -->
+<style>
+/* Credit line — bottom-right */
+.design-ui-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  font: 11px/1 system-ui, sans-serif;
+  color: rgba(128,128,128,0.5);
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: opacity 0.4s ease;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+/* Hide chrome on touch devices */
+@media (hover: none) {
+  .design-ui-credit { display: none; }
+}
+
+/* Print fixes */
+@media print {
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .design-ui-credit { display: none !important; }
+}
+
+</style>
+<script>
+(function () {
+    // Design-ui pages are single compositions, so the whole body is editable.
+    function markEditable() {
+        document.body.classList.add('artifact-editable');
+    }
+
+    // Credit badge with idle-fade. Hover devices only.
+    function initChromeUI() {
+        if (!matchMedia('(hover: hover)').matches) return;
+
+        var credit = document.createElement('div');
+        credit.className = 'design-ui-credit';
+        credit.setAttribute('aria-hidden', 'true');
+        credit.innerHTML = '\u{1F49C} by ClickUp Brain';
+        document.body.appendChild(credit);
+
+        var timer = null;
+        var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
+        fade(true);
+        var show = function () {
+            fade(false);
+            clearTimeout(timer);
+            timer = setTimeout(function () { fade(true); }, 3000);
+        };
+        document.addEventListener('mousemove', show);
+        show();
+    }
+
+    function init() {
+        markEditable();
+        initChromeUI();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+</script>
+<!-- /skill:chrome -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Roast & Rebuild — Jhon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: oklch(97.5% 0.008 60);
+    --paper-2: oklch(99% 0.006 70);
+    --ink: oklch(23% 0.02 40);
+    --ink-soft: oklch(42% 0.02 45);
+    --ink-faint: oklch(58% 0.015 50);
+    --ember: oklch(58% 0.17 38);
+    --ember-deep: oklch(48% 0.16 34);
+    --ember-tint: oklch(93% 0.04 45);
+    --gold: oklch(72% 0.13 78);
+    --line: oklch(88% 0.012 55);
+    --line-strong: oklch(80% 0.015 50);
+    --good: oklch(56% 0.13 155);
+    --good-tint: oklch(93% 0.05 155);
+    --bad: oklch(55% 0.17 28);
+    --shadow-sm: 0 1px 2px oklch(30% 0.03 40 / 0.06), 0 2px 8px oklch(30% 0.03 40 / 0.05);
+    --shadow-md: 0 4px 16px oklch(30% 0.03 40 / 0.09), 0 1px 3px oklch(30% 0.03 40 / 0.06);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --space: 24px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    font-optical-sizing:auto;
+  }
+  h1,h2,h3,h4{font-family:'Fraunces',serif;text-wrap:balance;line-height:1.08;font-weight:600}
+  p{text-wrap:pretty}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* ---- Sticky nav ---- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:oklch(97.5% 0.008 60 / 0.88);
+    backdrop-filter:saturate(1.4) blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;gap:4px;align-items:center;max-width:1080px;margin:0 auto;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+  .nav-inner::-webkit-scrollbar{display:none}
+  .nav-inner a{
+    font-size:.8rem;font-weight:600;color:var(--ink-soft);text-decoration:none;
+    padding:7px 13px;border-radius:99px;white-space:nowrap;transition:all .2s var(--ease);letter-spacing:.01em;
+  }
+  .nav-inner a:hover{color:var(--ember-deep);background:var(--ember-tint)}
+  .nav-brand{font-family:'Fraunces';font-weight:700;color:var(--ink);margin-right:auto;font-size:.95rem;letter-spacing:-.01em}
+
+  /* ---- Hero ---- */
+  header.hero{padding:72px 0 56px;position:relative;overflow:hidden}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ember-deep);background:var(--ember-tint);
+    padding:6px 14px;border-radius:99px;margin-bottom:22px;
+  }
+  .hero h1{font-size:clamp(2.6rem,7vw,4.6rem);font-weight:900;letter-spacing:-.02em;color:var(--ink)}
+  .hero h1 em{font-style:italic;color:var(--ember)}
+  .hero .sub{font-size:1.15rem;color:var(--ink-soft);max-width:60ch;margin-top:20px}
+  .hero-scores{display:flex;gap:14px;flex-wrap:wrap;margin-top:40px}
+  .score-dial{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:18px;
+    padding:22px 26px;min-width:160px;box-shadow:var(--shadow-sm);
+  }
+  .score-dial .lbl{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+  .score-dial .val{font-family:'Fraunces';font-weight:900;font-size:3rem;line-height:1;margin-top:8px;font-variant-numeric:tabular-nums}
+  .score-dial.before .val{color:var(--bad)}
+  .score-dial.after .val{color:var(--good)}
+  .score-dial .val small{font-size:1.1rem;color:var(--ink-faint);font-weight:600}
+  .arrow-chip{display:flex;align-items:center;font-size:1.8rem;color:var(--ember);align-self:center}
+  .delta{display:inline-block;margin-top:6px;font-size:.8rem;font-weight:700;color:var(--good)}
+
+  /* ---- Section frame ---- */
+  section{padding:56px 0;border-top:1px solid var(--line)}
+  .part-tag{font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ember);display:block;margin-bottom:10px}
+  section h2{font-size:clamp(1.8rem,4vw,2.7rem);font-weight:700;letter-spacing:-.015em}
+  section .lead{color:var(--ink-soft);max-width:62ch;margin-top:14px;font-size:1.05rem}
+
+  /* ---- Report cards ---- */
+  .roast-list{margin-top:36px;display:flex;flex-direction:column;gap:14px}
+  .roast{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:16px;
+    overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .25s var(--ease);
+  }
+  .roast:hover{box-shadow:var(--shadow-md)}
+  .roast-head{display:flex;align-items:center;gap:18px;padding:20px 22px;cursor:pointer;user-select:none}
+  .roast-head .titles{flex:1;min-width:0}
+  .roast-head h3{font-size:1.15rem;font-weight:600}
+  .roast-head .react{font-size:.86rem;color:var(--ink-faint);margin-top:3px;font-style:italic}
+  .badge{
+    font-family:'Fraunces';font-weight:900;font-size:1.5rem;font-variant-numeric:tabular-nums;
+    width:62px;height:62px;flex-shrink:0;border-radius:14px;display:grid;place-items:center;line-height:1;
+  }
+  .badge small{font-size:.7rem;font-weight:600;opacity:.6}
+  .s-low{background:oklch(94% 0.06 28);color:var(--bad)}
+  .s-mid{background:oklch(95% 0.06 78);color:oklch(52% 0.12 62)}
+  .s-high{background:var(--good-tint);color:var(--good)}
+  .chev{color:var(--ink-faint);transition:transform .3s var(--ease);flex-shrink:0}
+  .roast.open .chev{transform:rotate(180deg)}
+  .roast-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s var(--ease)}
+  .roast.open .roast-body{grid-template-rows:1fr}
+  .roast-body-inner{overflow:hidden}
+  .roast-body-pad{padding:0 22px 24px;border-top:1px solid var(--line);padding-top:20px;display:flex;flex-direction:column;gap:16px}
+  .diag{display:flex;gap:12px;align-items:flex-start}
+  .diag .ic{font-size:1.05rem;line-height:1.5;flex-shrink:0}
+  .diag .txt{font-size:.94rem;color:var(--ink-soft)}
+  .diag .txt b{color:var(--ink);font-weight:600}
+  .quote{font-family:'Fraunces';font-style:italic;color:var(--ember-deep);background:var(--ember-tint);padding:2px 7px;border-radius:5px;font-size:.9em}
+
+  /* ---- Rebuild blocks ---- */
+  .block{margin-top:34px}
+  .block-title{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .block-title h3{font-size:1.4rem;font-weight:600}
+  .block-note{font-size:.95rem;color:var(--ink-soft);max-width:64ch;margin-bottom:20px}
+
+  .opt{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:14px;
+    padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow-sm);
+  }
+  .opt-tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:99px;margin-bottom:12px}
+  .t-kw{background:oklch(93% 0.05 240);color:oklch(45% 0.13 250)}
+  .t-vp{background:var(--good-tint);color:var(--good)}
+  .t-auth{background:oklch(94% 0.06 300);color:oklch(48% 0.15 300)}
+  .opt .copytext{font-size:1.02rem;font-weight:500;color:var(--ink);line-height:1.5}
+  .opt .when{font-size:.85rem;color:var(--ink-faint);margin-top:12px}
+  .opt .when b{color:var(--ink-soft)}
+
+  .copybar{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:12px}
+  .copybtn{
+    font-family:'Inter';font-size:.78rem;font-weight:600;letter-spacing:.02em;
+    background:var(--ink);color:var(--paper);border:none;border-radius:8px;
+    padding:8px 16px;cursor:pointer;transition:all .2s var(--ease);display:inline-flex;align-items:center;gap:7px;
+  }
+  .copybtn:hover{background:var(--ember-deep)}
+  .copybtn.done{background:var(--good)}
+  .charcount{font-size:.75rem;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+  .charcount.over{color:var(--bad);font-weight:600}
+
+  .about-rewrite{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:24px 26px;box-shadow:var(--shadow-sm)}
+  .about-rewrite .seg{margin-bottom:16px}
+  .about-rewrite .seg:last-child{margin-bottom:0}
+  .seg-lbl{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ember);display:block;margin-bottom:5px}
+  .about-rewrite p{font-size:1rem;color:var(--ink)}
+  .ph{background:oklch(95% 0.06 78);color:oklch(48% 0.11 60);padding:1px 6px;border-radius:5px;font-weight:600;font-size:.92em}
+
+  .kw-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .kw{font-size:.82rem;font-weight:600;background:oklch(93% 0.05 240);color:oklch(42% 0.12 250);padding:5px 12px;border-radius:99px}
+
+  /* ---- Before/after bullets ---- */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+  .ba .col{padding:18px 20px}
+  .ba .before{background:oklch(96.5% 0.02 30);border-right:1px solid var(--line)}
+  .ba .after{background:var(--paper-2)}
+  .ba .col .tag{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:block}
+  .ba .before .tag{color:var(--bad)}
+  .ba .after .tag{color:var(--good)}
+  .ba .col p{font-size:.94rem;color:var(--ink-soft)}
+  .ba .after p{color:var(--ink)}
+  @media(max-width:640px){.ba{grid-template-columns:1fr}.ba .before{border-right:none;border-bottom:1px solid var(--line)}}
+
+  /* ---- Skills columns ---- */
+  .skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:24px}
+  .skill-card{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow-sm)}
+  .skill-card h4{font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .skill-card ol{list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:8px}
+  .skill-card ol li{counter-increment:s;font-size:.9rem;display:flex;gap:10px;align-items:center;color:var(--ink-soft)}
+  .skill-card ol li::before{content:counter(s);font-family:'Fraunces';font-weight:700;font-size:.8rem;color:var(--ember);width:20px;flex-shrink:0}
+  .skill-card.pin ol li::before{content:"📌";width:auto}
+  .skill-card ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .skill-card ul li{font-size:.9rem;color:var(--ink-soft);display:flex;gap:10px;align-items:flex-start}
+  .skill-card ul li::before{content:"✕";color:var(--bad);font-weight:700;flex-shrink:0}
+  .skill-card .pinname{font-weight:600;color:var(--ink)}
+
+  /* ---- Scorecard table ---- */
+  .scorecard{margin-top:32px;display:flex;flex-direction:column;gap:14px}
+  .sc-row{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:16px 20px;box-shadow:var(--shadow-sm)}
+  .sc-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;gap:12px}
+  .sc-name{font-weight:600;font-size:1rem}
+  .sc-nums{font-family:'Fraunces';font-weight:700;font-variant-numeric:tabular-nums;font-size:.95rem}
+  .sc-nums .b{color:var(--bad)}
+  .sc-nums .a{color:var(--good)}
+  .sc-nums .d{color:var(--ember);font-size:.85rem;margin-left:6px}
+  .track{height:9px;background:oklch(93% 0.01 50);border-radius:99px;position:relative;overflow:hidden}
+  .fill-b{position:absolute;inset:0;width:0;background:oklch(70% 0.12 30);border-radius:99px;transition:width 1s var(--ease)}
+  .fill-a{position:absolute;inset:0;width:0;background:linear-gradient(90deg,var(--gold),var(--good));border-radius:99px;transition:width 1.1s var(--ease) .15s;opacity:.95}
+  .sc-overall{background:var(--ink);color:var(--paper);border-radius:16px;padding:26px 28px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+  .sc-overall .lbl{font-family:'Fraunces';font-weight:600;font-size:1.3rem}
+  .sc-overall .nums{font-family:'Fraunces';font-weight:900;font-size:2rem;font-variant-numeric:tabular-nums}
+  .sc-overall .nums .b{color:oklch(72% 0.14 30)}
+  .sc-overall .nums .sep{color:var(--ink-faint);margin:0 10px;font-weight:400}
+  .sc-overall .nums .a{color:oklch(78% 0.14 150)}
+  .sc-overall .nums .d{display:block;font-size:.85rem;font-weight:600;color:var(--gold);text-align:right;margin-top:4px}
+
+  /* ---- 7 day plan ---- */
+  .days{margin-top:34px;display:flex;flex-direction:column;gap:14px}
+  .day{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm)}
+  .day-head{display:flex;align-items:center;gap:16px;padding:18px 22px;cursor:pointer;user-select:none}
+  .day-num{font-family:'Fraunces';font-weight:900;font-size:1rem;background:var(--ember-tint);color:var(--ember-deep);width:52px;height:52px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;line-height:1;text-align:center}
+  .day-num small{font-size:.6rem;letter-spacing:.05em;display:block;font-weight:600}
+  .day-head h3{font-size:1.08rem;font-weight:600;flex:1}
+  .day.open .chev{transform:rotate(180deg)}
+  .day-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s var(--ease)}
+  .day.open .day-body{grid-template-rows:1fr}
+  .day-body-inner{overflow:hidden}
+  .day-body-pad{padding:4px 22px 24px;border-top:1px solid var(--line);padding-top:18px}
+  .checklist{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+  .check{display:flex;gap:12px;align-items:flex-start;padding:9px 10px;border-radius:9px;cursor:pointer;transition:background .18s var(--ease)}
+  .check:hover{background:var(--ember-tint)}
+  .check input{appearance:none;width:20px;height:20px;border:2px solid var(--line-strong);border-radius:6px;flex-shrink:0;margin-top:2px;cursor:pointer;transition:all .2s var(--ease);position:relative}
+  .check input:checked{background:var(--good);border-color:var(--good)}
+  .check input:checked::after{content:"✓";position:absolute;color:#fff;font-size:.8rem;font-weight:800;top:-1px;left:3px}
+  .check span{font-size:.94rem;color:var(--ink-soft);transition:all .2s}
+  .check input:checked + span{color:var(--ink-faint);text-decoration:line-through}
+  .draft{background:oklch(96.5% 0.012 55);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-top:14px}
+  .draft .dh{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ember);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+  .draft p{font-size:.92rem;color:var(--ink);line-height:1.65;white-space:pre-line}
+  .formula{background:var(--ember-tint);border-radius:12px;padding:16px 20px;margin-top:14px}
+  .formula h5{font-family:'Fraunces';font-size:.95rem;font-weight:600;color:var(--ember-deep);margin-bottom:8px}
+  .formula p{font-size:.9rem;color:var(--ink-soft)}
+  .formula p b{color:var(--ink)}
+  .plan-progress{margin-top:28px;background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:18px;box-shadow:var(--shadow-sm)}
+  .plan-progress .ptrack{flex:1;height:10px;background:oklch(93% 0.01 50);border-radius:99px;overflow:hidden}
+  .plan-progress .pfill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--good));border-radius:99px;transition:width .5s var(--ease)}
+  .plan-progress .pnum{font-family:'Fraunces';font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+
+  /* ---- Share card ---- */
+  .share-card{
+    background:linear-gradient(155deg,var(--ink),oklch(28% 0.04 35));
+    color:var(--paper);border-radius:22px;padding:40px 42px;margin-top:34px;box-shadow:var(--shadow-md);position:relative;overflow:hidden;
+  }
+  .share-card::before{content:"";position:absolute;top:-60px;right:-40px;width:220px;height:220px;background:radial-gradient(circle,var(--ember) 0%,transparent 70%);opacity:.35}
+  .share-card .sc-eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);position:relative}
+  .share-card h3{font-family:'Fraunces';font-size:1.6rem;font-weight:600;margin:12px 0 22px;position:relative}
+  .share-ba{display:flex;gap:32px;margin-bottom:24px;position:relative}
+  .share-ba div .k{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:oklch(72% 0.02 60)}
+  .share-ba div .v{font-family:'Fraunces';font-weight:900;font-size:2.4rem;font-variant-numeric:tabular-nums}
+  .share-ba .before .v{color:oklch(72% 0.14 30)}
+  .share-ba .after .v{color:oklch(80% 0.14 150)}
+  .share-card .mistakes{position:relative}
+  .share-card .mistakes .k{font-size:.8rem;font-weight:700;color:var(--gold);margin-bottom:8px}
+  .share-card ol{margin:0 0 20px 20px;position:relative}
+  .share-card ol li{font-size:.95rem;color:oklch(90% 0.01 60);margin-bottom:5px;line-height:1.5}
+  .share-card .big{position:relative;border-top:1px solid oklch(45% 0.02 40);padding-top:18px}
+  .share-card .big .k{font-size:.8rem;font-weight:700;color:var(--gold);margin-bottom:6px}
+  .share-card .big p{font-size:1.05rem;font-weight:500;line-height:1.5}
+  .share-actions{margin-top:22px;position:relative}
+
+  footer{padding:48px 0 64px;text-align:center;color:var(--ink-faint);font-size:.85rem;border-top:1px solid var(--line)}
+  .disclaimer{max-width:60ch;margin:0 auto;line-height:1.6}
+
+  @media(max-width:640px){
+    header.hero{padding:48px 0 40px}
+    section{padding:44px 0}
+    .about-rewrite,.opt{padding:18px}
+    .share-card{padding:30px 24px}
+    .share-ba{gap:24px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-brand">🔥 Roast & Rebuild</span>
+    <a href="#roast">The Roast</a>
+    <a href="#rebuild">The Rebuild</a>
+    <a href="#scorecard">Scorecard</a>
+    <a href="#plan">7-Day Plan</a>
+    <a href="#share">Summary</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">🔥 LinkedIn Teardown · for Jhon</span>
+    <h1>Your profile isn't bad.<br>It's just <em>invisible.</em></h1>
+    <p class="sub">You've got real skills buried under "aspiring," "in progress," and copy-pasted job descriptions. Here's the honest roast, a full rebuild, and a 7-day plan to make recruiters stop scrolling. Goal: <b>land an ML internship.</b></p>
+    <div class="hero-scores">
+      <div class="score-dial before">
+        <span class="lbl">Before</span>
+        <div class="val">38<small>/100</small></div>
+      </div>
+      <div class="arrow-chip">→</div>
+      <div class="score-dial after">
+        <span class="lbl">After (rebuilt)</span>
+        <div class="val">88<small>/100</small></div>
+        <span class="delta">▲ +50 points</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ PART 1 : ROAST ============ -->
+<section id="roast">
+  <div class="wrap">
+    <span class="part-tag">Part 1 — The Roast</span>
+    <h2>What recruiters actually think in 3 seconds</h2>
+    <p class="lead">No fluff. Every section scored out of 10 with the real reaction, the specific problem (in your own words), why it hurts, and the invisible cost. Tap any card to open it up.</p>
+
+    <div class="roast-list">
+
+      <!-- Headline -->
+      <article class="roast open">
+        <div class="roast-head" onclick="toggle(this)">
+          <div class="badge s-low">4<small>/10</small></div>
+          <div class="titles">
+            <h3>Headline</h3>
+            <div class="react">"Aspiring… in progress… so, not ready yet. Next."</div>
+          </div>
+          <span class="chev">▾</span>
+        </div>
+        <div class="roast-body"><div class="roast-body-inner"><div class="roast-body-pad">
+          <div class="diag"><span class="ic">❌</span><div class="txt"><b>The problem:</b> You lead with <span class="quote">Aspiring Machine Learning Engineer in progress</span>. Two hedge words back to back. "Aspiring" says you're not one yet; "in progress" repeats it. You spent your most valuable line apologizing.</div></div>
+          <div class="diag"><span class="ic">🧠</span><div class="txt"><b>Why it hurts:</b> Recruiters skim headlines in search results. "Aspiring" reads as "not hireable yet." The pipe-stacked keywords (Python | Deep Learning | CV) are decent for search, but they're drowned by the weak opener.</div></div>
+          <div class="diag"><span class="ic">🔍</span><div class="txt"><b>Invisible cost:</b> You're filtered out of "Machine Learning Intern" searches before a human ever reads you, because you framed yourself as a wannabe instead of a student who ships.</div></div>
+        </div></div></div>
+      </article>
+
+      <!-- About hook -->
+      <article class="roast">
+        <div class="roast-head" onclick="toggle(this)">
+          <div class="badge s-low">3<small>/10</small></div>
+          <div class="titles">
+            <h3>About — First 2 Lines (the hook)</h3>
+            <div class="react">"A hashtag? In a sentence? …see more? nah."</div>
+          </div>
+          <span class="chev">▾</span>
+        </div>
+        <div class="roast-body"><div class="roast-body-inner"><div class="roast-body-pad">
+          <div class="diag"><span class="ic">❌</span><div class="txt"><b>The problem:</b> Your opener is <span class="quote">#Aspiring AI/ML Engineer passionate about building intelligent systems that solve real-world problems.</span> A stray hashtag mid-sentence, plus the single most overused phrase on the platform ("passionate about solving real-world problems").</div></div>
+          <div class="diag"><span class="ic">🧠</span><div class="txt"><b>Why it hurts:</b> Only the first ~2 lines show before "see more." This is prime real estate and you spent it on a cliché every second student uses. Nothing here makes anyone click.</div></div>
+          <div class="diag"><span class="ic">🔍</span><div class="txt"><b>Invisible cost:</b> 90% of visitors never hit "see more." So the rest of your About, and any proof in it, is invisible. The hook is the whole game.</div></div>
+        </div></div></div>
+      </article>
+
+      <!-- About full -->
+      <article class="roast">
+        <div class="roast-head" onclick="toggle(this)">
+          <div class="badge s-low">4<small>/10</small></div>
+          <div class="titles">
+            <h3>About — Full Section</h3>
+            <div class="react">"Reads like a syllabus. Where are the projects?"</div>
+          </div>
+          <span class="chev">▾</span>
+        </div>
+        <div class="roast-body"><div class="roast-body-inner"><div class="roast-body-pad">
+          <div class="diag"><span class="ic">❌</span><div class="txt"><b>The problem:</b> It's a list of topics, not evidence. <span class="quote">continuously enhancing my skills… transforming raw data into meaningful insights… understanding the fundamentals deeply</span>. All abstract. Zero named projects, zero numbers, zero proof you've actually built anything.</div></div>
+          <div class="diag"><span class="ic">🧠</span><div class="txt"><b>Why it hurts:</b> Everyone claims "passionate" and "hands-on." Recruiters have read it 10,000 times. Without a specific project or result, you're indistinguishable from every other AI undergrad.</div></div>
+          <div class="diag"><span class="ic">🔍</span><div class="txt"><b>Invisible cost:</b> No CTA at the end means even an interested reader has nowhere to go. No "check my GitHub," no "message me." Warm leads just… leave.</div></div>
+        </div></div></div>
+      </article>
+
+      <!-- Experience -->
+      <article class="roast">
+        <div class="roast-head" onclick="toggle(this)">
+          <div class="badge s-low">3<small>/10</small></div>
+          <div class="titles">
+            <h3>Experience</h3>
+            <div class="react">"'Self-employed' student? And… that's the whole entry?"</div>
+          </div>
+          <span class="chev">▾</span>
+        </div>
+        <div class="roast-body"><div class="roast-body-inner"><div class="roast-body-pad">
+          <div class="diag"><span class="ic">❌</span><div class="txt"><b>The problem:</b> Your one entry is titled <span class="quote">Artificial Intelligence & Machine Learning Student · Self-employed</span> with bullets <span class="quote">Pursuing B.Tech…</span> and <span class="quote">Skilled in Python, Machine Learning, Data Analysis and SQL.</span> That's a restated degree, not experience. "Self-employed" for coursework is confusing.</div></div>
+          <div class="diag"><span class="ic">🧠</span><div class="txt"><b>Why it hurts:</b> Bullets describe status, not achievement. "Skilled in X" is a claim with no proof. This belongs in Education, which you already have covered by your AKTU entry, so it's redundant.</div></div>
+          <div class="diag"><span class="ic">🔍</span><div class="txt"><b>Invisible cost:</b> Interns win on projects. An empty-feeling Experience section signals "hasn't built anything yet," even if you have. Every project you don't list is an interview you don't get.</div></div>
+        </div></div></div>
+      </article>
+
+      <!-- Skills -->
+      <article class="roast">
+        <div class="roast-head" onclick="toggle(this)">
+          <div class="badge s-mid">4<small>/10</small></div>
+          <div class="titles">
+            <h3>Skills & Keywords (search visibility)</h3>
+            <div class="react">"Right keywords, wrong places. Half-indexed."</div>
+          </div>
+          <span class="chev">▾</span>
+        </div>
+        <div class="roast-body"><div class="roast-body-inner"><div class="roast-body-pad">
+          <div class="diag"><span class="ic">❌</span><div class="txt"><b>The problem:</b> Your keywords (Python, TensorFlow, OpenCV, Scikit-Learn) live in prose inside About, but LinkedIn's search weighs the dedicated <b>Skills</b> section, headline, and job titles far more. SQL shows in Experience but not consistently. No <b>PyTorch</b> anywhere, which most ML internships list.</div></div>
+          <div class="diag"><span class="ic">🧠</span><div class="txt"><b>Why it hurts:</b> Recruiters search by skill tags and endorsements. If a term isn't a listed skill, you rank lower or don't appear. You're partially indexed at best.</div></div>
+          <div class="diag"><span class="ic">🔍</span><div class="txt"><b>Invisible cost:</b> You may be a great fit for roles whose recruiters will literally never see your profile, because you're not ranking for the exact skill filters they use.</div></div>
+        </div></div></div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART 2 : REBUILD ============ -->
+<section id="rebuild">
+  <div class="wrap">
+    <span class="part-tag">Part 2 — The Rebuild</span>
+    <h2>Rewritten, with the strategy behind each move</h2>
+    <p class="lead">I'm using only what you told me. Anything in <span class="ph">yellow</span> is a placeholder you must fill with a real project or number, never fake one. Copy buttons are on every block.</p>
+
+    <!-- HEADLINE -->
+    <div class="block">
+      <div class="block-title"><h3>Headline — 3 options</h3></div>
+      <p class="block-note">Formula: <b>[Role/Identity] | [Who I help or what I do] | [Proof or differentiator]</b>. Drop "aspiring" and "in progress" entirely. You're an ML engineer in training who ships, not a hopeful.</p>
+
+      <div class="opt">
+        <span class="opt-tag t-kw">Option 1 · Keyword-optimized</span>
+        <div class="copytext" data-copy>ML Engineer in Training | Python · Deep Learning · Computer Vision | Building CV projects with TensorFlow &amp; OpenCV | B.Tech AI '27</div>
+        <div class="when"><b>Use when:</b> you want maximum search visibility. Front-loads the exact terms recruiters filter for. Best default for internship hunting.</div>
+        <div class="copybar"><button class="copybtn" onclick="copyEl(this)">📋 Copy</button></div>
+      </div>
+
+      <div class="opt">
+        <span class="opt-tag t-vp">Option 2 · Value-proposition</span>
+        <div class="copytext" data-copy>I build computer vision models that turn images into decisions | Python · TensorFlow · OpenCV | AI/ML undergrad seeking a 2026 ML internship</div>
+        <div class="when"><b>Use when:</b> you want a human to feel what you do, not just scan keywords. Great if you're reaching out to people directly or attracting mentors.</div>
+        <div class="copybar"><button class="copybtn" onclick="copyEl(this)">📋 Copy</button></div>
+      </div>
+
+      <div class="opt">
+        <span class="opt-tag t-auth">Option 3 · Authority / thought-leadership</span>
+        <div class="copytext" data-copy>Learning ML in public | Documenting the road from B.Tech AI student to Machine Learning Engineer | Deep Learning · Computer Vision · Python</div>
+        <div class="when"><b>Use when:</b> you plan to post regularly. "In public" invites people to follow the journey and works well with the 7-day posting plan below.</div>
+        <div class="copybar"><button class="copybtn" onclick="copyEl(this)">📋 Copy</button></div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="block">
+      <div class="block-title"><h3>About — full rewrite</h3></div>
+      <p class="block-note">Structured as Hook → Story → Proof → CTA. Fill the <span class="ph">placeholders</span> with a real project (even a course project or a Kaggle notebook counts). Numbers can be honest estimates.</p>
+
+      <div class="about-rewrite">
+        <div class="seg">
+          <span class="seg-lbl">Hook (lines 1–2 · the only lines shown before "see more")</span>
+          <p>I teach machines to see. I'm a B.Tech AI student building computer vision and deep learning projects in Python, and I'm hunting my first ML internship.</p>
+        </div>
+        <div class="seg">
+          <span class="seg-lbl">Story (lines 3–5)</span>
+          <p>Most of my learning happens by building, not just watching lectures. I take a messy dataset or a raw image feed and turn it into something that actually predicts or classifies. Right now I'm focused on deep learning and computer vision, working hands-on with TensorFlow, OpenCV, and scikit-learn.</p>
+        </div>
+        <div class="seg">
+          <span class="seg-lbl">Proof (lines 6–8 · fill with your real work)</span>
+          <p>Recent build: <span class="ph">[project name]</span>, a <span class="ph">[what it does, e.g. image classifier / object detector]</span> using <span class="ph">[Python + TensorFlow/OpenCV]</span> that achieved <span class="ph">[accuracy % or result]</span>. Toolkit: Python, NumPy, Pandas, scikit-learn, TensorFlow, OpenCV, Git &amp; GitHub, SQL.</p>
+        </div>
+        <div class="seg">
+          <span class="seg-lbl">CTA (last line)</span>
+          <p>Open to ML/AI internships and collaborations. My projects live on GitHub (<span class="ph">[your GitHub link]</span>) — take a look, or DM me and let's talk.</p>
+        </div>
+        <div class="copybar">
+          <button class="copybtn" onclick="copyAbout(this)">📋 Copy full About</button>
+        </div>
+      </div>
+
+      <p class="block-note" style="margin-top:20px;margin-bottom:8px"><b>Keywords I embedded for LinkedIn SEO:</b></p>
+      <div class="kw-list">
+        <span class="kw">Machine Learning</span><span class="kw">Deep Learning</span><span class="kw">Computer Vision</span><span class="kw">Python</span><span class="kw">TensorFlow</span><span class="kw">OpenCV</span><span class="kw">scikit-learn</span><span class="kw">Image Classification</span><span class="kw">ML Internship</span><span class="kw">Data Science</span><span class="kw">GitHub</span>
+      </div>
+    </div>
+
+    <!-- EXPERIENCE -->
+    <div class="block">
+      <div class="block-title"><h3>Experience — top entry rewrite</h3></div>
+      <p class="block-note">First, retitle the entry. "Self-employed Student" is confusing. Reframe it as <b>self-directed project work</b> or add a real <b>Projects</b> section. Then flip every bullet from status → achievement. Fill <span class="ph">placeholders</span> honestly.</p>
+
+      <div class="ba">
+        <div class="col before"><span class="tag">Before · Title</span><p>Artificial Intelligence &amp; Machine Learning Student · Self-employed</p></div>
+        <div class="col after"><span class="tag">After · Title</span><p>Independent ML Projects · Self-directed &nbsp;(or list each project under a "Projects" section)</p></div>
+      </div>
+
+      <div class="ba">
+        <div class="col before"><span class="tag">Before · Bullet 1</span><p>Pursuing B.Tech in Artificial Intelligence &amp; Machine Learning.</p></div>
+        <div class="col after"><span class="tag">After · Bullet 1</span><p>Built <span class="ph">[project name]</span>, a <span class="ph">[image classifier]</span> in Python + TensorFlow that reached <span class="ph">[X% accuracy]</span> on <span class="ph">[dataset]</span>.</p></div>
+      </div>
+
+      <div class="ba">
+        <div class="col before"><span class="tag">Before · Bullet 2</span><p>Skilled in Python, Machine Learning, Data Analysis and SQL.</p></div>
+        <div class="col after"><span class="tag">After · Bullet 2</span><p>Engineered an OpenCV pipeline that <span class="ph">[detected / tracked X]</span>, processing <span class="ph">[N images/frames]</span> and cutting <span class="ph">[manual step]</span> by <span class="ph">[%]</span>.</p></div>
+      </div>
+
+      <div class="ba">
+        <div class="col before"><span class="tag">Before · Bullet 3</span><p>(none — section stops here)</p></div>
+        <div class="col after"><span class="tag">After · Bullet 3</span><p>Analyzed <span class="ph">[dataset]</span> with Pandas &amp; scikit-learn to <span class="ph">[surface insight]</span>; shipped code + notebook to GitHub with documentation.</p></div>
+      </div>
+
+      <div class="formula" style="margin-top:8px">
+        <h5>The rule for every bullet</h5>
+        <p><b>Strong verb + what you built + tool + result.</b> "Built / Engineered / Trained / Analyzed / Deployed," never "Responsible for" or "Skilled in." No project yet? Turn a course assignment or a Kaggle notebook into one this week. An estimated number beats no number.</p>
+      </div>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="block">
+      <div class="block-title"><h3>Skills recommendations</h3></div>
+      <p class="block-note">Tuned for one goal: landing an ML internship. Add what recruiters filter for, cut what dilutes, pin the three that matter most.</p>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <h4>➕ Add (priority order)</h4>
+          <ol>
+            <li>Python</li>
+            <li>Machine Learning</li>
+            <li>Deep Learning</li>
+            <li>Computer Vision</li>
+            <li>TensorFlow</li>
+            <li>PyTorch <span style="color:var(--ember);font-weight:600">(missing!)</span></li>
+            <li>OpenCV</li>
+            <li>scikit-learn</li>
+            <li>Data Analysis (Pandas/NumPy)</li>
+            <li>SQL &amp; Git/GitHub</li>
+          </ol>
+        </div>
+        <div class="skill-card">
+          <h4>✂️ Remove / demote</h4>
+          <ul>
+            <li>Vague soft-skill tags ("Teamwork," "Communication") — they don't rank you for ML roles</li>
+            <li>Broad umbrella terms like "Artificial Intelligence" as a standalone skill — too generic, let the specific ones carry it</li>
+            <li>Anything unrelated to AI/ML that's just filling space</li>
+          </ul>
+        </div>
+        <div class="skill-card pin">
+          <h4>📌 Pin these 3 to the top</h4>
+          <ol>
+            <li><span class="pinname">Machine Learning</span> — your core search term</li>
+            <li><span class="pinname">Deep Learning</span> — signals depth beyond basics</li>
+            <li><span class="pinname">Computer Vision</span> — your differentiator &amp; project focus</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART 3 : SCORECARD ============ -->
+<section id="scorecard">
+  <div class="wrap">
+    <span class="part-tag">Part 3 — Before vs After</span>
+    <h2>The scorecard</h2>
+    <p class="lead">Red is where you were. Gold-green is where the rebuild puts you (once you fill in real projects). Scroll to watch it fill.</p>
+
+    <div class="scorecard" id="scoreboard">
+      <div class="sc-row" data-b="40" data-a="90">
+        <div class="sc-top"><span class="sc-name">Headline</span><span class="sc-nums"><span class="b">4</span> → <span class="a">9</span><span class="d">+5</span></span></div>
+        <div class="track"><div class="fill-b"></div><div class="fill-a"></div></div>
+      </div>
+      <div class="sc-row" data-b="30" data-a="90">
+        <div class="sc-top"><span class="sc-name">About — Hook</span><span class="sc-nums"><span class="b">3</span> → <span class="a">9</span><span class="d">+6</span></span></div>
+        <div class="track"><div class="fill-b"></div><div class="fill-a"></div></div>
+      </div>
+      <div class="sc-row" data-b="40" data-a="90">
+        <div class="sc-top"><span class="sc-name">About — Full</span><span class="sc-nums"><span class="b">4</span> → <span class="a">9</span><span class="d">+5</span></span></div>
+        <div class="track"><div class="fill-b"></div><div class="fill-a"></div></div>
+      </div>
+      <div class="sc-row" data-b="30" data-a="80">
+        <div class="sc-top"><span class="sc-name">Experience</span><span class="sc-nums"><span class="b">3</span> → <span class="a">8</span><span class="d">+5</span></span></div>
+        <div class="track"><div class="fill-b"></div><div class="fill-a"></div></div>
+      </div>
+      <div class="sc-row" data-b="40" data-a="90">
+        <div class="sc-top"><span class="sc-name">Skills / Keywords</span><span class="sc-nums"><span class="b">4</span> → <span class="a">9</span><span class="d">+5</span></span></div>
+        <div class="track"><div class="fill-b"></div><div class="fill-a"></div></div>
+      </div>
+
+      <div class="sc-overall">
+        <span class="lbl">Overall Profile Strength</span>
+        <span class="nums"><span class="b">38</span><span class="sep">→</span><span class="a">88</span><span class="d">▲ +50 points</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART 4 : 7-DAY PLAN ============ -->
+<section id="plan">
+  <div class="wrap">
+    <span class="part-tag">Part 4 — 7-Day Activation</span>
+    <h2>Not just edits. Actions that get results.</h2>
+    <p class="lead">Check things off as you go. A profile only works if you feed it activity in the first week. Tap each day to expand.</p>
+
+    <div class="plan-progress">
+      <span class="pnum" id="planLabel">0 / 18 done</span>
+      <div class="ptrack"><div class="pfill" id="planFill"></div></div>
+    </div>
+
+    <div class="days">
+
+      <!-- DAY 1 -->
+      <article class="day open">
+        <div class="day-head" onclick="toggle(this,'day')">
+          <div class="day-num">1<small>MON</small></div>
+          <h3>Make all profile changes</h3>
+          <span class="chev">▾</span>
+        </div>
+        <div class="day-body"><div class="day-body-inner"><div class="day-body-pad">
+          <div class="checklist">
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Swap in one of the 3 new headlines (start with Option 1)</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Replace About with the rewrite + fill every yellow placeholder with real info</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Retitle your Experience entry and rewrite bullets as achievements</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Add the 10 priority skills; add PyTorch; remove vague ones</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Pin Machine Learning, Deep Learning, Computer Vision to the top</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Add a clear headshot + a simple banner; put your GitHub link in Featured/Contact</span></label>
+          </div>
+        </div></div></div>
+      </article>
+
+      <!-- DAY 2 -->
+      <article class="day">
+        <div class="day-head" onclick="toggle(this,'day')">
+          <div class="day-num">2<small>TUE</small></div>
+          <h3>Publish Post #1 — "I just rebuilt my LinkedIn"</h3>
+          <span class="chev">▾</span>
+        </div>
+        <div class="day-body"><div class="day-body-inner"><div class="day-body-pad">
+          <div class="checklist">
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Personalize the draft below, then publish it</span></label>
+          </div>
+          <div class="draft">
+            <div class="dh"><span>Draft · Post #1</span><span class="charcount" data-limit="1300"></span></div>
+            <p data-post>I just tore my own LinkedIn profile apart. And it needed it.
+
+For months my headline said "aspiring ML engineer, in progress." Translation: not ready yet. No wonder recruiters kept scrolling.
+
+So I rebuilt it from scratch:
+→ Cut "aspiring" and led with what I actually do: build computer vision models in Python.
+→ Turned my About from a list of buzzwords into real projects.
+→ Rewrote my experience around what I've built, not what I'm "skilled in."
+
+The lesson: your profile isn't a resume. It's a pitch. And "someday" doesn't get hired.
+
+I'm a B.Tech AI student looking for my first ML internship. If you build with TensorFlow, OpenCV or PyTorch, I'd love to connect and learn from you.
+
+What's the one line on your profile you know you're overdue to fix?</p>
+            <div class="copybar"><button class="copybtn" onclick="copyPost(this)">📋 Copy post</button></div>
+          </div>
+        </div></div></div>
+      </article>
+
+      <!-- DAY 3 -->
+      <article class="day">
+        <div class="day-head" onclick="toggle(this,'day')">
+          <div class="day-num">3<small>WED</small></div>
+          <h3>Send 10 strategic connection requests</h3>
+          <span class="chev">▾</span>
+        </div>
+        <div class="day-body"><div class="day-body-inner"><div class="day-body-pad">
+          <p class="block-note" style="margin-bottom:14px"><b>Exactly who to target</b> (mix, not all recruiters):</p>
+          <div class="checklist">
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>3 ML/AI recruiters or talent leads at companies hiring interns</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>3 ML engineers / data scientists 2–4 years ahead of you</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>2 seniors/alumni from AKTU or your program now working in AI</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>2 people who post ML content you genuinely learn from</span></label>
+          </div>
+          <div class="draft">
+            <div class="dh"><span>Connection message template</span><span class="charcount" data-limit="300"></span></div>
+            <p data-post>Hi [Name], I'm a B.Tech AI student focused on computer vision and deep learning, working toward my first ML internship. I really liked your work on [specific thing]. Would love to connect and follow what you're building.</p>
+            <div class="copybar"><button class="copybtn" onclick="copyPost(this)">📋 Copy template</button></div>
+          </div>
+        </div></div></div>
+      </article>
+
+      <!-- DAY 4 -->
+      <article class="day">
+        <div class="day-head" onclick="toggle(this,'day')">
+          <div class="day-num">4<small>THU</small></div>
+          <h3>Comment on 5 posts in your target space</h3>
+          <span class="chev">▾</span>
+        </div>
+        <div class="day-body"><div class="day-body-inner"><div class="day-body-pad">
+          <div class="checklist">
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Leave 5 real comments using the Value Comment formula below</span></label>
+          </div>
+          <div class="formula">
+            <h5>The "Value Comment" formula</h5>
+            <p><b>Agree + Add Insight + Ask a Question.</b> Example on a post about CNNs: "Totally agree data quality beats model size (Agree). I saw this first-hand, my accuracy jumped more from cleaning labels than from a bigger net (Insight). Curious, do you augment before or after your train/val split? (Question)". This gets you seen by the poster AND their audience, far better than "Great post!"</p>
+          </div>
+        </div></div></div>
+      </article>
+
+      <!-- DAY 5 -->
+      <article class="day">
+        <div class="day-head" onclick="toggle(this,'day')">
+          <div class="day-num">5<small>FRI</small></div>
+          <h3>Publish Post #2 — lessons / hot-take</h3>
+          <span class="chev">▾</span>
+        </div>
+        <div class="day-body"><div class="day-body-inner"><div class="day-body-pad">
+          <div class="checklist">
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Personalize with a real detail from a project, then publish</span></label>
+          </div>
+          <div class="draft">
+            <div class="dh"><span>Draft · Post #2</span><span class="charcount" data-limit="1300"></span></div>
+            <p data-post>Hot take: most beginners learning ML are watching too many tutorials and building too few things.
+
+I was one of them. I could explain a convolutional neural network on paper but froze the second I had to point one at a real image.
+
+Then I stopped watching and started shipping. Messy code, ugly notebooks, models that flopped. But every broken build taught me more than 10 polished videos ever did.
+
+What actually moved the needle:
+→ Rebuilding a model from scratch instead of copying a notebook.
+→ Cleaning the data myself. Painful, but it's where the real accuracy lived.
+→ Pushing everything to GitHub, even the embarrassing early versions.
+
+You don't learn ML by understanding it. You learn it by building things that break and fixing them.
+
+If you're a student learning ML: what are you building this week? Drop it below, I'll check it out.</p>
+            <div class="copybar"><button class="copybtn" onclick="copyPost(this)">📋 Copy post</button></div>
+          </div>
+        </div></div></div>
+      </article>
+
+      <!-- DAY 6 -->
+      <article class="day">
+        <div class="day-head" onclick="toggle(this,'day')">
+          <div class="day-num">6<small>SAT</small></div>
+          <h3>Engage with every comment + 5 more requests</h3>
+          <span class="chev">▾</span>
+        </div>
+        <div class="day-body"><div class="day-body-inner"><div class="day-body-pad">
+          <div class="checklist">
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Reply to every comment on Post #1 and #2 (replies boost reach)</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Send 5 more connection requests, prioritizing people who engaged</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Follow up (no pressure) with anyone who accepted from Day 3</span></label>
+          </div>
+        </div></div></div>
+      </article>
+
+      <!-- DAY 7 -->
+      <article class="day">
+        <div class="day-head" onclick="toggle(this,'day')">
+          <div class="day-num">7<small>SUN</small></div>
+          <h3>Review the numbers &amp; adjust</h3>
+          <span class="chev">▾</span>
+        </div>
+        <div class="day-body"><div class="day-body-inner"><div class="day-body-pad">
+          <div class="checklist">
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Check profile views vs last week (aim: a clear jump)</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Check connection acceptance rate</span></label>
+            <label class="check"><input type="checkbox" onchange="updatePlan()"><span>Note which post got more engagement, do more of that</span></label>
+          </div>
+          <div class="formula">
+            <h5>What the numbers mean</h5>
+            <p><b>Profile views up but few connections?</b> Your headline is working, your About isn't closing, tighten the hook. <b>High acceptance rate (&gt;60%)?</b> Good targeting, send more. <b>Low acceptance (&lt;30%)?</b> You're reaching too far up or your message feels generic, personalize line 1. <b>Post #1 beat Post #2 or vice versa?</b> That's your audience telling you what they want. Repeat the winner's format next week.</p>
+          </div>
+        </div></div></div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART 5 : SHARE CARD ============ -->
+<section id="share">
+  <div class="wrap">
+    <span class="part-tag">Part 5 — What I Learned Today</span>
+    <h2>Your shareable summary</h2>
+    <p class="lead">Screenshot this and post it as-is. It's a story in itself, and stories get engagement.</p>
+
+    <div class="share-card" id="shareCard">
+      <span class="sc-eyebrow">🔥 I let AI roast my LinkedIn today</span>
+      <h3>Here's what changed:</h3>
+      <div class="share-ba">
+        <div class="before"><div class="k">Before</div><div class="v">38</div></div>
+        <div class="after"><div class="k">After</div><div class="v">88</div></div>
+      </div>
+      <div class="mistakes">
+        <div class="k">Top 3 mistakes I was making:</div>
+        <ol>
+          <li>Leading with "aspiring" and "in progress" (recruiters read that as "not ready").</li>
+          <li>An About full of buzzwords and zero real projects or numbers.</li>
+          <li>Listing skills as claims ("skilled in…") instead of proving them with what I built.</li>
+        </ol>
+      </div>
+      <div class="big">
+        <div class="k">The #1 thing that made the biggest difference:</div>
+        <p>Rewriting my headline and hook to say what I actually build, not what I hope to become one day.</p>
+      </div>
+      <div class="share-actions"><button class="copybtn" onclick="copyShare(this)">📋 Copy summary text</button></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="disclaimer">Built only from what you shared. Every <span style="color:oklch(48% 0.11 60);font-weight:600">yellow placeholder</span> is yours to fill with real projects, links, and numbers, never invent them. Honest estimates beat blanks. Now go ship it, Jhon.</p>
+  </div>
+</footer>
+
+<script>
+  // expand / collapse
+  function toggle(el, type){
+    const card = el.closest(type==='day' ? '.day' : '.roast');
+    card.classList.toggle('open');
+  }
+
+  // copy a single element's text
+  function copyEl(btn){
+    const txt = btn.closest('.opt').querySelector('[data-copy]').innerText;
+    doCopy(txt, btn);
+  }
+  function copyPost(btn){
+    const txt = btn.closest('.draft').querySelector('[data-post]').innerText;
+    doCopy(txt, btn);
+  }
+  function copyAbout(btn){
+    const segs = btn.closest('.about-rewrite').querySelectorAll('.seg p');
+    const txt = Array.from(segs).map(s=>s.innerText).join('\n\n');
+    doCopy(txt, btn);
+  }
+  function copyShare(btn){
+    const c = document.getElementById('shareCard');
+    const txt =
+`I let AI roast my LinkedIn profile today. Here's what changed:
+
+Before: 38/100
+After: 88/100
+
+Top 3 mistakes I was making:
+1. Leading with "aspiring" and "in progress" (recruiters read that as "not ready").
+2. An About full of buzzwords and zero real projects or numbers.
+3. Listing skills as claims ("skilled in…") instead of proving them with what I built.
+
+The #1 thing that made the biggest difference: rewriting my headline and hook to say what I actually build, not what I hope to become one day.`;
+    doCopy(txt, btn);
+  }
+  function doCopy(txt, btn){
+    navigator.clipboard.writeText(txt).then(()=>{
+      const old = btn.innerHTML;
+      btn.innerHTML = '✓ Copied';
+      btn.classList.add('done');
+      setTimeout(()=>{btn.innerHTML=old;btn.classList.remove('done')},1600);
+    });
+  }
+
+  // character counters
+  document.querySelectorAll('.draft').forEach(d=>{
+    const post = d.querySelector('[data-post]');
+    const cc = d.querySelector('.charcount');
+    if(post && cc){
+      const limit = parseInt(cc.dataset.limit,10);
+      const n = post.innerText.length;
+      cc.textContent = n + ' / ' + limit + ' chars';
+      if(n>limit) cc.classList.add('over');
+    }
+  });
+
+  // plan progress
+  function updatePlan(){
+    const boxes = document.querySelectorAll('#plan input[type=checkbox]');
+    const done = document.querySelectorAll('#plan input[type=checkbox]:checked').length;
+    const pct = Math.round(done/boxes.length*100);
+    document.getElementById('planFill').style.width = pct + '%';
+    document.getElementById('planLabel').textContent = done + ' / ' + boxes.length + ' done';
+  }
+  updatePlan();
+
+  // animate scorecard on scroll
+  const board = document.getElementById('scoreboard');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        board.querySelectorAll('.sc-row').forEach(r=>{
+          r.querySelector('.fill-b').style.width = r.dataset.b + '%';
+          r.querySelector('.fill-a').style.width = r.dataset.a + '%';
+        });
+        io.unobserve(board);
+      }
+    });
+  },{threshold:.3});
+  if(board) io.observe(board);
+</script>
+</body>
+</html>
