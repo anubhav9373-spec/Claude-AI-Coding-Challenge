@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<!-- skill:chrome -->
+ 
 <style>
-/* Print fixes */
+
 @media print {
   * {
     transition: none !important;
@@ -19,7 +19,7 @@
 </style>
 <script>
 (function () {
-    // Design-ui pages are single compositions, so the whole body is editable.
+    
     function markEditable() {
         document.body.classList.add('artifact-editable');
     }
@@ -36,10 +36,9 @@
 })();
 
 </script>
-<!-- /skill:chrome -->
-<!-- skill:libraries -->
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js" integrity="sha384-XcdcwHqIPULERb2yDEM4R0XaQKU3YnDsrTmjACBZyfdVVqjh6xQ4/DCMd7XLcA6Y" crossorigin="anonymous"></script>
-<!-- /skill:libraries -->
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Typing Studio</title>
@@ -106,7 +105,7 @@ button{font-family:inherit;cursor:pointer;border:none}
 .wrap{max-width:1120px;margin:0 auto;padding:clamp(16px,3vw,32px) clamp(16px,4vw,40px) 80px}
 .wrap.wide{max-width:1320px;padding-bottom:32px}
 
-/* HOME title band */
+
 .title-band{position:relative;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:20px 0 4px;text-align:center}
 .title-band h1{font-family:var(--font-display);font-weight:700;font-size:clamp(2.8rem,8vw,4.6rem);color:var(--green-deep);letter-spacing:.5px;position:relative;z-index:2}
 .title-band .sub{color:var(--ink-soft);font-weight:700;margin-top:8px;font-size:1.08rem;position:relative;z-index:2}
@@ -141,7 +140,7 @@ button{font-family:inherit;cursor:pointer;border:none}
 .btn.warm{background:oklch(0.88 0.13 92);color:oklch(0.34 0.06 60)}
 .btn.sm{padding:8px 16px;font-size:.9rem}
 
-/* section head: title + pill on the left, buddies spread across the rest of the band */
+
 .section-head{display:flex;align-items:center;gap:14px;margin-bottom:var(--sp-6);flex-wrap:wrap}
 .section-head h2{font-size:clamp(1.7rem,4vw,2.4rem);color:var(--green-deep)}
 .head-buddies{flex:1;min-width:260px;display:flex;align-items:flex-end;justify-content:space-evenly;gap:12px}
@@ -150,7 +149,7 @@ button{font-family:inherit;cursor:pointer;border:none}
 @media(max-width:520px){.head-buddies{display:none}}
 .pill{display:inline-block;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700;color:var(--ink-soft);font-size:.85rem;font-family:var(--font-display)}
 
-/* ============ TYPING ============ */
+
 .type-top{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);flex-wrap:wrap;margin-bottom:8px}
 .type-top-actions{display:flex;align-items:center;gap:8px}
 .type-top-actions .btn{min-width:84px;text-align:center}
@@ -202,7 +201,7 @@ button{font-family:inherit;cursor:pointer;border:none}
 @media(max-width:480px){.keyboard{display:none}}
 .live-ctrl{display:flex;gap:var(--sp-3);margin-top:var(--sp-3);flex-wrap:wrap;justify-content:center}
 
-/* results */
+
 .celebrate{display:flex;justify-content:center;align-items:flex-end;gap:clamp(8px,3vw,40px);margin-bottom:var(--sp-6);flex-wrap:wrap}
 .celebrate .ch{width:150px}
 .grade-card{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:var(--shadow-md);margin-bottom:var(--sp-6)}
@@ -216,7 +215,7 @@ button{font-family:inherit;cursor:pointer;border:none}
 .chart-box h3{margin-bottom:14px;font-size:1.25rem}
 .chart-holder{position:relative;height:300px}
 
-/* dashboard */
+
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--sp-4);margin-bottom:var(--sp-8)}
 .dstat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
 .dstat .k{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:800}
@@ -249,12 +248,12 @@ button{font-family:inherit;cursor:pointer;border:none}
 <nav class="nav">
   <div class="brand"><img class="ch" id="navCh" alt="" src="https://t90161693404.p.clickup-attachments.com/t90161693404/6499a983-bc70-473d-8cfb-c5b1e906cd13/generated-image-312d50d5-7646-4c95-af68-08e03f14a30a.png?view=open"> Typing Studio</div>
   <div class="spacer"></div>
-  <button class="link active" data-go="home">Home</button>
-  <button class="link" data-go="dashboard">Dashboard</button>
-  <button class="link" data-go="achievements">Achievements</button>
+  <button class="link active" data-go="home" fdprocessedid="t3mvd">Home</button>
+  <button class="link" data-go="dashboard" fdprocessedid="zp6q21n">Dashboard</button>
+  <button class="link" data-go="achievements" fdprocessedid="ntyrg">Achievements</button>
 </nav>
 
-<!-- HOME -->
+
 <section class="screen on" id="home">
   <div class="wrap">
     <div class="title-band">
@@ -267,40 +266,38 @@ button{font-family:inherit;cursor:pointer;border:none}
       <h1>Typing Studio</h1>
       <p class="sub">Type fun little stories, race the clock, and level up your speed.</p>
     </div>
-    <div class="modes" id="modeGrid"><div class="mode-cell"><button class="mode blue"><div class="big">1 min</div><div class="small">Quick Burst Challenge</div></button><img src="https://t90161693404.p.clickup-attachments.com/t90161693404/e851eb0c-2a5c-4c5d-b96f-1f05977ab224/generated-image-ea6887fb-229c-409f-a7fb-1e255edcbeec.png?view=open" alt="" class="ch anim-jump" style="width: 150px;"></div><div class="mode-cell"><button class="mode orange"><div class="big">3 min</div><div class="small">Extend Focus</div></button><img src="https://t90161693404.p.clickup-attachments.com/t90161693404/a6579a56-8b11-4167-b01f-fa8800ad3779/generated-image-e5bf3883-3feb-4dbe-81dd-1019a38e5acf.png?view=open" alt="" class="ch anim-float" style="width: 150px;"></div><div class="mode-cell"><button class="mode pink"><div class="big">5 min</div><div class="small">Complete Challenge</div></button><img src="https://t90161693404.p.clickup-attachments.com/t90161693404/ca10f2b6-0c2d-4f37-a2df-5d61fc0da1cf/generated-image-a8637cff-f46b-4638-b08a-9877a0931068.png?view=open" alt="" class="ch anim-dance" style="width: 150px;"></div><div class="mode-cell"><button class="mode lime"><div class="big">Live Mode</div><div class="small">Endless Practice</div></button><img src="https://t90161693404.p.clickup-attachments.com/t90161693404/d582fc78-67c9-4010-b22f-0e87872580ab/generated-image-1ddc39e8-8df4-419f-8f6e-97afc47b8075.png?view=open" alt="" class="ch anim-bounce" style="width: 150px;"></div></div>
+    <div class="modes" id="modeGrid"><div class="mode-cell"><button class="mode blue" fdprocessedid="y83ghe"><div class="big">1 min</div><div class="small">Quick Burst Challenge</div></button><img src="https://t90161693404.p.clickup-attachments.com/t90161693404/e851eb0c-2a5c-4c5d-b96f-1f05977ab224/generated-image-ea6887fb-229c-409f-a7fb-1e255edcbeec.png?view=open" alt="" class="ch anim-jump" style="width: 150px;"></div><div class="mode-cell"><button class="mode orange" fdprocessedid="41elos"><div class="big">3 min</div><div class="small">Extend Focus</div></button><img src="https://t90161693404.p.clickup-attachments.com/t90161693404/a6579a56-8b11-4167-b01f-fa8800ad3779/generated-image-e5bf3883-3feb-4dbe-81dd-1019a38e5acf.png?view=open" alt="" class="ch anim-float" style="width: 150px;"></div><div class="mode-cell"><button class="mode pink" fdprocessedid="ozoidq"><div class="big">5 min</div><div class="small">Complete Challenge</div></button><img src="https://t90161693404.p.clickup-attachments.com/t90161693404/ca10f2b6-0c2d-4f37-a2df-5d61fc0da1cf/generated-image-a8637cff-f46b-4638-b08a-9877a0931068.png?view=open" alt="" class="ch anim-dance" style="width: 150px;"></div><div class="mode-cell"><button class="mode lime" fdprocessedid="xyk3kb"><div class="big">Live Mode</div><div class="small">Endless Practice</div></button><img src="https://t90161693404.p.clickup-attachments.com/t90161693404/d582fc78-67c9-4010-b22f-0e87872580ab/generated-image-1ddc39e8-8df4-419f-8f6e-97afc47b8075.png?view=open" alt="" class="ch anim-bounce" style="width: 150px;"></div></div>
     <div class="home-actions">
-      <button class="btn ghost" data-go="dashboard">📊 My Dashboard</button>
-      <button class="btn warm" data-go="achievements">🏆 Achievements</button>
-      <button class="btn primary" id="downloadBtn">⬇️ Download this app</button>
+      <button class="btn ghost" data-go="dashboard" fdprocessedid="05s6l9">📊 My Dashboard</button>
+      <button class="btn warm" data-go="achievements" fdprocessedid="57tg0s">🏆 Achievements</button>
     </div>
   </div>
 </section>
 
-<!-- TYPING -->
 <section class="screen" id="typing">
   <div class="wrap wide">
     <div class="type-top">
-      <div class="mode-tag" id="typeModeTag">Live Mode<small id="typeCatTag">Comedy story</small></div>
+      <div class="mode-tag" id="typeModeTag">Live Mode<small id="typeCatTag">Mystery story</small></div>
       <div class="top-center">
         <img class="ch anim-float" data-pose="cheeky" alt="" src="https://t90161693404.p.clickup-attachments.com/t90161693404/32eb160e-4678-4e59-a7aa-4bf69bd5d69f/generated-image-fceaa2b3-2206-4c6c-ab25-5e0155cae9ce.png?view=open">
         <img class="ch anim-bounce" data-pose="thumbs" alt="" src="https://t90161693404.p.clickup-attachments.com/t90161693404/e851eb0c-2a5c-4c5d-b96f-1f05977ab224/generated-image-ea6887fb-229c-409f-a7fb-1e255edcbeec.png?view=open">
-        <div class="timer tnum" id="timer">00:11:26</div>
+        <div class="timer tnum" id="timer">00:00:54</div>
         <img class="ch anim-bounce" data-pose="point" alt="" src="https://t90161693404.p.clickup-attachments.com/t90161693404/a6579a56-8b11-4167-b01f-fa8800ad3779/generated-image-e5bf3883-3feb-4dbe-81dd-1019a38e5acf.png?view=open">
         <img class="ch anim-float" data-pose="crown" alt="" src="https://t90161693404.p.clickup-attachments.com/t90161693404/6499a983-bc70-473d-8cfb-c5b1e906cd13/generated-image-312d50d5-7646-4c95-af68-08e03f14a30a.png?view=open">
       </div>
       <div class="type-top-actions">
-        <button class="btn ghost sm" id="navRedoBtn">Redo</button>
-        <button class="btn ghost sm" id="quitBtn">Quit</button>
+        <button class="btn ghost sm" id="navRedoBtn" fdprocessedid="9fr1c">Redo</button>
+        <button class="btn ghost sm" id="quitBtn" fdprocessedid="1dsrs">Quit</button>
       </div>
     </div>
-    <div class="metrics" id="metricRow"><div class="metric"><div class="k">WPM</div><div class="v tnum" id="m_wpm">15</div></div><div class="metric"><div class="k">Acc</div><div class="v tnum" id="m_acc">94%</div></div><div class="metric"><div class="k">Chars</div><div class="v tnum" id="m_chars">928</div></div><div class="metric"><div class="k">Words</div><div class="v tnum" id="m_words">170</div></div><div class="metric"><div class="k">Wrong</div><div class="v tnum" id="m_wrong">38</div></div><div class="metric"><div class="k">Mistakes</div><div class="v tnum" id="m_mistakes">60</div></div><div class="metric"><div class="k">Streak</div><div class="v tnum" id="m_streak">9</div></div><div class="metric"><div class="k">Best</div><div class="v tnum" id="m_best">78</div></div></div>
+    <div class="metrics" id="metricRow"><div class="metric"><div class="k">WPM</div><div class="v tnum" id="m_wpm">17</div></div><div class="metric"><div class="k">Acc</div><div class="v tnum" id="m_acc">96%</div></div><div class="metric"><div class="k">Chars</div><div class="v tnum" id="m_chars">82</div></div><div class="metric"><div class="k">Words</div><div class="v tnum" id="m_words">7</div></div><div class="metric"><div class="k">Wrong</div><div class="v tnum" id="m_wrong">3</div></div><div class="metric"><div class="k">Mistakes</div><div class="v tnum" id="m_mistakes">3</div></div><div class="metric"><div class="k">Streak</div><div class="v tnum" id="m_streak">54</div></div><div class="metric"><div class="k">Best</div><div class="v tnum" id="m_best">54</div></div></div>
     <div class="stage-row">
       <span class="side-buddy"><img class="ch anim-float" data-pose="reading" alt="" src="https://t90161693404.p.clickup-attachments.com/t90161693404/c142b981-805d-4fd2-bfed-abcbd9f266be/generated-image-64c29b5d-37f6-4b18-ba42-c63d33ac4fcb.png?view=open"></span>
       <div class="teleprompter" id="prompter" tabindex="0">
-        <div class="tline" id="l0"><span class="c ok">f</span><span class="c ok">i</span><span class="c ok">n</span><span class="c ok">a</span><span class="c ok">l</span><span class="c ok">l</span><span class="c ok">y</span><span class="c ok">&nbsp;</span><span class="c ok">f</span><span class="c ok">i</span><span class="c ok">t</span><span class="c ok">&nbsp;</span><span class="c ok">i</span><span class="c ok">n</span><span class="c ok">&nbsp;</span><span class="c ok">p</span><span class="c ok">l</span><span class="c ok">a</span><span class="c ok">c</span><span class="c ok">e</span><span class="c ok">.</span><span class="c ok">&nbsp;</span><span class="c ok">T</span><span class="c ok">h</span><span class="c ok">e</span><span class="c ok">&nbsp;</span><span class="c ok">l</span><span class="c ok">e</span><span class="c err">t</span><span class="c ok">t</span><span class="c err">e</span><span class="c err">r</span><span class="c err space">&nbsp;</span><span class="c err">c</span><span class="c ok">a</span><span class="c ok">r</span><span class="c ok">r</span><span class="c ok">i</span><span class="c ok">e</span><span class="c ok">d</span><span class="c ok">&nbsp;</span><span class="c ok">n</span><span class="c ok">o</span><span class="c ok">&nbsp;</span><span class="c err">n</span><span class="c ok">a</span><span class="c err">m</span><span class="c ok">e</span><span class="c ok">&nbsp;</span><span class="c ok">a</span><span class="c ok">t</span><span class="c ok">&nbsp;</span><span class="c ok">a</span><span class="c ok">l</span><span class="c ok">l</span><span class="c err space">&nbsp;</span><span class="c ok">o</span><span class="c ok">n</span><span class="c ok">l</span><span class="c ok">y</span><span class="c ok">&nbsp;</span><span class="c ok">a</span></div>
-        <div class="tline" id="l1"><span class="c err">w</span><span class="c err">a</span><span class="c ok">x</span><span class="c ok">&nbsp;</span><span class="c ok">s</span><span class="c ok">e</span><span class="c ok">a</span><span class="c ok">l</span><span class="c ok">&nbsp;</span><span class="c ok">s</span><span class="c ok">h</span><span class="c ok">a</span><span class="c ok">p</span><span class="c ok">e</span><span class="c ok">d</span><span class="c ok">&nbsp;</span><span class="c ok">l</span><span class="c ok">i</span><span class="c ok">k</span><span class="c ok">e</span><span class="c ok">&nbsp;</span><span class="c ok">a</span><span class="c ok">&nbsp;</span><span class="c ok">s</span><span class="c ok">l</span><span class="c ok">y</span><span class="c ok">&nbsp;</span><span class="c ok">f</span><span class="c ok">o</span><span class="c ok">x</span><span class="c ok">.</span><span class="c ok">&nbsp;</span><span class="c ok">E</span><span class="c ok">v</span><span class="c ok">e</span><span class="c ok">r</span><span class="c ok">y</span><span class="c ok">&nbsp;</span><span class="c ok">t</span><span class="c ok">i</span><span class="c ok">n</span><span class="c ok">y</span><span class="c ok">&nbsp;</span><span class="c ok">c</span><span class="c ok">l</span><span class="c ok">u</span><span class="c ok">e</span><span class="c ok">&nbsp;</span><span class="c ok">s</span><span class="c ok">e</span><span class="c ok">e</span><span class="c ok">m</span><span class="c ok">e</span><span class="c ok">d</span><span class="c err space">&nbsp;</span><span class="c err">t</span><span class="c ok">o</span></div>
-        <div class="tline" id="l2"><span class="c ok">w</span><span class="c ok">h</span><span class="c ok">i</span><span class="c ok">s</span><span class="c ok">p</span><span class="c ok">e</span><span class="c ok">r</span><span class="c ok">&nbsp;</span><span class="c ok">a</span><span class="c ok">&nbsp;</span><span class="c ok">f</span><span class="c ok">a</span><span class="c ok">m</span><span class="c ok">i</span><span class="c ok">l</span><span class="c err">i</span><span class="c ok">a</span><span class="c ok">r</span><span class="c ok">&nbsp;</span><span class="c ok">n</span><span class="c ok">a</span><span class="c ok">m</span><span class="c ok">e</span><span class="c ok">&nbsp;</span><span class="c ok">s</span><span class="c ok">h</span><span class="c ok">e</span><span class="c ok">&nbsp;</span><span class="c ok">a</span><span class="c ok">l</span><span class="c ok">m</span><span class="c ok">o</span><span class="c ok">s</span><span class="c ok">t</span><span class="c ok">&nbsp;</span><span class="c ok">f</span><span class="c err">u</span><span class="c ok">l</span><span class="c ok">l</span><span class="c ok">y</span><span class="c ok">&nbsp;</span><span class="c ok">k</span><span class="c ok">n</span><span class="c ok">e</span><span class="c ok">w</span><span class="c ok">.</span><span class="c ok">&nbsp;</span><span class="c ok">T</span><span class="c err">h</span><span class="c ok">e</span><span class="c ok">&nbsp;</span><span class="c ok">w</span><span class="c ok">h</span><span class="c ok">o</span><span class="c ok">l</span><span class="c ok">e</span><span class="c ok">&nbsp;</span><span class="c ok">m</span><span class="c ok">y</span><span class="c ok">s</span><span class="c ok">t</span><span class="c err">e</span><span class="c err">r</span><span class="c err">y</span></div>
-        <div class="tline cur" id="l3"><span class="c ok">u</span><span class="c ok">n</span><span class="c ok">r</span><span class="c ok">a</span><span class="c ok">v</span><span class="c ok">e</span><span class="c ok">l</span><span class="c ok">e</span><span class="c ok">d</span><span class="c cursor">&nbsp;</span><span class="c">q</span><span class="c">u</span><span class="c">i</span><span class="c">e</span><span class="c">t</span><span class="c">l</span><span class="c">y</span><span class="c">&nbsp;</span><span class="c">o</span><span class="c">n</span><span class="c">e</span><span class="c">&nbsp;</span><span class="c">g</span><span class="c">e</span><span class="c">n</span><span class="c">t</span><span class="c">l</span><span class="c">e</span><span class="c">&nbsp;</span><span class="c">p</span><span class="c">a</span><span class="c">t</span><span class="c">i</span><span class="c">e</span><span class="c">n</span><span class="c">t</span><span class="c">&nbsp;</span><span class="c">c</span><span class="c">l</span><span class="c">u</span><span class="c">e</span><span class="c">&nbsp;</span><span class="c">a</span><span class="c">t</span><span class="c">&nbsp;</span><span class="c">a</span><span class="c">&nbsp;</span><span class="c">t</span><span class="c">i</span><span class="c">m</span><span class="c">e</span><span class="c">.</span><span class="c">&nbsp;</span><span class="c">S</span><span class="c">h</span><span class="c">e</span><span class="c">&nbsp;</span><span class="c">n</span><span class="c">o</span><span class="c">t</span><span class="c">i</span><span class="c">c</span><span class="c">e</span><span class="c">d</span></div>
+        <div class="tline" id="l0"><span class="c ok">T</span><span class="c ok">h</span><span class="c err">e</span><span class="c ok"> </span><span class="c ok">d</span><span class="c ok">e</span><span class="c ok">t</span><span class="c ok">e</span><span class="c ok">c</span><span class="c ok">t</span><span class="c ok">i</span><span class="c ok">v</span><span class="c ok">e</span><span class="c ok"> </span><span class="c ok">s</span><span class="c ok">m</span><span class="c ok">i</span><span class="c err">l</span><span class="c ok">e</span><span class="c ok">d</span><span class="c ok"> </span><span class="c ok">s</span><span class="c ok">o</span><span class="c ok">f</span><span class="c ok">t</span><span class="c ok">l</span><span class="c ok">y</span><span class="c err">;</span><span class="c ok"> </span><span class="c ok">t</span><span class="c ok">h</span><span class="c ok">e</span><span class="c ok"> </span><span class="c ok">v</span><span class="c ok">e</span><span class="c ok">r</span><span class="c ok">y</span><span class="c ok"> </span><span class="c ok">l</span><span class="c ok">a</span><span class="c ok">s</span><span class="c ok">t</span><span class="c ok"> </span></div>
+        <div class="tline cur" id="l1"><span class="c ok">p</span><span class="c ok">i</span><span class="c ok">e</span><span class="c ok">c</span><span class="c ok">e</span><span class="c ok"> </span><span class="c ok">h</span><span class="c ok">a</span><span class="c ok">d</span><span class="c ok"> </span><span class="c ok">f</span><span class="c ok">i</span><span class="c ok">n</span><span class="c ok">a</span><span class="c ok">l</span><span class="c ok">l</span><span class="c ok">y</span><span class="c ok"> </span><span class="c ok">f</span><span class="c ok">i</span><span class="c ok">t</span><span class="c ok"> </span><span class="c ok">i</span><span class="c ok">n</span><span class="c ok">t</span><span class="c ok">o</span><span class="c ok"> </span><span class="c ok">p</span><span class="c ok">l</span><span class="c ok">a</span><span class="c ok">c</span><span class="c ok">e</span><span class="c ok">.</span><span class="c ok"> </span><span class="c ok">"</span><span class="c ok">D</span><span class="c ok">o</span><span class="c ok">e</span><span class="c ok">s</span><span class="c cursor">n</span><span class="c">'</span><span class="c">t</span><span class="c"> </span></div>
+        <div class="tline" id="l2"><span class="c">t</span><span class="c">h</span><span class="c">a</span><span class="c">t</span><span class="c"> </span><span class="c">c</span><span class="c">l</span><span class="c">u</span><span class="c">e</span><span class="c"> </span><span class="c">s</span><span class="c">e</span><span class="c">e</span><span class="c">m</span><span class="c"> </span><span class="c">f</span><span class="c">a</span><span class="c">m</span><span class="c">i</span><span class="c">l</span><span class="c">i</span><span class="c">a</span><span class="c">r</span><span class="c">?</span><span class="c">"</span><span class="c"> </span><span class="c">s</span><span class="c">h</span><span class="c">e</span><span class="c"> </span><span class="c">a</span><span class="c">s</span><span class="c">k</span><span class="c">e</span><span class="c">d</span><span class="c">,</span><span class="c"> </span><span class="c">a</span><span class="c">l</span><span class="c">m</span><span class="c">o</span><span class="c">s</span><span class="c">t</span><span class="c"> </span></div>
+        <div class="tline" id="l3"><span class="c">c</span><span class="c">e</span><span class="c">r</span><span class="c">t</span><span class="c">a</span><span class="c">i</span><span class="c">n</span><span class="c"> </span><span class="c">s</span><span class="c">h</span><span class="c">e</span><span class="c"> </span><span class="c">k</span><span class="c">n</span><span class="c">e</span><span class="c">w</span><span class="c"> </span><span class="c">t</span><span class="c">h</span><span class="c">e</span><span class="c"> </span><span class="c">a</span><span class="c">n</span><span class="c">s</span><span class="c">w</span><span class="c">e</span><span class="c">r</span><span class="c">.</span><span class="c"> </span><span class="c">A</span><span class="c"> </span><span class="c">m</span><span class="c">u</span><span class="c">d</span><span class="c">d</span><span class="c">y</span><span class="c"> </span></div>
       </div>
       <span class="side-buddy"><img class="ch anim-bounce" data-pose="banana" alt="" src="https://t90161693404.p.clickup-attachments.com/t90161693404/4bb50456-268d-4bd2-9c68-c159d4e8a6ac/generated-image-328563b5-3984-4c52-bbd1-e667af02bb08.png?view=open"></span>
     </div>
@@ -311,13 +308,13 @@ button{font-family:inherit;cursor:pointer;border:none}
       <span class="kb-buddy"><img class="ch anim-float" data-pose="point" alt="" src="https://t90161693404.p.clickup-attachments.com/t90161693404/a6579a56-8b11-4167-b01f-fa8800ad3779/generated-image-e5bf3883-3feb-4dbe-81dd-1019a38e5acf.png?view=open"></span>
     </div>
     <div class="live-ctrl" id="liveCtrl" style="display: flex;">
-      <button class="btn warm" id="pauseBtn">⏸ Pause</button>
-      <button class="btn primary" id="endBtn">🏁 End Session</button>
+      <button class="btn warm" id="pauseBtn" fdprocessedid="bn6um">⏸ Pause</button>
+      <button class="btn primary" id="endBtn" fdprocessedid="let117">🏁 End Session</button>
     </div>
   </div>
 </section>
 
-<!-- RESULTS -->
+
 <section class="screen" id="results">
   <div class="wrap">
     <div class="celebrate">
@@ -341,7 +338,7 @@ button{font-family:inherit;cursor:pointer;border:none}
   </div>
 </section>
 
-<!-- DASHBOARD -->
+
 <section class="screen" id="dashboard">
   <div class="wrap">
     <div class="section-head">
@@ -363,7 +360,7 @@ button{font-family:inherit;cursor:pointer;border:none}
   </div>
 </section>
 
-<!-- ACHIEVEMENTS -->
+
 <section class="screen" id="achievements">
   <div class="wrap">
     <div class="section-head">
@@ -383,7 +380,7 @@ button{font-family:inherit;cursor:pointer;border:none}
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-/* ============ CHARACTER IMAGES ============ */
+
 const POSES={
   crown:'https://t90161693404.p.clickup-attachments.com/t90161693404/6499a983-bc70-473d-8cfb-c5b1e906cd13/generated-image-312d50d5-7646-4c95-af68-08e03f14a30a.png?view=open',
   banana:'https://t90161693404.p.clickup-attachments.com/t90161693404/4bb50456-268d-4bd2-9c68-c159d4e8a6ac/generated-image-328563b5-3984-4c52-bbd1-e667af02bb08.png?view=open',
@@ -403,7 +400,7 @@ function chImg(pose,{w=120,anim='anim-float'}={}){
   img.style.width=w+'px';return img;
 }
 
-/* ============ DATA ============ */
+
 const MODES={
   '1min':{label:'1 Minute',secs:60,cls:'blue'},
   '3min':{label:'3 Minutes',secs:180,cls:'orange'},
@@ -436,14 +433,14 @@ const ACHIEVEMENTS=[
   {id:'master',ico:'👑',name:'Typing Master',desc:'80 WPM at 95% accuracy',test:s=>s.masterHit}
 ];
 
-/* ============ STORAGE ============ */
+
 const LS='typingStudioData_v1';
 function loadData(){try{return JSON.parse(localStorage.getItem(LS))||{history:[],unlocked:[]}}catch(e){return{history:[],unlocked:[]}}}
 function saveData(d){try{localStorage.setItem(LS,JSON.stringify(d))}catch(e){}}
 let store=loadData();
 let engine=null;
 
-/* ============ NAV ============ */
+
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
   document.querySelectorAll('.nav .link').forEach(b=>b.classList.toggle('active',b.dataset.go===id));
@@ -455,7 +452,7 @@ function go(id){
 document.getElementById('navRedoBtn').addEventListener('click',()=>{if(engine)startSession(engine.mode);});
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 
-/* ============ HOME MODES ============ */
+
 function renderModes(){
   const g=document.getElementById('modeGrid');g.innerHTML='';
   Object.keys(MODE_MINI).forEach(k=>{
@@ -471,7 +468,6 @@ function renderModes(){
 }
 renderModes();
 
-/* ============ TEXT ============ */
 function buildParagraph(){
   let parts=[];
   const lead=CATS[Math.floor(Math.random()*CATS.length)];
@@ -500,7 +496,7 @@ function measureCtx(){
   _measureCtx.font=promptFont();
   return _measureCtx;
 }
-const CHAR_BOX_EXTRA=4; // px added per character by the boxed-letter padding/margin in CSS
+const CHAR_BOX_EXTRA=4; 
 function wrapText(text,maxWidth){
   const ctx=measureCtx();
   const words=text.split(' ');const lines=[];let cur='';
@@ -514,7 +510,7 @@ function wrapText(text,maxWidth){
   return lines;
 }
 
-/* ============ KEYBOARD (laptop) ============ */
+
 const KB_LAYOUT=[
   [['`',''],['1',''],['2',''],['3',''],['4',''],['5',''],['6',''],['7',''],['8',''],['9',''],['0',''],['-',''],['=',''],['backspace','⌫','k175 accent']],
   [['tab','tab','k15 accent'],['q',''],['w',''],['e',''],['r',''],['t',''],['y',''],['u',''],['i',''],['o',''],['p',''],['[',''],[']',''],['\\','\\','accent']],
@@ -577,7 +573,6 @@ function playClick(kind){
 function flashKey(k,correct){const el=keyEl(k);if(!el)return;el.classList.add('down',correct?'ok':'err');setTimeout(()=>el.classList.remove('down','ok','err'),150);}
 (function(){try{_actx=new (window.AudioContext||window.webkitAudioContext)();ensureKBuffers();}catch(e){}})();
 
-/* ============ ENGINE ============ */
 
 function startSession(mode){
   if(engine)engine.teardown();
@@ -737,7 +732,7 @@ function drawPerfChart(r){
       scales:{y:{beginAtZero:true,title:{display:true,text:'WPM / Wrong'}},y1:{position:'right',min:0,max:100,grid:{drawOnChartArea:false},title:{display:true,text:'Accuracy %'}}}}});
 }
 
-/* ============ DASHBOARD ============ */
+
 function aggregate(){
   const h=store.history;const total=h.length;
   const bestWpm=h.reduce((m,x)=>Math.max(m,x.wpm),0);const avgWpm=total?Math.round(h.reduce((s,x)=>s+x.wpm,0)/total):0;
@@ -770,7 +765,7 @@ function renderDashboard(){
       scales:{y:{beginAtZero:true},y1:{position:'right',min:0,max:100,grid:{drawOnChartArea:false}}}}});
 }
 
-/* ============ ACHIEVEMENTS ============ */
+
 function checkAchievements(){const a=aggregate();ACHIEVEMENTS.forEach(ac=>{if(!store.unlocked.includes(ac.id)&&ac.test(a)){store.unlocked.push(ac.id);saveData(store);toast(ac.ico,ac.name+' unlocked!');}});}
 function renderAchievements(){
   document.getElementById('achCount').textContent=store.unlocked.length+' / '+ACHIEVEMENTS.length;
@@ -778,15 +773,7 @@ function renderAchievements(){
   ACHIEVEMENTS.forEach(ac=>{const on=store.unlocked.includes(ac.id);const d=document.createElement('div');d.className='ach '+(on?'unlocked':'locked');d.innerHTML='<div class="badge">'+(on?ac.ico:'🔒')+'</div><div><h4>'+ac.name+'</h4><p>'+ac.desc+'</p></div>';g.appendChild(d);});
 }
 function toast(ico,msg){const wrap=document.getElementById('toasts');const t=document.createElement('div');t.className='toast';t.innerHTML='<span class="t-ico">'+ico+'</span><span>'+msg+'</span>';wrap.appendChild(t);setTimeout(()=>{t.style.transition='opacity .4s,transform .4s';t.style.opacity='0';t.style.transform='translateX(120%)';setTimeout(()=>t.remove(),400);},3200);}
-
-/* ============ DOWNLOAD ============ */
-document.getElementById('downloadBtn').addEventListener('click',()=>{
-  const html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
-  const blob=new Blob([html],{type:'text/html'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='typing-studio.html';
-  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  toast('⬇️','Downloading Typing Studio…');
-});
 </script>
 
-</body></html>
+
+<span id="PING_IFRAME_FORM_DETECTION" style="display: none;"></span></body></html>
