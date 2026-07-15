@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<!-- skill:chrome -->
+
 <style>
-/* Print fixes */
+
 @media print {
   * {
     transition: none !important;
@@ -19,7 +19,7 @@
 </style>
 <script>
 (function () {
-    // Design-ui pages are single compositions, so the whole body is editable.
+    
     function markEditable() {
         document.body.classList.add('artifact-editable');
     }
@@ -36,10 +36,9 @@
 })();
 
 </script>
-<!-- /skill:chrome -->
-<!-- skill:libraries -->
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js" integrity="sha384-XcdcwHqIPULERb2yDEM4R0XaQKU3YnDsrTmjACBZyfdVVqjh6xQ4/DCMd7XLcA6Y" crossorigin="anonymous"></script>
-<!-- /skill:libraries -->
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Typing Studio</title>
@@ -106,7 +105,7 @@ button{font-family:inherit;cursor:pointer;border:none}
 .wrap{max-width:1120px;margin:0 auto;padding:clamp(16px,3vw,32px) clamp(16px,4vw,40px) 80px}
 .wrap.wide{max-width:1320px;padding-bottom:32px}
 
-/* HOME title band */
+
 .title-band{position:relative;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:20px 0 4px;text-align:center}
 .title-band h1{font-family:var(--font-display);font-weight:700;font-size:clamp(2.8rem,8vw,4.6rem);color:var(--green-deep);letter-spacing:.5px;position:relative;z-index:2}
 .title-band .sub{color:var(--ink-soft);font-weight:700;margin-top:8px;font-size:1.08rem;position:relative;z-index:2}
@@ -141,7 +140,6 @@ button{font-family:inherit;cursor:pointer;border:none}
 .btn.warm{background:oklch(0.88 0.13 92);color:oklch(0.34 0.06 60)}
 .btn.sm{padding:8px 16px;font-size:.9rem}
 
-/* section head: title + pill on the left, buddies spread across the rest of the band */
 .section-head{display:flex;align-items:center;gap:14px;margin-bottom:var(--sp-6);flex-wrap:wrap}
 .section-head h2{font-size:clamp(1.7rem,4vw,2.4rem);color:var(--green-deep)}
 .head-buddies{flex:1;min-width:260px;display:flex;align-items:flex-end;justify-content:space-evenly;gap:12px}
@@ -150,7 +148,6 @@ button{font-family:inherit;cursor:pointer;border:none}
 @media(max-width:520px){.head-buddies{display:none}}
 .pill{display:inline-block;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700;color:var(--ink-soft);font-size:.85rem;font-family:var(--font-display)}
 
-/* ============ TYPING ============ */
 .type-top{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);flex-wrap:wrap;margin-bottom:8px}
 .type-top-actions{display:flex;align-items:center;gap:8px}
 .type-top-actions .btn{min-width:84px;text-align:center}
@@ -202,7 +199,7 @@ button{font-family:inherit;cursor:pointer;border:none}
 @media(max-width:480px){.keyboard{display:none}}
 .live-ctrl{display:flex;gap:var(--sp-3);margin-top:var(--sp-3);flex-wrap:wrap;justify-content:center}
 
-/* results */
+
 .celebrate{display:flex;justify-content:center;align-items:flex-end;gap:clamp(8px,3vw,40px);margin-bottom:var(--sp-6);flex-wrap:wrap}
 .celebrate .ch{width:150px}
 .grade-card{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:var(--shadow-md);margin-bottom:var(--sp-6)}
@@ -216,7 +213,7 @@ button{font-family:inherit;cursor:pointer;border:none}
 .chart-box h3{margin-bottom:14px;font-size:1.25rem}
 .chart-holder{position:relative;height:300px}
 
-/* dashboard */
+
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--sp-4);margin-bottom:var(--sp-8)}
 .dstat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
 .dstat .k{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:800}
@@ -254,7 +251,7 @@ button{font-family:inherit;cursor:pointer;border:none}
   <button class="link" data-go="achievements" fdprocessedid="ntyrg">Achievements</button>
 </nav>
 
-<!-- HOME -->
+
 <section class="screen on" id="home">
   <div class="wrap">
     <div class="title-band">
@@ -275,7 +272,7 @@ button{font-family:inherit;cursor:pointer;border:none}
   </div>
 </section>
 
-<!-- TYPING -->
+
 <section class="screen" id="typing">
   <div class="wrap wide">
     <div class="type-top">
@@ -316,7 +313,6 @@ button{font-family:inherit;cursor:pointer;border:none}
   </div>
 </section>
 
-<!-- RESULTS -->
 <section class="screen" id="results">
   <div class="wrap">
     <div class="celebrate">
@@ -340,7 +336,7 @@ button{font-family:inherit;cursor:pointer;border:none}
   </div>
 </section>
 
-<!-- DASHBOARD -->
+
 <section class="screen" id="dashboard">
   <div class="wrap">
     <div class="section-head">
@@ -362,7 +358,7 @@ button{font-family:inherit;cursor:pointer;border:none}
   </div>
 </section>
 
-<!-- ACHIEVEMENTS -->
+
 <section class="screen" id="achievements">
   <div class="wrap">
     <div class="section-head">
@@ -382,7 +378,7 @@ button{font-family:inherit;cursor:pointer;border:none}
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-/* ============ CHARACTER IMAGES ============ */
+
 const POSES={
   crown:'https://t90161693404.p.clickup-attachments.com/t90161693404/6499a983-bc70-473d-8cfb-c5b1e906cd13/generated-image-312d50d5-7646-4c95-af68-08e03f14a30a.png?view=open',
   banana:'https://t90161693404.p.clickup-attachments.com/t90161693404/4bb50456-268d-4bd2-9c68-c159d4e8a6ac/generated-image-328563b5-3984-4c52-bbd1-e667af02bb08.png?view=open',
@@ -402,7 +398,7 @@ function chImg(pose,{w=120,anim='anim-float'}={}){
   img.style.width=w+'px';return img;
 }
 
-/* ============ DATA ============ */
+
 const MODES={
   '1min':{label:'1 Minute',secs:60,cls:'blue'},
   '3min':{label:'3 Minutes',secs:180,cls:'orange'},
@@ -435,14 +431,13 @@ const ACHIEVEMENTS=[
   {id:'master',ico:'👑',name:'Typing Master',desc:'80 WPM at 95% accuracy',test:s=>s.masterHit}
 ];
 
-/* ============ STORAGE ============ */
+
 const LS='typingStudioData_v1';
 function loadData(){try{return JSON.parse(localStorage.getItem(LS))||{history:[],unlocked:[]}}catch(e){return{history:[],unlocked:[]}}}
 function saveData(d){try{localStorage.setItem(LS,JSON.stringify(d))}catch(e){}}
 let store=loadData();
 let engine=null;
 
-/* ============ NAV ============ */
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
   document.querySelectorAll('.nav .link').forEach(b=>b.classList.toggle('active',b.dataset.go===id));
@@ -454,7 +449,7 @@ function go(id){
 document.getElementById('navRedoBtn').addEventListener('click',()=>{if(engine)startSession(engine.mode);});
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 
-/* ============ HOME MODES ============ */
+
 function renderModes(){
   const g=document.getElementById('modeGrid');g.innerHTML='';
   Object.keys(MODE_MINI).forEach(k=>{
@@ -470,7 +465,7 @@ function renderModes(){
 }
 renderModes();
 
-/* ============ TEXT ============ */
+
 function buildParagraph(){
   let parts=[];
   const lead=CATS[Math.floor(Math.random()*CATS.length)];
@@ -499,7 +494,7 @@ function measureCtx(){
   _measureCtx.font=promptFont();
   return _measureCtx;
 }
-const CHAR_BOX_EXTRA=4; // px added per character by the boxed-letter padding/margin in CSS
+const CHAR_BOX_EXTRA=4; 
 function wrapText(text,maxWidth){
   const ctx=measureCtx();
   const words=text.split(' ');const lines=[];let cur='';
@@ -513,7 +508,7 @@ function wrapText(text,maxWidth){
   return lines;
 }
 
-/* ============ KEYBOARD (laptop) ============ */
+
 const KB_LAYOUT=[
   [['`',''],['1',''],['2',''],['3',''],['4',''],['5',''],['6',''],['7',''],['8',''],['9',''],['0',''],['-',''],['=',''],['backspace','⌫','k175 accent']],
   [['tab','tab','k15 accent'],['q',''],['w',''],['e',''],['r',''],['t',''],['y',''],['u',''],['i',''],['o',''],['p',''],['[',''],[']',''],['\\','\\','accent']],
@@ -576,7 +571,7 @@ function playClick(kind){
 function flashKey(k,correct){const el=keyEl(k);if(!el)return;el.classList.add('down',correct?'ok':'err');setTimeout(()=>el.classList.remove('down','ok','err'),150);}
 (function(){try{_actx=new (window.AudioContext||window.webkitAudioContext)();ensureKBuffers();}catch(e){}})();
 
-/* ============ ENGINE ============ */
+
 
 function startSession(mode){
   if(engine)engine.teardown();
@@ -713,7 +708,7 @@ function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 function fmtMS(sec){const m=Math.floor(sec/60),s=sec%60;return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 function fmtHMS(sec){sec=Math.floor(sec);const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return [h,m,s].map(n=>String(n).padStart(2,'0')).join(':');}
 
-/* ============ RESULTS ============ */
+
 let perfChartRef=null;
 function gradeFor(wpm,acc){const score=wpm*0.7+acc*0.6;if(acc>=99&&wpm>=70)return 'S';if(score>=110)return 'A+';if(score>=90)return 'A';if(score>=72)return 'B';if(score>=55)return 'C';return 'D';}
 function showResults(r){
@@ -736,7 +731,7 @@ function drawPerfChart(r){
       scales:{y:{beginAtZero:true,title:{display:true,text:'WPM / Wrong'}},y1:{position:'right',min:0,max:100,grid:{drawOnChartArea:false},title:{display:true,text:'Accuracy %'}}}}});
 }
 
-/* ============ DASHBOARD ============ */
+
 function aggregate(){
   const h=store.history;const total=h.length;
   const bestWpm=h.reduce((m,x)=>Math.max(m,x.wpm),0);const avgWpm=total?Math.round(h.reduce((s,x)=>s+x.wpm,0)/total):0;
@@ -769,7 +764,6 @@ function renderDashboard(){
       scales:{y:{beginAtZero:true},y1:{position:'right',min:0,max:100,grid:{drawOnChartArea:false}}}}});
 }
 
-/* ============ ACHIEVEMENTS ============ */
 function checkAchievements(){const a=aggregate();ACHIEVEMENTS.forEach(ac=>{if(!store.unlocked.includes(ac.id)&&ac.test(a)){store.unlocked.push(ac.id);saveData(store);toast(ac.ico,ac.name+' unlocked!');}});}
 function renderAchievements(){
   document.getElementById('achCount').textContent=store.unlocked.length+' / '+ACHIEVEMENTS.length;
