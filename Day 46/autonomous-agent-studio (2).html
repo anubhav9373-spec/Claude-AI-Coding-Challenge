@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autonomous Agent Studio — Social Media Content Workflow</title>
+<style>
+:root{
+  --bg-0:#070a12;
+  --bg-1:#0c1120;
+  --panel:#10162a;
+  --panel-2:#141b32;
+  --border:rgba(255,255,255,0.08);
+  --border-strong:rgba(255,255,255,0.16);
+  --text-hi:#eef1fb;
+  --text-mid:#a6b0cf;
+  --text-lo:#6b7394;
+  --neon-cyan:#4bf5d8;
+  --neon-violet:#9d7bff;
+  --neon-amber:#ffb454;
+  --neon-rose:#ff6b8b;
+  --neon-green:#5fe38a;
+  --radius:14px;
+  --radius-sm:8px;
+  --font-display:'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body:'Inter', 'Segoe UI', sans-serif;
+  --font-mono:'JetBrains Mono', 'Consolas', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  background:
+    radial-gradient(circle at 12% 8%, rgba(157,123,255,0.10), transparent 40%),
+    radial-gradient(circle at 88% 15%, rgba(75,245,216,0.08), transparent 45%),
+    var(--bg-0);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+@font-face{font-family:'Space Grotesk';src:local('Space Grotesk');}
+a{color:inherit;}
+::selection{background:var(--neon-violet);color:#fff;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+button, select, input{font-family:inherit;}
+button:focus-visible, select:focus-visible, input:focus-visible, [tabindex]:focus-visible{
+  outline:2px solid var(--neon-cyan);
+  outline-offset:2px;
+}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;}
+
+/* Layout shell */
+.shell{display:grid;grid-template-columns:230px 1fr;grid-template-rows:64px 1fr;min-height:100vh;}
+.topbar{
+  grid-column:1/3;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 22px;
+  background:rgba(10,13,24,0.85);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;
+}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;letter-spacing:0.02em;}
+.brand-mark{
+  width:30px;height:30px;border-radius:8px;
+  background:conic-gradient(from 180deg, var(--neon-cyan), var(--neon-violet), var(--neon-rose), var(--neon-cyan));
+  box-shadow:0 0 18px rgba(157,123,255,0.55);
+  position:relative;
+}
+.brand-mark::after{content:"";position:absolute;inset:4px;background:var(--bg-1);border-radius:5px;}
+.brand small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;color:var(--text-lo);letter-spacing:0.06em;text-transform:uppercase;}
+.top-status{display:flex;align-items:center;gap:18px;font-size:12.5px;color:var(--text-mid);}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:99px;border:1px solid var(--border-strong);
+  background:rgba(255,255,255,0.03);
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--neon-lo);}
+.dot.live{background:var(--neon-green);box-shadow:0 0 8px var(--neon-green);animation:pulse 1.6s infinite;}
+.dot.idle{background:var(--text-lo);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+
+.sidebar{
+  border-right:1px solid var(--border);
+  background:rgba(9,12,22,0.6);
+  padding:16px 10px;
+  display:flex;flex-direction:column;gap:4px;
+  position:sticky;top:64px;height:calc(100vh - 64px);
+  overflow-y:auto;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:var(--radius-sm);
+  color:var(--text-mid);font-size:13.5px;font-weight:500;
+  cursor:pointer;border:1px solid transparent;
+  transition:all .15s ease;
+  background:none;text-align:left;width:100%;
+}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text-hi);}
+.nav-item.active{
+  background:linear-gradient(90deg, rgba(75,245,216,0.12), rgba(157,123,255,0.08));
+  border-color:rgba(75,245,216,0.35);
+  color:var(--text-hi);
+}
+.nav-icon{width:16px;text-align:center;opacity:0.85;}
+.nav-section-label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-lo);padding:14px 12px 6px;}
+
+.main{padding:22px 26px 60px;overflow-x:hidden;}
+.view{display:none;animation:fadein .25s ease;}
+.view.active{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+.panel{
+  background:linear-gradient(180deg, rgba(20,27,50,0.75), rgba(16,22,42,0.65));
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  backdrop-filter:blur(10px);
+  padding:18px 18px 20px;
+}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.panel-title{font-family:var(--font-display);font-size:15px;font-weight:600;letter-spacing:0.01em;}
+.panel-sub{font-size:11.5px;color:var(--text-lo);margin-top:2px;}
+
+.grid{display:grid;gap:16px;}
+.g-metrics{grid-template-columns:repeat(5,1fr);margin-bottom:16px;}
+.g-main{grid-template-columns:1.4fr 1fr;align-items:start;}
+.g-two{grid-template-columns:1fr 1fr;}
+
+.metric-card{
+  background:linear-gradient(160deg, rgba(20,27,50,0.8), rgba(14,19,36,0.7));
+  border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px;position:relative;overflow:hidden;
+}
+.metric-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-violet));opacity:0.7;}
+.metric-label{font-size:10.5px;color:var(--text-lo);text-transform:uppercase;letter-spacing:0.08em;}
+.metric-value{font-family:var(--font-display);font-size:24px;font-weight:700;margin-top:4px;}
+.metric-value.small{font-size:17px;}
+.metric-trend{font-size:11px;margin-top:4px;color:var(--text-mid);}
+.metric-trend.up{color:var(--neon-green);}
+.metric-trend.down{color:var(--neon-rose);}
+
+/* Orchestration diagram */
+.orbit-wrap{position:relative;width:100%;height:520px;}
+svg.orbit{width:100%;height:100%;overflow:visible;}
+.agent-node{cursor:pointer;transition:transform .2s ease;}
+.agent-node:hover{transform:scale(1.04);}
+.agent-node rect{transition:all .25s ease;}
+.agent-node.active rect{filter:drop-shadow(0 0 12px currentColor);}
+.agent-node text{font-family:var(--font-body);pointer-events:none;}
+.edge-path{fill:none;stroke:var(--border-strong);stroke-width:1.6;}
+.edge-path.active{stroke:var(--neon-cyan);stroke-width:2.4;filter:drop-shadow(0 0 6px var(--neon-cyan));}
+.flow-dot{fill:var(--neon-cyan);filter:drop-shadow(0 0 5px var(--neon-cyan));}
+
+.agent-card-list{display:flex;flex-direction:column;gap:10px;}
+.agent-card{
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:11px 13px;background:rgba(255,255,255,0.02);
+  display:flex;flex-direction:column;gap:4px;
+}
+.agent-card.active-agent{border-color:var(--neon-cyan);box-shadow:0 0 0 1px rgba(75,245,216,0.25), 0 0 16px rgba(75,245,216,0.12);}
+.agent-card-top{display:flex;align-items:center;justify-content:space-between;}
+.agent-name{font-weight:600;font-size:13.5px;display:flex;align-items:center;gap:8px;}
+.agent-swatch{width:9px;height:9px;border-radius:3px;}
+.agent-status-badge{font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid var(--border-strong);color:var(--text-mid);}
+.agent-status-badge.working{color:var(--neon-cyan);border-color:rgba(75,245,216,0.4);}
+.agent-status-badge.done{color:var(--neon-green);border-color:rgba(95,227,138,0.4);}
+.agent-desc{font-size:11.5px;color:var(--text-mid);line-height:1.4;}
+.agent-output{
+  margin-top:4px;font-size:11.5px;font-family:var(--font-mono);color:var(--text-hi);
+  background:rgba(0,0,0,0.25);border-radius:6px;padding:8px 10px;border:1px solid var(--border);
+  max-height:0;overflow:hidden;transition:max-height .3s ease, padding .3s ease;
+}
+.agent-output.show{max-height:140px;overflow-y:auto;}
+
+.controls-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.btn{
+  border:1px solid var(--border-strong);background:rgba(255,255,255,0.03);
+  color:var(--text-hi);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .15s ease;display:inline-flex;align-items:center;gap:8px;
+}
+.btn:hover{background:rgba(255,255,255,0.07);border-color:var(--neon-cyan);}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.btn.primary{
+  background:linear-gradient(120deg,var(--neon-cyan),var(--neon-violet));
+  color:#05070d;border:none;box-shadow:0 4px 22px rgba(75,245,216,0.25);
+}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn.danger{border-color:rgba(255,107,139,0.5);color:var(--neon-rose);}
+.btn.ghost{background:none;}
+
+.status-line{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-mid);margin-left:auto;}
+.round-label{font-family:var(--font-mono);font-size:12.5px;color:var(--neon-cyan);}
+
+.progress-track{width:100%;height:6px;border-radius:99px;background:rgba(255,255,255,0.06);overflow:hidden;margin-top:8px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-violet));border-radius:99px;transition:width .4s ease;}
+
+/* Activity stream */
+.stream{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:4px;}
+.stream-item{
+  display:flex;gap:10px;padding:9px 11px;border-radius:9px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.015);animation:slidein .25s ease;
+}
+@keyframes slidein{from{opacity:0;transform:translateX(-6px);}to{opacity:1;transform:translateX(0);}}
+.stream-tag{width:5px;border-radius:3px;flex-shrink:0;}
+.stream-body{flex:1;}
+.stream-top{display:flex;justify-content:space-between;font-size:11.5px;}
+.stream-agent{font-weight:700;}
+.stream-time{color:var(--text-lo);font-family:var(--font-mono);font-size:10.5px;}
+.stream-msg{font-size:12.5px;color:var(--text-mid);margin-top:2px;}
+
+/* Memory */
+.mem-col-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-lo);margin-bottom:10px;}
+.mem-item{
+  font-size:12px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);
+  border:1px solid var(--border);margin-bottom:8px;color:var(--text-mid);
+}
+.mem-item b{color:var(--text-hi);}
+.mem-empty{font-size:12px;color:var(--text-lo);font-style:italic;padding:12px 0;}
+
+/* Comm center */
+.comm-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px dashed var(--border);font-size:12.5px;}
+.comm-row:last-child{border-bottom:none;}
+.comm-arrow{color:var(--neon-violet);font-weight:700;}
+.comm-msg{color:var(--text-mid);flex:1;}
+.comm-time{color:var(--text-lo);font-family:var(--font-mono);font-size:10.5px;}
+
+/* History table */
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+th{text-align:left;color:var(--text-lo);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;padding:8px 10px;border-bottom:1px solid var(--border-strong);}
+td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text-mid);}
+tr:hover td{background:rgba(255,255,255,0.02);color:var(--text-hi);}
+.delta-pos{color:var(--neon-green);font-weight:600;}
+.delta-neg{color:var(--neon-rose);font-weight:600;}
+.history-controls{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+input[type="text"], select{
+  background:rgba(255,255,255,0.03);border:1px solid var(--border-strong);color:var(--text-hi);
+  padding:9px 12px;border-radius:9px;font-size:12.5px;
+}
+
+/* Analytics */
+.chart-box{background:rgba(255,255,255,0.015);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:var(--text-mid);}
+.legend span{display:inline-flex;align-items:center;gap:5px;}
+.legend i{width:9px;height:9px;border-radius:2px;display:inline-block;}
+
+/* Education */
+.edu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+.edu-card h4{font-family:var(--font-display);font-size:14px;margin:0 0 8px;color:var(--neon-cyan);}
+.edu-card p{font-size:12.5px;color:var(--text-mid);line-height:1.6;margin:0;}
+
+/* Settings */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;color:var(--text-mid);margin-bottom:6px;}
+.field input[type=range]{width:100%;accent-color:var(--neon-cyan);}
+.field-value{font-family:var(--font-mono);color:var(--neon-cyan);font-size:12px;float:right;}
+.checkbox-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-mid);margin-bottom:8px;}
+
+/* Final results */
+.result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.result-card h4{margin:0 0 8px;font-size:13px;font-family:var(--font-display);color:var(--neon-violet);}
+.result-card{font-size:12.5px;color:var(--text-mid);line-height:1.6;}
+.empty-state{
+  text-align:center;padding:50px 20px;color:var(--text-lo);
+}
+.empty-state .icon{font-size:32px;margin-bottom:10px;}
+
+.toast-region{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:200;}
+.toast{
+  background:var(--panel-2);border:1px solid var(--border-strong);border-radius:10px;
+  padding:11px 16px;font-size:12.5px;box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  animation:slidein .25s ease; max-width:280px;
+}
+.toast.error{border-color:rgba(255,107,139,0.5);}
+
+@media (max-width:980px){
+  .g-main{grid-template-columns:1fr;}
+  .g-metrics{grid-template-columns:repeat(2,1fr);}
+  .settings-grid{grid-template-columns:1fr;}
+}
+@media (max-width:760px){
+  .shell{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .g-metrics{grid-template-columns:repeat(2,1fr);}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <div>
+        AUTONOMOUS AGENT STUDIO
+        <small>Social Media Content Workflow</small>
+      </div>
+    </div>
+    <div class="top-status">
+      <div class="pill"><span class="dot idle" id="engineDot"></span><span id="engineStatusText">Idle</span></div>
+      <div class="pill">Quality Target: <b id="topThreshold">90</b>%</div>
+      <div class="pill">Round: <b id="topRound">0</b></div>
+    </div>
+  </header>
+
+  <nav class="sidebar" aria-label="Primary navigation">
+    <div class="nav-section-label">Operate</div>
+    <button class="nav-item active" data-view="dashboard"><span class="nav-icon">◈</span> Dashboard</button>
+    <button class="nav-item" data-view="agents"><span class="nav-icon">▣</span> Agents</button>
+    <button class="nav-item" data-view="memory"><span class="nav-icon">▤</span> Memory</button>
+    <button class="nav-item" data-view="comm"><span class="nav-icon">↔</span> Communication</button>
+    <div class="nav-section-label">Review</div>
+    <button class="nav-item" data-view="history"><span class="nav-icon">≡</span> Execution History</button>
+    <button class="nav-item" data-view="analytics"><span class="nav-icon">◔</span> Analytics</button>
+    <button class="nav-item" data-view="results"><span class="nav-icon">✓</span> Final Results</button>
+    <div class="nav-section-label">Learn &amp; Configure</div>
+    <button class="nav-item" data-view="education"><span class="nav-icon">◍</span> Education</button>
+    <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span> Settings</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="controls-row">
+        <input type="text" id="goalInput" placeholder="Workflow goal (e.g. Launch week Instagram carousel campaign)" style="flex:1;min-width:240px;">
+        <button class="btn primary" id="startBtn">▶ Start Workflow</button>
+        <button class="btn" id="pauseBtn" disabled>⏸ Pause</button>
+        <button class="btn danger" id="resetBtn">⟲ Reset</button>
+        <div class="status-line">
+          <span class="round-label" id="roundLabel">Round 0 — Awaiting Goal</span>
+        </div>
+      </div>
+
+      <div class="grid g-metrics">
+        <div class="metric-card"><div class="metric-label">Quality Score</div><div class="metric-value" id="mQuality">0%</div><div class="metric-trend" id="mQualityTrend">—</div></div>
+        <div class="metric-card"><div class="metric-label">Completeness</div><div class="metric-value" id="mCompleteness">0%</div><div class="metric-trend" id="mCompletenessTrend">Primary metric</div></div>
+        <div class="metric-card"><div class="metric-label">Confidence</div><div class="metric-value" id="mConfidence">0%</div><div class="metric-trend">Model self-assessed</div></div>
+        <div class="metric-card"><div class="metric-label">Execution Time</div><div class="metric-value small" id="mTime">0.0s</div><div class="metric-trend">Elapsed</div></div>
+        <div class="metric-card"><div class="metric-label">Retry Count</div><div class="metric-value small" id="mRetry">0</div><div class="metric-trend">Recoveries applied</div></div>
+      </div>
+
+      <div class="grid g-main">
+        <div class="panel">
+          <div class="panel-head">
+            <div><div class="panel-title">Orchestration Loop</div><div class="panel-sub">Live agent activation and message flow</div></div>
+            <div class="pill" id="stopConditionPill">Stop condition: Quality Threshold Reached</div>
+          </div>
+          <div class="orbit-wrap"><svg class="orbit" id="orbitSvg" viewBox="0 0 640 520" role="img" aria-label="Orchestration diagram"></svg></div>
+          <div class="progress-track"><div class="progress-fill" id="completionBar" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text-lo);">
+            <span id="completionLabel">0% complete</span>
+            <span id="workflowStatusLabel">Workflow Status: Not Started</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div><div class="panel-title">Activity Stream</div><div class="panel-sub">Live event feed</div></div>
+          </div>
+          <div class="stream" id="activityStream">
+            <div class="empty-state"><div class="icon">◌</div>No activity yet. Start a workflow to see agents work in real time.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENTS -->
+    <section class="view" id="view-agents">
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Agent Team — Auto Designed</div><div class="panel-sub">8 specialized roles collaborating on the Social Media Content workflow</div></div></div>
+        <div class="agent-card-list" id="agentCardList"></div>
+      </div>
+    </section>
+
+    <!-- MEMORY -->
+    <section class="view" id="view-memory">
+      <div class="grid g-two">
+        <div class="panel">
+          <div class="panel-title">Short-Term Memory</div>
+          <div class="panel-sub" style="margin-bottom:12px;">Current context &amp; recent results</div>
+          <div class="mem-col-title">Current Context</div>
+          <div id="stmContext" class="mem-empty">No active context.</div>
+          <div class="mem-col-title" style="margin-top:14px;">Recent Results</div>
+          <div id="stmResults" class="mem-empty">No results yet.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Long-Term Memory</div>
+          <div class="panel-sub" style="margin-bottom:12px;">Patterns retained across the session</div>
+          <div class="mem-col-title">Successful Patterns</div>
+          <div id="ltmSuccess" class="mem-empty">None recorded yet.</div>
+          <div class="mem-col-title" style="margin-top:14px;">Failed Attempts</div>
+          <div id="ltmFailed" class="mem-empty">None recorded yet.</div>
+          <div class="mem-col-title" style="margin-top:14px;">Lessons Learned</div>
+          <div id="ltmLessons" class="mem-empty">None recorded yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMM -->
+    <section class="view" id="view-comm">
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Agent Communication Center</div><div class="panel-sub">Message exchange log with timestamps</div></div></div>
+        <div id="commLog"><div class="empty-state"><div class="icon">↔</div>No messages exchanged yet.</div></div>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="view" id="view-history">
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Execution History</div><div class="panel-sub">Every iteration recorded</div></div>
+          <button class="btn ghost" id="exportBtn">⬇ Export JSON</button>
+        </div>
+        <div class="history-controls">
+          <input type="text" id="historySearch" placeholder="Search critique or changes...">
+          <select id="historyFilter">
+            <option value="all">All rounds</option>
+            <option value="improved">Improved only</option>
+            <option value="regressed">Regressed only</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Round</th><th>Quality</th><th>Δ Improvement</th><th>Critique Summary</th><th>Applied Changes</th><th>Timestamp</th></tr></thead>
+          <tbody id="historyBody"><tr><td colspan="6" style="text-align:center;color:var(--text-lo);">No iterations recorded yet.</td></tr></tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section class="view" id="view-analytics">
+      <div class="grid g-two">
+        <div class="panel">
+          <div class="panel-title">Improvement Trend</div>
+          <div class="panel-sub" style="margin-bottom:10px;">Quality score across rounds</div>
+          <div class="chart-box"><svg id="trendChart" viewBox="0 0 500 220" style="width:100%;height:220px;"></svg></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Agent Utilization</div>
+          <div class="panel-sub" style="margin-bottom:10px;">Share of active cycles per agent</div>
+          <div class="chart-box"><svg id="utilChart" viewBox="0 0 300 300" style="width:100%;height:260px;"></svg></div>
+          <div class="legend" id="utilLegend"></div>
+        </div>
+      </div>
+      <div class="grid g-two" style="margin-top:16px;">
+        <div class="panel">
+          <div class="panel-title">Workflow Efficiency &amp; Bottleneck Detection</div>
+          <div class="panel-sub" style="margin-bottom:10px;">Time contribution per agent role</div>
+          <div class="chart-box"><svg id="bottleneckChart" viewBox="0 0 500 200" style="width:100%;height:200px;"></svg></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Success Probability</div>
+          <div class="panel-sub" style="margin-bottom:10px;">Modeled likelihood of reaching quality threshold</div>
+          <div class="chart-box" style="display:flex;align-items:center;justify-content:center;height:200px;">
+            <svg id="gaugeChart" viewBox="0 0 240 140" style="width:260px;"></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="view" id="view-results">
+      <div class="panel" id="finalResultsPanel">
+        <div class="empty-state"><div class="icon">✓</div>Run a workflow to completion to see the final results panel here.</div>
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section class="view" id="view-education">
+      <div class="panel">
+        <div class="panel-title">Understanding Autonomous Agent Systems</div>
+        <div class="panel-sub" style="margin-bottom:16px;">Core concepts behind this platform</div>
+        <div class="edu-grid">
+          <div class="edu-card"><h4>Agentic AI</h4><p>An agentic system doesn't just answer a single prompt — it pursues a goal across multiple steps, deciding what to do next based on the outcome of its previous action, with minimal human intervention along the way.</p></div>
+          <div class="edu-card"><h4>Multi-Agent Systems</h4><p>Instead of one generalist model doing everything, work is split across specialized agents — a planner, an executor, an evaluator — each optimized for a narrower responsibility, which tends to raise overall output quality.</p></div>
+          <div class="edu-card"><h4>Autonomous Workflows</h4><p>A workflow becomes autonomous when it can plan, act, judge its own output, revise, and decide when it is finished, all without a person approving every intermediate step.</p></div>
+          <div class="edu-card"><h4>Memory Systems</h4><p>Short-term memory holds the current task's context so agents stay coherent within a run. Long-term memory keeps patterns that worked (and failed) so future runs start smarter.</p></div>
+          <div class="edu-card"><h4>Evaluation Loops</h4><p>An evaluator scores output against the target metric, a critic explains what's weak, and an improver revises — this loop repeats until quality plateaus or a threshold is met.</p></div>
+          <div class="edu-card"><h4>Orchestration Engines</h4><p>The orchestrator is the traffic controller: it sequences agents, routes messages between them, tracks stop conditions, and decides when to branch to final review.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings">
+      <div class="panel">
+        <div class="panel-title">Settings</div>
+        <div class="panel-sub" style="margin-bottom:16px;">Configure orchestration behavior. Saved automatically to local storage.</div>
+        <div class="settings-grid">
+          <div>
+            <div class="field">
+              <label>Quality Threshold <span class="field-value" id="valThreshold">90%</span></label>
+              <input type="range" id="setThreshold" min="50" max="100" value="90">
+            </div>
+            <div class="field">
+              <label>Plateau Sensitivity <span class="field-value" id="valPlateau">3%</span></label>
+              <input type="range" id="setPlateau" min="1" max="10" value="3">
+            </div>
+            <div class="field">
+              <label>Maximum Runtime (seconds) <span class="field-value" id="valRuntime">60s</span></label>
+              <input type="range" id="setRuntime" min="10" max="180" value="60">
+            </div>
+            <div class="field">
+              <label>Maximum Iterations (Safety Only) <span class="field-value" id="valMaxIter">10</span></label>
+              <input type="range" id="setMaxIter" min="3" max="20" value="10">
+            </div>
+          </div>
+          <div>
+            <div class="field">
+              <label>Memory Retention (recent results kept) <span class="field-value" id="valRetention">5</span></label>
+              <input type="range" id="setRetention" min="1" max="15" value="5">
+            </div>
+            <div class="field">
+              <label style="margin-bottom:8px;">Active Agents</label>
+              <div id="agentToggleList"></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn primary" id="saveSettingsBtn">Save Settings</button>
+        <button class="btn ghost" id="clearStorageBtn">Clear Local Storage</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast-region" id="toastRegion"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------------------------------------------------
+   CONFIG / STATE
+--------------------------------------------------------- */
+const AGENTS = [
+  {id:"planner", name:"Planner Agent", color:"var(--neon-cyan)", role:"Strategy", goal:"Design the execution strategy for the social content goal.",
+    responsibility:"Break the goal into a content plan: platform, format, hook, and posting cadence."},
+  {id:"executor", name:"Executor Agent", color:"var(--neon-violet)", role:"Production", goal:"Generate the initial social media content draft.",
+    responsibility:"Produce captions, hooks, hashtags, and post structure per the plan."},
+  {id:"evaluator", name:"Evaluator Agent", color:"var(--neon-amber)", role:"Scoring", goal:"Assign a completeness/quality score against the target metric.",
+    responsibility:"Score the draft on completeness, tone fit, and platform requirements."},
+  {id:"critic", name:"Critic Agent", color:"var(--neon-rose)", role:"Critique", goal:"Identify concrete weaknesses in the current draft.",
+    responsibility:"Surface gaps: missing CTA, weak hook, hashtag mismatch, tone drift."},
+  {id:"improver", name:"Improver Agent", color:"var(--neon-green)", role:"Revision", goal:"Apply targeted revisions based on the critic's findings.",
+    responsibility:"Rewrite weak sections while preserving what already scored well."},
+  {id:"memory", name:"Memory Manager", color:"#7dd3fc", role:"Memory", goal:"Persist useful patterns and lessons across rounds.",
+    responsibility:"Store short-term context and long-term successful/failed patterns."},
+  {id:"safety", name:"Safety Monitor", color:"#fca5a5", role:"Safety", goal:"Validate output against brand and platform safety constraints.",
+    responsibility:"Check for policy violations, tone risk, and factual overreach."},
+  {id:"reviewer", name:"Final Reviewer", color:"#fbbf24", role:"Review", goal:"Deliver the final sign-off and package the results.",
+    responsibility:"Confirm stop condition rationale and compile the final deliverable."}
+];
+
+const state = {
+  running:false,
+  paused:false,
+  round:0,
+  quality:0,
+  completeness:0,
+  confidence:0,
+  startTime:null,
+  timerHandle:null,
+  retryCount:0,
+  history:[],
+  stmContext:null,
+  stmResults:[],
+  ltm:{success:[],failed:[],lessons:[]},
+  comm:[],
+  activity:[],
+  plateauCount:0,
+  activeAgent:null,
+  goal:"",
+  finished:false,
+  stopReason:null,
+  settings:{
+    threshold:90, plateau:3, runtime:60, maxIter:10, retention:5,
+    activeAgents:AGENTS.map(a=>a.id)
+  },
+  utilization:{}
+};
+
+AGENTS.forEach(a=>state.utilization[a.id]=0);
+
+/* ---------------------------------------------------------
+   LOCAL STORAGE
+--------------------------------------------------------- */
+function loadStorage(){
+  try{
+    const raw = localStorage.getItem("aas_state_v1");
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(parsed.settings) Object.assign(state.settings, parsed.settings);
+      if(parsed.history) state.history = parsed.history;
+      if(parsed.ltm) state.ltm = parsed.ltm;
+      if(parsed.utilization) state.utilization = parsed.utilization;
+    }
+  }catch(e){
+    console.warn("Storage load failed", e);
+    showToast("Could not restore saved data — starting fresh.", true);
+  }
+}
+function persist(){
+  try{
+    localStorage.setItem("aas_state_v1", JSON.stringify({
+      settings:state.settings, history:state.history, ltm:state.ltm, utilization:state.utilization
+    }));
+  }catch(e){ console.warn("Persist failed", e); }
+}
+
+/* ---------------------------------------------------------
+   UTIL
+--------------------------------------------------------- */
+function $(sel){return document.querySelector(sel);}
+function $all(sel){return Array.from(document.querySelectorAll(sel));}
+function nowStamp(){
+  const d = new Date();
+  return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+function showToast(msg, isError){
+  const region = $("#toastRegion");
+  const t = document.createElement("div");
+  t.className = "toast" + (isError ? " error" : "");
+  t.textContent = msg;
+  region.appendChild(t);
+  setTimeout(()=>{ t.remove(); }, 4200);
+}
+
+/* ---------------------------------------------------------
+   NAVIGATION
+--------------------------------------------------------- */
+$all(".nav-item").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    $all(".nav-item").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const view = btn.dataset.view;
+    $all(".view").forEach(v=>v.classList.remove("active"));
+    $("#view-"+view).classList.add("active");
+    if(view==="analytics") renderAnalytics();
+  });
+});
+
+/* ---------------------------------------------------------
+   ORBIT DIAGRAM (SVG)
+--------------------------------------------------------- */
+const ORBIT_ORDER = ["planner","executor","evaluator","critic","improver","reviewer"];
+const ORBIT_POS = {
+  planner:  {x:320, y:50},
+  executor: {x:560, y:180},
+  evaluator:{x:560, y:380},
+  critic:   {x:320, y:470},
+  improver: {x:80,  y:380},
+  reviewer: {x:80,  y:180}
+};
+const EDGES = [
+  ["planner","executor"], ["executor","evaluator"], ["evaluator","critic"],
+  ["critic","improver"], ["improver","evaluator"], ["evaluator","reviewer"]
+];
+
+function agentById(id){ return AGENTS.find(a=>a.id===id); }
+
+function buildOrbit(){
+  const svg = $("#orbitSvg");
+  svg.innerHTML = "";
+  const ns = "http://www.w3.org/2000/svg";
+
+  EDGES.forEach(([from,to], i)=>{
+    const p1 = ORBIT_POS[from], p2 = ORBIT_POS[to];
+    const path = document.createElementNS(ns,"path");
+    const mx = (p1.x+p2.x)/2, my=(p1.y+p2.y)/2;
+    const curveOffset = (from==="improver"&&to==="evaluator") ? 40 : 0;
+    const d = `M ${p1.x} ${p1.y} Q ${mx+curveOffset} ${my} ${p2.x} ${p2.y}`;
+    path.setAttribute("d", d);
+    path.setAttribute("class","edge-path");
+    path.setAttribute("id","edge-"+from+"-"+to);
+    svg.appendChild(path);
+  });
+
+  ORBIT_ORDER.forEach(id=>{
+    const a = agentById(id);
+    const p = ORBIT_POS[id];
+    const g = document.createElementNS(ns,"g");
+    g.setAttribute("class","agent-node");
+    g.setAttribute("id","node-"+id);
+    g.setAttribute("tabindex","0");
+    g.setAttribute("role","button");
+    g.setAttribute("aria-label", a.name);
+    g.style.color = a.color;
+
+    const rect = document.createElementNS(ns,"rect");
+    rect.setAttribute("x", p.x-62); rect.setAttribute("y", p.y-26);
+    rect.setAttribute("width",124); rect.setAttribute("height",52);
+    rect.setAttribute("rx",12);
+    rect.setAttribute("fill","rgba(16,22,42,0.9)");
+    rect.setAttribute("stroke", a.color);
+    rect.setAttribute("stroke-width","1.4");
+    g.appendChild(rect);
+
+    const text = document.createElementNS(ns,"text");
+    text.setAttribute("x", p.x); text.setAttribute("y", p.y-2);
+    text.setAttribute("text-anchor","middle");
+    text.setAttribute("fill","#eef1fb");
+    text.setAttribute("font-size","12.5");
+    text.setAttribute("font-weight","600");
+    text.textContent = a.name.replace(" Agent","");
+    g.appendChild(text);
+
+    const sub = document.createElementNS(ns,"text");
+    sub.setAttribute("x", p.x); sub.setAttribute("y", p.y+15);
+    sub.setAttribute("text-anchor","middle");
+    sub.setAttribute("fill","#6b7394");
+    sub.setAttribute("font-size","10");
+    sub.textContent = a.role;
+    g.appendChild(sub);
+
+    svg.appendChild(g);
+  });
+
+  // memory + safety as satellites
+  [["memory",{x:320,y:250}]].forEach(()=>{});
+}
+buildOrbit();
+
+function setActiveAgent(id, edgeFrom, edgeTo){
+  $all(".agent-node").forEach(n=>n.classList.remove("active"));
+  $all(".edge-path").forEach(e=>e.classList.remove("active"));
+  if(id){
+    const node = $("#node-"+id);
+    if(node) node.classList.add("active");
+  }
+  if(edgeFrom && edgeTo){
+    const edge = $("#edge-"+edgeFrom+"-"+edgeTo);
+    if(edge) edge.classList.add("active");
+  }
+}
+
+/* ---------------------------------------------------------
+   AGENT CARDS (Agents view)
+--------------------------------------------------------- */
+function renderAgentCards(){
+  const list = $("#agentCardList");
+  list.innerHTML = "";
+  AGENTS.forEach(a=>{
+    const card = document.createElement("div");
+    card.className = "agent-card";
+    card.id = "card-"+a.id;
+    card.innerHTML = `
+      <div class="agent-card-top">
+        <div class="agent-name"><span class="agent-swatch" style="background:${a.color}"></span>${a.name}</div>
+        <span class="agent-status-badge" id="badge-${a.id}">Idle</span>
+      </div>
+      <div class="agent-desc"><b>Goal:</b> ${a.goal}</div>
+      <div class="agent-desc"><b>Responsibility:</b> ${a.responsibility}</div>
+      <div class="agent-output" id="output-${a.id}"></div>
+    `;
+    list.appendChild(card);
+  });
+}
+renderAgentCards();
+
+function updateAgentUI(id, status, output){
+  const badge = $("#badge-"+id);
+  const card = $("#card-"+id);
+  const out = $("#output-"+id);
+  $all(".agent-card").forEach(c=>c.classList.remove("active-agent"));
+  if(!badge) return;
+  badge.textContent = status;
+  badge.className = "agent-status-badge " + (status==="Working" ? "working" : status==="Done" ? "done" : "");
+  if(status==="Working" && card) card.classList.add("active-agent");
+  if(output !== undefined){
+    out.textContent = output;
+    out.classList.add("show");
+  }
+}
+
+/* ---------------------------------------------------------
+   CONTENT SIMULATION HELPERS
+--------------------------------------------------------- */
+const HOOKS = ["Stop scrolling —", "You need to see this:", "Nobody's talking about this, but", "3 things I wish I knew before", "The truth about"];
+const CTAS = ["Save this for later.", "Tag someone who needs this.", "Drop a 🔥 if this resonated.", "Link in bio for the full guide.", "Comment your favorite tip below."];
+const WEAKNESSES = ["hook lacks urgency", "missing a clear call-to-action", "hashtags too generic for the niche", "caption exceeds optimal platform length", "tone doesn't match brand voice", "no visual direction included", "posting time not specified"];
+
+function randomFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function generateDraft(round){
+  return `${randomFrom(HOOKS)} ${state.goal || "our latest update"}. ${round>1?"[Revised] ":""}${randomFrom(CTAS)} #ContentThatConverts #SocialGrowth`;
+}
+
+/* ---------------------------------------------------------
+   ORCHESTRATION ENGINE
+--------------------------------------------------------- */
+const CYCLE_STEPS = [
+  {agent:"planner", edge:null},
+  {agent:"executor", edge:["planner","executor"]},
+  {agent:"evaluator", edge:["executor","evaluator"]},
+  {agent:"critic", edge:["evaluator","critic"]},
+  {agent:"improver", edge:["critic","improver"]},
+  {agent:"evaluator", edge:["improver","evaluator"], reeval:true},
+  {agent:"safety", edge:null},
+  {agent:"memory", edge:null}
+];
+
+let stepIndex = 0;
+let cycleTimer = null;
+
+function startWorkflow(){
+  const goal = $("#goalInput").value.trim();
+  if(!goal){
+    showToast("Please enter a workflow goal before starting.", true);
+    return;
+  }
+  resetRunState(false);
+  state.goal = goal;
+  state.running = true;
+  state.paused = false;
+  state.startTime = Date.now();
+  state.finished = false;
+  state.stopReason = null;
+  $("#startBtn").disabled = true;
+  $("#pauseBtn").disabled = false;
+  $("#engineDot").className = "dot live";
+  $("#engineStatusText").textContent = "Running";
+  $("#workflowStatusLabel").textContent = "Workflow Status: Running";
+  $("#activityStream").innerHTML = "";
+  $("#commLog").innerHTML = "";
+  state.stmContext = goal;
+  renderMemory();
+  logActivity("System", `Workflow initialized for goal: "${goal}"`, "var(--neon-cyan)");
+  startTimer();
+  stepIndex = 0;
+  state.round = 1;
+  runNextStep();
+}
+
+function pauseWorkflow(){
+  state.paused = !state.paused;
+  $("#pauseBtn").textContent = state.paused ? "▶ Resume" : "⏸ Pause";
+  if(state.paused){
+    clearTimeout(cycleTimer);
+    $("#engineStatusText").textContent = "Paused";
+    $("#engineDot").className = "dot idle";
+  }else{
+    $("#engineStatusText").textContent = "Running";
+    $("#engineDot").className = "dot live";
+    runNextStep();
+  }
+}
+
+function resetRunState(fullReset){
+  clearTimeout(cycleTimer);
+  clearInterval(state.timerHandle);
+  state.running = false;
+  state.paused = false;
+  state.round = 0;
+  state.quality = 0;
+  state.completeness = 0;
+  state.confidence = 0;
+  state.retryCount = 0;
+  state.plateauCount = 0;
+  state.activeAgent = null;
+  state.stmResults = [];
+  stepIndex = 0;
+  $("#startBtn").disabled = false;
+  $("#pauseBtn").disabled = true;
+  $("#pauseBtn").textContent = "⏸ Pause";
+  $("#engineDot").className = "dot idle";
+  $("#engineStatusText").textContent = "Idle";
+  $("#roundLabel").textContent = "Round 0 — Awaiting Goal";
+  $("#topRound").textContent = "0";
+  $("#completionBar").style.width = "0%";
+  $("#completionLabel").textContent = "0% complete";
+  $("#workflowStatusLabel").textContent = "Workflow Status: Not Started";
+  updateMetricsUI();
+  setActiveAgent(null);
+  if(fullReset){
+    state.history = [];
+    state.comm = [];
+    state.activity = [];
+    state.ltm = {success:[],failed:[],lessons:[]};
+    AGENTS.forEach(a=>state.utilization[a.id]=0);
+    $("#activityStream").innerHTML = '<div class="empty-state"><div class="icon">◌</div>No activity yet. Start a workflow to see agents work in real time.</div>';
+    $("#commLog").innerHTML = '<div class="empty-state"><div class="icon">↔</div>No messages exchanged yet.</div>';
+    $("#historyBody").innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-lo);">No iterations recorded yet.</td></tr>';
+    $("#finalResultsPanel").innerHTML = '<div class="empty-state"><div class="icon">✓</div>Run a workflow to completion to see the final results panel here.</div>';
+    persist();
+  }
+  AGENTS.forEach(a=>updateAgentUI(a.id,"Idle"));
+  renderMemory();
+}
+
+function startTimer(){
+  clearInterval(state.timerHandle);
+  state.timerHandle = setInterval(()=>{
+    if(!state.running || state.paused) return;
+    const elapsed = (Date.now()-state.startTime)/1000;
+    $("#mTime").textContent = elapsed.toFixed(1)+"s";
+    if(elapsed >= state.settings.runtime){
+      finishWorkflow("Maximum Runtime Reached");
+    }
+  }, 200);
+}
+
+function runNextStep(){
+  if(!state.running || state.paused) return;
+  if(stepIndex >= CYCLE_STEPS.length){
+    // end of cycle — check stop conditions
+    evaluateStopConditions();
+    return;
+  }
+  const step = CYCLE_STEPS[stepIndex];
+  executeAgentStep(step);
+  stepIndex++;
+  cycleTimer = setTimeout(runNextStep, 780);
+}
+
+function executeAgentStep(step){
+  const a = agentById(step.agent);
+  state.utilization[a.id] = (state.utilization[a.id]||0) + 1;
+  updateAgentUI(a.id, "Working");
+  setActiveAgent(a.id, step.edge ? step.edge[0] : null, step.edge ? step.edge[1] : null);
+  $("#roundLabel").textContent = `Round ${state.round} — ${a.name} Active`;
+
+  let output = "";
+  switch(a.id){
+    case "planner":
+      output = `Plan: 1 hook + 1 CTA + 3 hashtags targeted at goal "${state.goal}". Cadence: single post.`;
+      logComm("Planner","Executor","Sending content strategy and structural brief.");
+      break;
+    case "executor":
+      const draft = generateDraft(state.round);
+      state.stmResults.unshift({round:state.round, draft});
+      state.stmResults = state.stmResults.slice(0, state.settings.retention);
+      output = `Draft: "${draft}"`;
+      logComm("Executor","Evaluator","Submitting draft for scoring.");
+      break;
+    case "evaluator":
+      const prevQ = state.quality;
+      const gain = state.round===1 ? (55 + Math.random()*20) : (Math.random()*14 - 2);
+      state.quality = clamp(prevQ + (state.round===1 ? gain : gain), 0, 100);
+      state.completeness = clamp(state.quality + (Math.random()*6-3), 0, 100);
+      state.confidence = clamp(state.quality + (Math.random()*10-5), 0, 100);
+      output = `Score: ${state.quality.toFixed(1)}% quality, ${state.completeness.toFixed(1)}% completeness.`;
+      logComm("Executor","Evaluator", step.reeval ? "Re-evaluating improved draft." : "Scoring submitted draft.");
+      break;
+    case "critic":
+      const weakness = randomFrom(WEAKNESSES);
+      state._lastWeakness = weakness;
+      output = `Critique: ${weakness}.`;
+      logComm("Evaluator","Critic","Requesting weakness analysis.");
+      break;
+    case "improver":
+      output = `Applied fix: rewrote content to address "${state._lastWeakness}".`;
+      logComm("Critic","Improver","Forwarding critique for revision.");
+      logComm("Improver","Evaluator","Returning revised draft for re-scoring.");
+      break;
+    case "safety":
+      output = "Validation passed: no policy or brand-safety violations detected.";
+      break;
+    case "memory":
+      output = "Stored round context and interim result in short-term memory.";
+      break;
+  }
+  updateAgentUI(a.id, "Done", output);
+  logActivity(a.name, output, a.color);
+  updateMetricsUI();
+  renderMemory();
+}
+
+function logActivity(agentName, msg, color){
+  state.activity.unshift({agentName, msg, time:nowStamp(), color});
+  renderActivity();
+}
+function renderActivity(){
+  const el = $("#activityStream");
+  el.innerHTML = "";
+  state.activity.slice(0,60).forEach(item=>{
+    const div = document.createElement("div");
+    div.className = "stream-item";
+    div.innerHTML = `
+      <div class="stream-tag" style="background:${item.color}"></div>
+      <div class="stream-body">
+        <div class="stream-top"><span class="stream-agent">${item.agentName}</span><span class="stream-time">${item.time}</span></div>
+        <div class="stream-msg">${item.msg}</div>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+function logComm(from,to,msg){
+  state.comm.unshift({from,to,msg,time:nowStamp()});
+  renderComm();
+}
+function renderComm(){
+  const el = $("#commLog");
+  if(state.comm.length===0){
+    el.innerHTML = '<div class="empty-state"><div class="icon">↔</div>No messages exchanged yet.</div>';
+    return;
+  }
+  el.innerHTML = "";
+  state.comm.slice(0,80).forEach(c=>{
+    const row = document.createElement("div");
+    row.className = "comm-row";
+    row.innerHTML = `<b>${c.from}</b><span class="comm-arrow">→</span><b>${c.to}</b><span class="comm-msg">${c.msg}</span><span class="comm-time">${c.time}</span>`;
+    el.appendChild(row);
+  });
+}
+
+function renderMemory(){
+  $("#stmContext").textContent = state.stmContext ? state.stmContext : "";
+  if(!state.stmContext){ $("#stmContext").className="mem-empty"; $("#stmContext").textContent="No active context."; }
+  else { $("#stmContext").className=""; }
+
+  const resEl = $("#stmResults");
+  if(state.stmResults.length===0){
+    resEl.className = "mem-empty"; resEl.textContent = "No results yet.";
+  }else{
+    resEl.className = "";
+    resEl.innerHTML = state.stmResults.map(r=>`<div class="mem-item"><b>Round ${r.round}:</b> ${r.draft}</div>`).join("");
+  }
+
+  const renderCol = (elId, arr, emptyText)=>{
+    const el = $(elId);
+    if(arr.length===0){ el.className="mem-empty"; el.textContent = emptyText; }
+    else { el.className=""; el.innerHTML = arr.slice(0,8).map(x=>`<div class="mem-item">${x}</div>`).join(""); }
+  };
+  renderCol("#ltmSuccess", state.ltm.success, "None recorded yet.");
+  renderCol("#ltmFailed", state.ltm.failed, "None recorded yet.");
+  renderCol("#ltmLessons", state.ltm.lessons, "None recorded yet.");
+}
+
+function updateMetricsUI(){
+  $("#mQuality").textContent = state.quality.toFixed(1)+"%";
+  $("#mCompleteness").textContent = state.completeness.toFixed(1)+"%";
+  $("#mConfidence").textContent = state.confidence.toFixed(1)+"%";
+  $("#mRetry").textContent = state.retryCount;
+  $("#topRound").textContent = state.round;
+  $("#topThreshold").textContent = state.settings.threshold;
+  const prev = state.history.length ? state.history[state.history.length-1].quality : 0;
+  const trendEl = $("#mQualityTrend");
+  if(state.history.length===0){ trendEl.textContent="—"; trendEl.className="metric-trend"; }
+  else{
+    const d = state.quality-prev;
+    trendEl.textContent = (d>=0?"+":"")+d.toFixed(1)+"% vs last round";
+    trendEl.className = "metric-trend " + (d>=0?"up":"down");
+  }
+  const pct = clamp((state.quality/state.settings.threshold)*100, 0, 100);
+  $("#completionBar").style.width = pct+"%";
+  $("#completionLabel").textContent = Math.round(pct)+"% complete";
+}
+
+/* ---------------------------------------------------------
+   STOP CONDITION ENGINE
+--------------------------------------------------------- */
+function evaluateStopConditions(){
+  // Record this round in history
+  const prevQ = state.history.length ? state.history[state.history.length-1].quality : 0;
+  const delta = state.quality - prevQ;
+  state.history.push({
+    round: state.round,
+    quality: state.quality,
+    delta: delta,
+    critique: state._lastWeakness || "n/a",
+    changes: `Revised to address: ${state._lastWeakness||"n/a"}`,
+    time: nowStamp()
+  });
+  renderHistory();
+
+  if(Math.abs(delta) < state.settings.plateau && state.round>1){
+    state.plateauCount++;
+  } else {
+    state.plateauCount = 0;
+  }
+
+  if(state.quality >= state.settings.threshold){
+    finishWorkflow("Quality Threshold Reached");
+    return;
+  }
+  if(state.plateauCount >= 2){
+    finishWorkflow("Plateau Detected");
+    return;
+  }
+  if(state.round >= state.settings.maxIter){
+    finishWorkflow("Maximum Iterations (Safety Only)");
+    return;
+  }
+  const elapsed = (Date.now()-state.startTime)/1000;
+  if(elapsed >= state.settings.runtime){
+    finishWorkflow("Maximum Runtime Reached");
+    return;
+  }
+  // continue to next round
+  state.round++;
+  stepIndex = 0;
+  runNextStep();
+}
+
+function finishWorkflow(reason){
+  clearTimeout(cycleTimer);
+  state.running = false;
+  state.finished = true;
+  state.stopReason = reason;
+  $("#stopConditionPill").textContent = "Stopped: " + reason;
+  $("#roundLabel").textContent = `Round ${state.round} — Stopped (${reason})`;
+  $("#engineDot").className = "dot idle";
+  $("#engineStatusText").textContent = "Completed";
+  $("#workflowStatusLabel").textContent = "Workflow Status: Completed";
+  $("#startBtn").disabled = false;
+  $("#pauseBtn").disabled = true;
+  setActiveAgent("reviewer", "evaluator","reviewer");
+  updateAgentUI("reviewer","Working");
+
+  logActivity("Final Reviewer", `Workflow concluded — ${reason}.`, "#fbbf24");
+  logComm("Evaluator","Final Reviewer", `Handing off for final review. Reason: ${reason}.`);
+
+  if(state.quality >= state.settings.threshold){
+    state.ltm.success.unshift(`Round ${state.round}: reached ${state.quality.toFixed(1)}% via iterative critique-improve cycle.`);
+  }else{
+    state.ltm.failed.unshift(`Round ${state.round}: stopped at ${state.quality.toFixed(1)}% (${reason}).`);
+  }
+  state.ltm.lessons.unshift(`Addressing "${state._lastWeakness||'clarity gaps'}" was the most common revision trigger this run.`);
+  renderMemory();
+
+  setTimeout(()=>{
+    updateAgentUI("reviewer","Done","Final package compiled and quality-gated.");
+    renderFinalResults(reason);
+    persist();
+  }, 700);
+}
+
+/* ---------------------------------------------------------
+   HISTORY TABLE
+--------------------------------------------------------- */
+function renderHistory(){
+  const body = $("#historyBody");
+  const searchTerm = ($("#historySearch").value||"").toLowerCase();
+  const filter = $("#historyFilter").value;
+  let rows = state.history.slice().reverse();
+  if(filter==="improved") rows = rows.filter(r=>r.delta>0);
+  if(filter==="regressed") rows = rows.filter(r=>r.delta<0);
+  if(searchTerm) rows = rows.filter(r=> (r.critique+r.changes).toLowerCase().includes(searchTerm));
+
+  if(rows.length===0){
+    body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-lo);">No matching iterations.</td></tr>';
+    return;
+  }
+  body.innerHTML = rows.map(r=>`
+    <tr>
+      <td>${r.round}</td>
+      <td>${r.quality.toFixed(1)}%</td>
+      <td class="${r.delta>=0?'delta-pos':'delta-neg'}">${r.delta>=0?'+':''}${r.delta.toFixed(1)}%</td>
+      <td>${r.critique}</td>
+      <td>${r.changes}</td>
+      <td>${r.time}</td>
+    </tr>`).join("");
+}
+$("#historySearch").addEventListener("input", renderHistory);
+$("#historyFilter").addEventListener("change", renderHistory);
+$("#exportBtn").addEventListener("click", ()=>{
+  try{
+    const blob = new Blob([JSON.stringify(state.history,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "execution-history.json";
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    showToast("Execution history exported.");
+  }catch(e){
+    showToast("Export failed. Please try again.", true);
+  }
+});
+
+/* ---------------------------------------------------------
+   ANALYTICS (SVG)
+--------------------------------------------------------- */
+function renderAnalytics(){
+  renderTrendChart();
+  renderUtilChart();
+  renderBottleneckChart();
+  renderGauge();
+}
+
+function renderTrendChart(){
+  const svg = $("#trendChart");
+  svg.innerHTML = "";
+  const ns = "http://www.w3.org/2000/svg";
+  const w=500,h=220,pad=30;
+  const data = state.history.map(h=>h.quality);
+  const axis = document.createElementNS(ns,"line");
+  axis.setAttribute("x1",pad); axis.setAttribute("y1",h-pad); axis.setAttribute("x2",w-10); axis.setAttribute("y2",h-pad);
+  axis.setAttribute("stroke","rgba(255,255,255,0.15)");
+  svg.appendChild(axis);
+  if(data.length<2){
+    const t = document.createElementNS(ns,"text");
+    t.setAttribute("x",w/2); t.setAttribute("y",h/2); t.setAttribute("text-anchor","middle");
+    t.setAttribute("fill","#6b7394"); t.setAttribute("font-size","12");
+    t.textContent = "Run a workflow to populate this chart.";
+    svg.appendChild(t);
+    return;
+  }
+  const maxV = 100;
+  const stepX = (w-pad-20)/(data.length-1);
+  let d = "";
+  data.forEach((v,i)=>{
+    const x = pad + i*stepX;
+    const y = h-pad - (v/maxV)*(h-pad-20);
+    d += (i===0?"M":"L")+x+" "+y+" ";
+  });
+  const path = document.createElementNS(ns,"path");
+  path.setAttribute("d",d);
+  path.setAttribute("fill","none");
+  path.setAttribute("stroke","url(#trendGrad)");
+  path.setAttribute("stroke-width","2.6");
+  const defs = document.createElementNS(ns,"defs");
+  defs.innerHTML = `<linearGradient id="trendGrad" x1="0" x2="1"><stop offset="0" stop-color="#4bf5d8"/><stop offset="1" stop-color="#9d7bff"/></linearGradient>`;
+  svg.appendChild(defs);
+  svg.appendChild(path);
+  data.forEach((v,i)=>{
+    const x = pad + i*stepX;
+    const y = h-pad - (v/maxV)*(h-pad-20);
+    const c = document.createElementNS(ns,"circle");
+    c.setAttribute("cx",x); c.setAttribute("cy",y); c.setAttribute("r","3.5");
+    c.setAttribute("fill","#4bf5d8");
+    svg.appendChild(c);
+  });
+}
+
+function renderUtilChart(){
+  const svg = $("#utilChart");
+  svg.innerHTML = "";
+  const legend = $("#utilLegend");
+  legend.innerHTML = "";
+  const ns = "http://www.w3.org/2000/svg";
+  const total = Object.values(state.utilization).reduce((a,b)=>a+b,0);
+  const cx=150,cy=140,r=100;
+  if(total===0){
+    const t = document.createElementNS(ns,"text");
+    t.setAttribute("x",150); t.setAttribute("y",140); t.setAttribute("text-anchor","middle");
+    t.setAttribute("fill","#6b7394"); t.setAttribute("font-size","12");
+    t.textContent = "No utilization data yet.";
+    svg.appendChild(t);
+    return;
+  }
+  let angle = -90;
+  AGENTS.forEach(a=>{
+    const val = state.utilization[a.id]||0;
+    if(val===0) return;
+    const slice = (val/total)*360;
+    const x1 = cx + r*Math.cos(Math.PI*angle/180);
+    const y1 = cy + r*Math.sin(Math.PI*angle/180);
+    angle += slice;
+    const x2 = cx + r*Math.cos(Math.PI*angle/180);
+    const y2 = cy + r*Math.sin(Math.PI*angle/180);
+    const largeArc = slice>180?1:0;
+    const path = document.createElementNS(ns,"path");
+    path.setAttribute("d",`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`);
+    const colorVal = getComputedColor(a.color);
+    path.setAttribute("fill", colorVal);
+    path.setAttribute("fill-opacity","0.85");
+    path.setAttribute("stroke","#0c1120");
+    path.setAttribute("stroke-width","1.5");
+    svg.appendChild(path);
+
+    const legItem = document.createElement("span");
+    legItem.innerHTML = `<i style="background:${colorVal}"></i> ${a.name} (${val})`;
+    legend.appendChild(legItem);
+  });
+}
+
+function getComputedColor(cssVar){
+  if(!cssVar.startsWith("var(")) return cssVar;
+  const varName = cssVar.slice(4,-1);
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || "#4bf5d8";
+}
+
+function renderBottleneckChart(){
+  const svg = $("#bottleneckChart");
+  svg.innerHTML = "";
+  const ns = "http://www.w3.org/2000/svg";
+  const w=500,h=200,pad=100,barH=18,gap=10;
+  const total = Object.values(state.utilization).reduce((a,b)=>a+b,0);
+  if(total===0){
+    const t = document.createElementNS(ns,"text");
+    t.setAttribute("x",w/2); t.setAttribute("y",h/2); t.setAttribute("text-anchor","middle");
+    t.setAttribute("fill","#6b7394"); t.setAttribute("font-size","12");
+    t.textContent = "No timing data yet.";
+    svg.appendChild(t);
+    return;
+  }
+  const maxV = Math.max(...Object.values(state.utilization));
+  let y = 10;
+  AGENTS.forEach(a=>{
+    const val = state.utilization[a.id]||0;
+    const barW = maxV>0 ? (val/maxV)*(w-pad-20) : 0;
+    const label = document.createElementNS(ns,"text");
+    label.setAttribute("x",pad-8); label.setAttribute("y",y+barH-5); label.setAttribute("text-anchor","end");
+    label.setAttribute("fill","#a6b0cf"); label.setAttribute("font-size","10.5");
+    label.textContent = a.name.replace(" Agent","");
+    svg.appendChild(label);
+
+    const bg = document.createElementNS(ns,"rect");
+    bg.setAttribute("x",pad); bg.setAttribute("y",y); bg.setAttribute("width",w-pad-20); bg.setAttribute("height",barH);
+    bg.setAttribute("fill","rgba(255,255,255,0.04)"); bg.setAttribute("rx","4");
+    svg.appendChild(bg);
+
+    const bar = document.createElementNS(ns,"rect");
+    bar.setAttribute("x",pad); bar.setAttribute("y",y); bar.setAttribute("width",barW); bar.setAttribute("height",barH);
+    bar.setAttribute("fill", getComputedColor(a.color)); bar.setAttribute("rx","4");
+    svg.appendChild(bar);
+    y += barH+gap;
+  });
+}
+
+function renderGauge(){
+  const svg = $("#gaugeChart");
+  svg.innerHTML = "";
+  const ns = "http://www.w3.org/2000/svg";
+  const cx=120,cy=120,r=100;
+  const successProb = state.history.length ? clamp(state.quality/state.settings.threshold*100,0,100) : 0;
+  const bg = document.createElementNS(ns,"path");
+  bg.setAttribute("d",`M 20 120 A 100 100 0 0 1 220 120`);
+  bg.setAttribute("fill","none"); bg.setAttribute("stroke","rgba(255,255,255,0.08)"); bg.setAttribute("stroke-width","16");
+  svg.appendChild(bg);
+  const angle = 180 - (successProb/100)*180;
+  const rad = Math.PI*angle/180;
+  const x2 = cx + r*Math.cos(rad), y2 = cy - r*Math.sin(rad);
+  const largeArc = successProb>50?1:0;
+  const fg = document.createElementNS(ns,"path");
+  fg.setAttribute("d",`M 20 120 A 100 100 0 ${largeArc} 1 ${x2} ${y2}`);
+  fg.setAttribute("fill","none"); fg.setAttribute("stroke","url(#gaugeGrad)"); fg.setAttribute("stroke-width","16"); fg.setAttribute("stroke-linecap","round");
+  const defs = document.createElementNS(ns,"defs");
+  defs.innerHTML = `<linearGradient id="gaugeGrad" x1="0" x2="1"><stop offset="0" stop-color="#4bf5d8"/><stop offset="1" stop-color="#9d7bff"/></linearGradient>`;
+  svg.appendChild(defs);
+  svg.appendChild(fg);
+  const t = document.createElementNS(ns,"text");
+  t.setAttribute("x",120); t.setAttribute("y",110); t.setAttribute("text-anchor","middle");
+  t.setAttribute("fill","#eef1fb"); t.setAttribute("font-size","26"); t.setAttribute("font-weight","700");
+  t.textContent = Math.round(successProb)+"%";
+  svg.appendChild(t);
+}
+
+/* ---------------------------------------------------------
+   FINAL RESULTS PANEL
+--------------------------------------------------------- */
+function renderFinalResults(reason){
+  const panel = $("#finalResultsPanel");
+  const lastDraft = state.stmResults[0] ? state.stmResults[0].draft : "No draft captured.";
+  const topAgent = Object.entries(state.utilization).sort((a,b)=>b[1]-a[1])[0];
+  const topAgentName = topAgent ? agentById(topAgent[0]).name : "n/a";
+  panel.innerHTML = `
+    <div class="panel-head"><div><div class="panel-title">Final Results — ${state.goal}</div><div class="panel-sub">Completed in ${state.round} round(s)</div></div></div>
+    <div class="result-grid">
+      <div class="result-card"><h4>1. Final Output</h4>${lastDraft}</div>
+      <div class="result-card"><h4>2. Stop Reason</h4>${reason}</div>
+      <div class="result-card"><h4>3. Agent Performance Summary</h4>Most active: ${topAgentName}. All 8 agents completed their assigned responsibilities across ${state.round} round(s).</div>
+      <div class="result-card"><h4>4. Execution Statistics</h4>Quality: ${state.quality.toFixed(1)}% · Completeness: ${state.completeness.toFixed(1)}% · Confidence: ${state.confidence.toFixed(1)}% · Retries: ${state.retryCount}</div>
+      <div class="result-card"><h4>5. Memory Summary</h4>${state.ltm.success.length} success pattern(s), ${state.ltm.failed.length} failed attempt(s), ${state.ltm.lessons.length} lesson(s) recorded.</div>
+      <div class="result-card"><h4>6. Architecture Overview</h4>8-agent pipeline: Planner → Executor → Evaluator ⇄ Critic ⇄ Improver → Safety Monitor → Memory Manager → Final Reviewer.</div>
+      <div class="result-card"><h4>7. Lessons Learned</h4>${state.ltm.lessons[0] || "No lessons recorded."}</div>
+      <div class="result-card"><h4>8. Suggested Improvements</h4>Tighten hook variety and pre-validate hashtag relevance before the first evaluation pass to reduce rounds needed.</div>
+      <div class="result-card"><h4>9. Next-Level Agent System Ideas</h4>Add an A/B Variant Generator agent and a Scheduling agent to queue approved posts automatically.</div>
+      <div class="result-card"><h4>10. Advanced Prompt Suggestions</h4>Try: "Optimize for Reels retention in the first 3 seconds" or "Generate 3 hook variants and let the Evaluator pick the strongest."</div>
+    </div>
+  `;
+}
+
+/* ---------------------------------------------------------
+   SETTINGS
+--------------------------------------------------------- */
+function renderSettingsUI(){
+  $("#setThreshold").value = state.settings.threshold;
+  $("#valThreshold").textContent = state.settings.threshold+"%";
+  $("#setPlateau").value = state.settings.plateau;
+  $("#valPlateau").textContent = state.settings.plateau+"%";
+  $("#setRuntime").value = state.settings.runtime;
+  $("#valRuntime").textContent = state.settings.runtime+"s";
+  $("#setMaxIter").value = state.settings.maxIter;
+  $("#valMaxIter").textContent = state.settings.maxIter;
+  $("#setRetention").value = state.settings.retention;
+  $("#valRetention").textContent = state.settings.retention;
+  $("#topThreshold").textContent = state.settings.threshold;
+
+  const toggleList = $("#agentToggleList");
+  toggleList.innerHTML = "";
+  AGENTS.forEach(a=>{
+    const row = document.createElement("div");
+    row.className = "checkbox-row";
+    const checked = state.settings.activeAgents.includes(a.id);
+    row.innerHTML = `<input type="checkbox" id="toggle-${a.id}" ${checked?"checked":""}> <label for="toggle-${a.id}" style="margin:0;">${a.name}</label>`;
+    toggleList.appendChild(row);
+  });
+}
+
+["setThreshold","setPlateau","setRuntime","setMaxIter","setRetention"].forEach(id=>{
+  $("#"+id).addEventListener("input", (e)=>{
+    const map = {setThreshold:"threshold",setPlateau:"plateau",setRuntime:"runtime",setMaxIter:"maxIter",setRetention:"retention"};
+    const key = map[id];
+    state.settings[key] = Number(e.target.value);
+    const suffix = {threshold:"%",plateau:"%",runtime:"s",maxIter:"",retention:""}[key];
+    document.getElementById("val"+id.slice(3)).textContent = e.target.value+suffix;
+    $("#topThreshold").textContent = state.settings.threshold;
+  });
+});
+
+$("#saveSettingsBtn").addEventListener("click", ()=>{
+  state.settings.activeAgents = AGENTS.filter(a=>{
+    const el = document.getElementById("toggle-"+a.id);
+    return el && el.checked;
+  }).map(a=>a.id);
+  persist();
+  showToast("Settings saved.");
+});
+$("#clearStorageBtn").addEventListener("click", ()=>{
+  try{
+    localStorage.removeItem("aas_state_v1");
+    showToast("Local storage cleared.");
+  }catch(e){
+    showToast("Could not clear storage.", true);
+  }
+});
+
+/* ---------------------------------------------------------
+   EVENT WIRING
+--------------------------------------------------------- */
+$("#startBtn").addEventListener("click", startWorkflow);
+$("#pauseBtn").addEventListener("click", pauseWorkflow);
+$("#resetBtn").addEventListener("click", ()=>{
+  resetRunState(true);
+  showToast("Workflow reset.");
+});
+
+/* ---------------------------------------------------------
+   INIT
+--------------------------------------------------------- */
+loadStorage();
+renderSettingsUI();
+renderHistory();
+renderMemory();
+updateMetricsUI();
+
+})();
+</script>
+</body>
+</html>
