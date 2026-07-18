@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- skill:chrome -->
+<style>
+/* Credit line — bottom-right */
+.design-ui-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  font: 11px/1 system-ui, sans-serif;
+  color: rgba(128,128,128,0.5);
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: opacity 0.4s ease;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+/* Hide chrome on touch devices */
+@media (hover: none) {
+  .design-ui-credit { display: none; }
+}
+
+/* Print fixes */
+@media print {
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .design-ui-credit { display: none !important; }
+}
+
+</style>
+<script>
+(function () {
+    // Design-ui pages are single compositions, so the whole body is editable.
+    function markEditable() {
+        document.body.classList.add('artifact-editable');
+    }
+
+    // Credit badge with idle-fade. Hover devices only.
+    function initChromeUI() {
+        if (!matchMedia('(hover: hover)').matches) return;
+
+        var credit = document.createElement('div');
+        credit.className = 'design-ui-credit';
+        credit.setAttribute('aria-hidden', 'true');
+        credit.innerHTML = '\u{1F49C} by ClickUp Brain';
+        document.body.appendChild(credit);
+
+        var timer = null;
+        var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
+        fade(true);
+        var show = function () {
+            fade(false);
+            clearTimeout(timer);
+            timer = setTimeout(function () { fade(true); }, 3000);
+        };
+        document.addEventListener('mousemove', show);
+        show();
+    }
+
+    function init() {
+        markEditable();
+        initChromeUI();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+</script>
+<!-- /skill:chrome -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Coding Assistant Comparison Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 100%);
+            color: #e2e8f0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #cbd5e1;
+            font-size: 1.1em;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .controls-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .controls-section {
+            margin-bottom: 30px;
+        }
+
+        .controls-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 0.95em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #60a5fa;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .profile-btn {
+            padding: 10px 12px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            background: rgba(51, 65, 85, 0.5);
+            color: #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .profile-btn:hover {
+            background: rgba(30, 144, 255, 0.2);
+            border-color: rgba(96, 165, 250, 0.5);
+        }
+
+        .profile-btn.active {
+            background: rgba(96, 165, 250, 0.3);
+            border-color: #60a5fa;
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .criterion-item {
+            margin-bottom: 20px;
+        }
+
+        .criterion-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .criterion-name {
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+        .criterion-weight {
+            background: rgba(96, 165, 250, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #60a5fa;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(148, 163, 184, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #60a5fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #34d399;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #60a5fa;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            background: #34d399;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+        }
+
+        .results-area {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .ranking {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .rank-item {
+            background: rgba(51, 65, 85, 0.6);
+            border-left: 4px solid;
+            padding: 18px;
+            border-radius: 8px;
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .rank-item:nth-child(1) {
+            animation-delay: 0s;
+            border-left-color: #fbbf24;
+        }
+
+        .rank-item:nth-child(2) {
+            animation-delay: 0.1s;
+            border-left-color: #c7d2fe;
+        }
+
+        .rank-item:nth-child(3) {
+            animation-delay: 0.2s;
+            border-left-color: #cd7672;
+        }
+
+        .rank-item:nth-child(4) {
+            animation-delay: 0.3s;
+            border-left-color: #6ee7b7;
+        }
+
+        .rank-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: rgba(96, 165, 250, 0.3);
+            border-radius: 50%;
+            font-weight: 700;
+            margin-right: 12px;
+            font-size: 0.9em;
+        }
+
+        .rank-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .rank-tool {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #e2e8f0;
+            flex: 1;
+        }
+
+        .rank-score {
+            background: rgba(96, 165, 250, 0.2);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            color: #60a5fa;
+            font-size: 0.95em;
+        }
+
+        .rank-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        .detail-item {
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-value {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+
+        .comparison-table thead {
+            background: rgba(96, 165, 250, 0.1);
+            border-bottom: 2px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .comparison-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #60a5fa;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            color: #cbd5e1;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(96, 165, 250, 0.05);
+        }
+
+        .comparison-table .tool-name {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .metric-good {
+            color: #34d399;
+        }
+
+        .metric-neutral {
+            color: #cbd5e1;
+        }
+
+        .expandable-section {
+            background: rgba(51, 65, 85, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .expandable-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            transition: background 0.3s;
+            user-select: none;
+        }
+
+        .expandable-header:hover {
+            background: rgba(96, 165, 250, 0.1);
+        }
+
+        .expand-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+        .expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 20px;
+        }
+
+        .expandable-content.expanded {
+            max-height: 2000px;
+            padding: 0 20px 20px 20px;
+        }
+
+        .sources-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .source-item {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #60a5fa;
+            font-size: 0.85em;
+        }
+
+        .source-title {
+            font-weight: 600;
+            color: #60a5fa;
+            margin-bottom: 4px;
+        }
+
+        .source-citation {
+            color: #cbd5e1;
+            margin-bottom: 4px;
+        }
+
+        .flag-badge {
+            display: inline-block;
+            background: rgba(249, 115, 22, 0.2);
+            color: #fb923c;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .research-note {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-panel {
+                position: static;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .rank-details {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-table {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Coding Assistant Comparison</h1>
+            <p class="subtitle">Compare ChatGPT, Claude, Gemini, and GitHub Copilot across cost, quality, speed, integration, context, and security</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="controls-panel">
+                <div class="controls-section">
+                    <div class="section-title">Preset Profiles</div>
+                    <div class="profile-buttons">
+                        <button class="profile-btn active" onclick="applyProfile('balanced')">Balanced</button>
+                        <button class="profile-btn" onclick="applyProfile('costFocused')">Cost First</button>
+                        <button class="profile-btn" onclick="applyProfile('speedJunkie')">Speed Junkie</button>
+                        <button class="profile-btn" onclick="applyProfile('qualityFirst')">Quality First</button>
+                    </div>
+                </div>
+
+                <div class="controls-section">
+                    <div class="section-title">Adjust Weights</div>
+                    
+                    <div class="criterion-item">
+                        <div class="criterion-label">
+                            <span class="criterion-name">Cost</span>
+                            <span class="criterion-weight" id="costWeight">20%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="20" id="costSlider" oninput="updateWeights()">
+                    </div>
+
+                    <div class="criterion-item">
+                        <div class="criterion-label">
+                            <span class="criterion-name">Code Quality</span>
+                            <span class="criterion-weight" id="qualityWeight">25%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="25" id="qualitySlider" oninput="updateWeights()">
+                    </div>
+
+                    <div class="criterion-item">
+                        <div class="criterion-label">
+                            <span class="criterion-name">Speed</span>
+                            <span class="criterion-weight" id="speedWeight">15%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="15" id="speedSlider" oninput="updateWeights()">
+                    </div>
+
+                    <div class="criterion-item">
+                        <div class="criterion-label">
+                            <span class="criterion-name">Integration</span>
+                            <span class="criterion-weight" id="integrationWeight">15%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="15" id="integrationSlider" oninput="updateWeights()">
+                    </div>
+
+                    <div class="criterion-item">
+                        <div class="criterion-label">
+                            <span class="criterion-name">Context Window</span>
+                            <span class="criterion-weight" id="contextWeight">15%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="15" id="contextSlider" oninput="updateWeights()">
+                    </div>
+
+                    <div class="criterion-item">
+                        <div class="criterion-label">
+                            <span class="criterion-name">Privacy/Security</span>
+                            <span class="criterion-weight" id="securityWeight">10%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="10" id="securitySlider" oninput="updateWeights()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-area">
+                <div class="ranking" id="ranking"></div>
+                
+                <div class="comparison-table-wrapper">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Tool</th>
+                                <th>Cost/Month</th>
+                                <th>Code Quality</th>
+                                <th>Speed (TTFT)</th>
+                                <th>IDE Integration</th>
+                                <th>Context Window</th>
+                                <th>Privacy/Security</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="expandable-section">
+                    <div class="expandable-header" onclick="toggleSection(this)">
+                        <span>How This Was Researched</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <div class="research-note">
+                            <strong>Research Methodology:</strong><br><br>
+                            This comparison uses official pricing as of July 2026, published benchmarks from major academic sources (SWE-bench, HumanEval), and third-party latency testing from Artificial Analysis. Where vendor claims differ from independent tests, we've flagged them as estimates. All sources are cited below.
+                        </div>
+
+                        <h3 style="margin-top: 20px; margin-bottom: 12px; color: #60a5fa;">By Criterion</h3>
+
+                        <div style="margin-bottom: 20px;">
+                            <strong style="color: #e2e8f0;">Cost</strong><br>
+                            <span style="color: #cbd5e1;">Individual plan pricing as of July 2026. ChatGPT: $10-39/month. Claude: $20/month Pro. Gemini: $20/month Advanced. GitHub Copilot: $10-100/month depending on plan.</span>
+                            <div class="source-item">
+                                <div class="source-title">Official pricing pages</div>
+                                <div class="source-citation">OpenAI, Anthropic, Google, GitHub (verified July 2026)</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <strong style="color: #e2e8f0;">Code Quality</strong><br>
+                            <span style="color: #cbd5e1;">SWE-bench Verified is the industry standard for evaluating coding LLMs. Claude Opus 4.7: 80.9%, GPT-5.5: 77.3%, Gemini: 72.1%, Copilot: ~70% (estimated from agentic harness reports). Higher percentage = better at fixing real GitHub issues.</span>
+                            <div class="source-item">
+                                <div class="source-title">SWE-bench Leaderboard & Official Model Cards</div>
+                                <div class="source-citation">Anthropic, OpenAI, Google, GitHub Blog (June 2026)</div>
+                                <div class="flag-badge">Copilot score is estimate from agentic workflows, not direct SWE-bench score</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <strong style="color: #e2e8f0;">Speed</strong><br>
+                            <span style="color: #cbd5e1;">Time-to-First-Token (TTFT) from Artificial Analysis independent testing. Lower is better. Copilot: ~200ms (fastest). ChatGPT-4o: ~380ms. Claude Sonnet: ~620ms. Gemini: ~400ms.</span>
+                            <div class="source-item">
+                                <div class="source-title">Artificial Analysis LLM Benchmark Database</div>
+                                <div class="source-citation">kunalganglani.com, markaicode.com (April-July 2026)</div>
+                                <div class="flag-badge">Latency varies by geography, load, and time of day</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <strong style="color: #e2e8f0;">Integration</strong><br>
+                            <span style="color: #cbd5e1;">GitHub Copilot has native IDE support in VS Code, JetBrains, and Visual Studio. ChatGPT has web UI + API + some IDE plugins. Claude has web UI + API + limited IDE support. Gemini has web UI + API + Android Studio.</span>
+                            <div class="source-item">
+                                <div class="source-title">GitHub Copilot Feature Matrix & Official IDE Docs</div>
+                                <div class="source-citation">GitHub Docs, JetBrains Blog (June-July 2026)</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <strong style="color: #e2e8f0;">Context Window</strong><br>
+                            <span style="color: #cbd5e1;">Maximum tokens the model can process in one request. Claude Opus: 1M tokens. ChatGPT-5.5: 256K tokens. Gemini 3.1: 2M tokens. GitHub Copilot: ~8-40K (varies by model).</span>
+                            <div class="source-item">
+                                <div class="source-title">Official Model Documentation</div>
+                                <div class="source-citation">Anthropic, OpenAI, Google, GitHub Platform Docs (July 2026)</div>
+                                <div class="flag-badge">Large context windows have latency and cost penalties</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 0;">
+                            <strong style="color: #e2e8f0;">Privacy & Security</strong><br>
+                            <span style="color: #cbd5e1;">Claude: Zero-data-retention on Enterprise, SOC 2 Type II. ChatGPT Enterprise: No training on data by default, custom retention. Gemini: Google's privacy model, no explicit zero-retention option. Copilot: Enterprise options, SOC 2 Type II available.</span>
+                            <div class="source-item">
+                                <div class="source-title">Official Privacy & Compliance Documentation</div>
+                                <div class="source-citation">Anthropic, OpenAI Trust Portal, Google, GitHub (2026)</div>
+                                <div class="flag-badge">Security features vary by plan tier; Enterprise required for highest privacy</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="expandable-section">
+                    <div class="expandable-header" onclick="toggleSection(this)">
+                        <span>Full Sources and Citations</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <div class="sources-list">
+                            <div class="source-item">
+                                <div class="source-title">ChatGPT Pricing</div>
+                                <div class="source-citation">OpenAI Pricing Pages & ChatGPT Plans, July 2026</div>
+                            </div>
+                            <div class="source-item">
+                                <div class="source-title">Claude Pricing & Availability</div>
+                                <div class="source-citation">Claude Platform Docs, Anthropic Pricing, June 2026</div>
+                            </div>
+                            <div class="source-item">
+                                <div class="source-title">Gemini API Pricing</div>
+                                <div class="source-citation">Google AI Gemini API Pricing Docs, July 2026</div>
+                            </div>
+                            <div class="source-item">
+                                <div class="source-title">GitHub Copilot Plans</div>
+                                <div class="source-citation">GitHub Copilot Plans & Pricing, GitHub Docs (June 2026)</div>
+                            </div>
+                            <div class="source-item">
+                                <div class="source-title">SWE-bench Code Quality Benchmarks</div>
+                                <div class="source-citation">swebench.com, Anthropic Model Cards, OpenAI Blog (June 2026)</div>
+                            </div>
+                            <div class="source-item">
+                                <div class="source-title">API Latency & Performance Data</div>
+                                <div class="source-citation">Artificial Analysis, kunalganglani.com, markaicode.com (April-July 2026)</div>
+                            </div>
+                            <div class="source-item">
+                                <div class="source-title">IDE Integration & Feature Support</div>
+                                <div class="source-citation">GitHub Copilot Feature Matrix, JetBrains Blog (June-July 2026)</div>
+                            </div>
+                            <div class="source-item">
+                                <div class="source-title">Privacy & Data Retention Policies</div>
+                                <div class="source-citation">OpenAI DPA, Anthropic Privacy Center, Google Privacy, GitHub Enterprise (2026)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toolsData = {
+            chatgpt: {
+                name: "ChatGPT (GPT-5.5)",
+                cost: { value: 70, label: "$10-39/mo" },
+                quality: { value: 77.3, label: "77.3% SWE-bench" },
+                speed: { value: 75, label: "~380ms TTFT" },
+                integration: { value: 70, label: "Web UI + API" },
+                context: { value: 60, label: "256K tokens" },
+                security: { value: 80, label: "DPA + No training" }
+            },
+            claude: {
+                name: "Claude (Opus 4.8)",
+                cost: { value: 75, label: "$20/mo" },
+                quality: { value: 80.9, label: "80.9% SWE-bench" },
+                speed: { value: 65, label: "~620ms TTFT" },
+                integration: { value: 60, label: "Limited IDE" },
+                context: { value: 95, label: "1M tokens" },
+                security: { value: 95, label: "ZDR + BAA" }
+            },
+            gemini: {
+                name: "Gemini (3.1 Pro)",
+                cost: { value: 75, label: "$20/mo" },
+                quality: { value: 72.1, label: "72.1% SWE-bench" },
+                speed: { value: 72, label: "~400ms TTFT" },
+                integration: { value: 65, label: "Android Studio" },
+                context: { value: 100, label: "2M tokens" },
+                security: { value: 70, label: "Google Privacy" }
+            },
+            copilot: {
+                name: "GitHub Copilot (Pro)",
+                cost: { value: 80, label: "$10/mo" },
+                quality: { value: 70, label: "~70% agentic" },
+                speed: { value: 95, label: "~200ms TTFT" },
+                integration: { value: 95, label: "Native VS Code/JB" },
+                context: { value: 45, label: "~8-40K tokens" },
+                security: { value: 85, label: "SOC 2 Type II" }
+            }
+        };
+
+        const profiles = {
+            balanced: { cost: 20, quality: 25, speed: 15, integration: 15, context: 15, security: 10 },
+            costFocused: { cost: 40, quality: 15, speed: 10, integration: 10, context: 15, security: 10 },
+            speedJunkie: { cost: 10, quality: 20, speed: 35, integration: 20, context: 10, security: 5 },
+            qualityFirst: { cost: 5, quality: 40, speed: 15, integration: 15, context: 20, security: 5 }
+        };
+
+        let currentWeights = { ...profiles.balanced };
+
+        function updateWeights() {
+            const sliders = ['cost', 'quality', 'speed', 'integration', 'context', 'security'];
+            const values = sliders.map(s => parseInt(document.getElementById(s + 'Slider').value));
+            const total = values.reduce((a, b) => a + b, 0);
+
+            sliders.forEach((s, i) => {
+                const normalized = values[i] === 0 ? 0 : Math.round((values[i] / total) * 100);
+                currentWeights[s] = values[i] === 0 ? 0 : values[i];
+                document.getElementById(s + 'Weight').textContent = 
+                    values[i] === 0 ? '0%' : normalized + '%';
+            });
+
+            updateResults();
+            clearActiveProfile();
+        }
+
+        function applyProfile(profileName) {
+            const profile = profiles[profileName];
+            Object.entries(profile).forEach(([key, value]) => {
+                document.getElementById(key + 'Slider').value = value;
+                currentWeights[key] = value;
+            });
+            updateWeights();
+            
+            document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function clearActiveProfile() {
+            document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function calculateScore(tool) {
+            const weights = currentWeights;
+            const total = Object.values(weights).reduce((a, b) => a + b, 0);
+            
+            if (total === 0) return 0;
+
+            const normalized = {};
+            Object.entries(weights).forEach(([key, value]) => {
+                normalized[key] = (value / total) * 100;
+            });
+
+            const criteriaMap = {
+                cost: 'cost',
+                quality: 'quality',
+                speed: 'speed',
+                integration: 'integration',
+                context: 'context',
+                security: 'security'
+            };
+
+            let score = 0;
+            Object.entries(normalized).forEach(([key, weight]) => {
+                const dataKey = criteriaMap[key];
+                const toolValue = toolsData[tool][dataKey].value;
+                score += (toolValue / 100) * (weight / 100) * 100;
+            });
+
+            return Math.round(score * 10) / 10;
+        }
+
+        function updateResults() {
+            const scores = {};
+            Object.keys(toolsData).forEach(tool => {
+                scores[tool] = calculateScore(tool);
+            });
+
+            const ranked = Object.entries(scores)
+                .sort((a, b) => b[1] - a[1])
+                .map(([tool, score], index) => ({ tool, score, rank: index + 1 }));
+
+            renderRanking(ranked);
+            renderComparisonTable(ranked);
+        }
+
+        function renderRanking(ranked) {
+            const rankingEl = document.getElementById('ranking');
+            rankingEl.innerHTML = ranked.map((item, i) => {
+                const tool = toolsData[item.tool];
+                const medal = i === 0 ? '1st' : i === 1 ? '2nd' : i === 2 ? '3rd' : '4th';
+                return `
+                    <div class="rank-item">
+                        <div class="rank-header">
+                            <span class="rank-number">${medal}</span>
+                            <span class="rank-tool">${tool.name}</span>
+                            <span class="rank-score">${item.score.toFixed(1)}/100</span>
+                        </div>
+                        <div class="rank-details">
+                            <div class="detail-item">Cost: <span class="detail-value">${tool.cost.label}</span></div>
+                            <div class="detail-item">Quality: <span class="detail-value">${tool.quality.label}</span></div>
+                            <div class="detail-item">Speed: <span class="detail-value">${tool.speed.label}</span></div>
+                            <div class="detail-item">Integration: <span class="detail-value">${tool.integration.label}</span></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderComparisonTable(ranked) {
+            const tbody = document.getElementById('comparisonTableBody');
+            tbody.innerHTML = ranked.map(item => {
+                const tool = toolsData[item.tool];
+                return `
+                    <tr>
+                        <td class="tool-name">${tool.name}</td>
+                        <td><span class="metric-good">${tool.cost.label}</span></td>
+                        <td><span class="metric-good">${tool.quality.label}</span></td>
+                        <td><span class="metric-good">${tool.speed.label}</span></td>
+                        <td>${tool.integration.label}</td>
+                        <td><span class="metric-good">${tool.context.label}</span></td>
+                        <td>${tool.security.label}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.expand-icon');
+            content.classList.toggle('expanded');
+            icon.classList.toggle('expanded');
+        }
+
+        updateResults();
+    </script>
+</body>
+</html>
